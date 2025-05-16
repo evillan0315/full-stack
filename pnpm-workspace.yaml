@@ -1,0 +1,14 @@
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@parcel/watcher'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@scarf/scarf'
+  - '@tailwindcss/oxide'
+  - bcrypt
+  - cpu-features
+  - esbuild
+  - prisma
+  - protobufjs
+  - sharp
+  - ssh2
