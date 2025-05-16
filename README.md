@@ -1,7 +1,3 @@
-Here is an updated version of your `README.md` reflecting the **email verification**, **mail service**, and **template generation tooling** enhancements:
-
----
-
 # Authentication Module
 
 A robust and secure authentication module for **NestJS**, using **Prisma ORM**, **JWT authentication** via **HTTP-only cookies**, and full **Swagger API documentation**. Includes **email verification**, a **Nest CLI scaffolding tool**, and OAuth placeholders for future use.
