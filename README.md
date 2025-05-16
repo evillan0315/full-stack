@@ -1,13 +1,19 @@
+Here's the updated `README.md` with all your new features, including **role-based access control (RBAC)** and scaffolding for future **OAuth integrations**:
+
+---
+
+````markdown
 # Authentication Module
 
 A robust and secure authentication module for NestJS, using Prisma ORM, JWT authentication via HTTP-only cookies, and full Swagger API documentation. OAuth support for Google and GitHub is scaffolded for future extension.
 
 ---
 
-* JWT-based auth via HTTP-only cookies and optional bearer header
-* User registration and login
-* Swagger support
-* Future support placeholders for Google and GitHub OAuth
+- ✅ JWT-based auth via HTTP-only cookies and optional bearer header
+- ✅ User registration and login
+- ✅ Role-based access control (RBAC)
+- ✅ Swagger support with cookie + bearer authentication
+- 🚧 Future support for Google and GitHub OAuth
 
 ---
 
@@ -18,7 +24,8 @@ A robust and secure authentication module for NestJS, using Prisma ORM, JWT auth
 - ✅ JWT authentication via:
   - Secure HTTP-only cookies (primary)
   - Authorization header (Bearer, optional)
-- ✅ Swagger API documentation
+- ✅ Role-based access guard with `@Roles()` decorator
+- ✅ Swagger API documentation with protected routes
 - ✅ Prisma ORM integration
 - 🚧 OAuth2 support for Google and GitHub (scaffolded)
 
@@ -43,7 +50,7 @@ A robust and secure authentication module for NestJS, using Prisma ORM, JWT auth
 git clone https://github.com/evillan0315/auth-module.git
 cd auth-module
 npm install
-```
+````
 
 ### 2. Environment Configuration
 
@@ -116,9 +123,27 @@ GET /auth/me
 
 ---
 
-## 🧪 Testing
+## 🛡️ Role-Based Access (RBAC)
 
-You can test the login & session flow with:
+### Decorator Usage
+
+```ts
+@Roles('ADMIN')
+@Get('admin/dashboard')
+getDashboard(@CurrentUser() user: User) {
+  return { message: `Hello ${user.name}` };
+}
+```
+
+### Guard Integration
+
+```ts
+@UseGuards(JwtAuthGuard, RolesGuard)
+```
+
+---
+
+## 🧪 Testing
 
 ### 🔐 Login and get JWT cookie
 
@@ -170,6 +195,13 @@ src/
 │   ├── auth.service.ts
 │   ├── auth.guard.ts
 │   ├── auth.strategy.ts
+│   ├── decorators/
+│   │   ├── roles.decorator.ts
+│   │   └── current-user.decorator.ts
+│   ├── guards/
+│   │   └── roles.guard.ts
+│   ├── interfaces/
+│   │   └── auth-request.interface.ts
 │   ├── dto/
 │   │   ├── login.dto.ts
 │   │   └── register.dto.ts
@@ -195,4 +227,4 @@ src/
 
 MIT License — © Eddie Villanueva
 
----
+
