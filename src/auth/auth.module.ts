@@ -6,10 +6,11 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './auth.strategy';
 import { JwtAuthGuard } from './auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
+import { MailService } from '../mail/mail.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), // ✅ Makes ConfigService available app-wide
+    ConfigModule.forRoot({ isGlobal: true }),
     JwtModule.registerAsync({
       imports: [ConfigModule], // ✅ Required so JwtModule can access ConfigService
       inject: [ConfigService],
@@ -25,8 +26,8 @@ import { PrismaService } from '../prisma/prisma.service';
     JwtStrategy,
     JwtAuthGuard,
     PrismaService,
+    MailService,
   ],
   exports: [AuthService],
 })
 export class AuthModule {}
-

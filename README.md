@@ -1,35 +1,45 @@
-Here's the updated `README.md` with all your new features, including **role-based access control (RBAC)** and scaffolding for future **OAuth integrations**:
+Here is an updated version of your `README.md` reflecting the **email verification**, **mail service**, and **template generation tooling** enhancements:
 
 ---
 
-````markdown
 # Authentication Module
 
-A robust and secure authentication module for NestJS, using Prisma ORM, JWT authentication via HTTP-only cookies, and full Swagger API documentation. OAuth support for Google and GitHub is scaffolded for future extension.
+A robust and secure authentication module for **NestJS**, using **Prisma ORM**, **JWT authentication** via **HTTP-only cookies**, and full **Swagger API documentation**. Includes **email verification**, a **Nest CLI scaffolding tool**, and OAuth placeholders for future use.
 
 ---
 
-- ✅ JWT-based auth via HTTP-only cookies and optional bearer header
-- ✅ User registration and login
-- ✅ Role-based access control (RBAC)
-- ✅ Swagger support with cookie + bearer authentication
-- 🚧 Future support for Google and GitHub OAuth
+* ✅ JWT-based auth via HTTP-only cookies and optional Bearer header
+* ✅ User registration and login
+* ✅ Email verification with JWT token links
+* ✅ Role-based access control (RBAC)
+* ✅ Swagger support with cookie + bearer authentication
+* ✅ CLI tool to scaffold modules with service/controller/dto
+* 🚧 Future support for Google and GitHub OAuth
 
 ---
 
 ## 🔐 Features
 
-- ✅ User registration and login
-- ✅ Password hashing with bcrypt
-- ✅ JWT authentication via:
-  - Secure HTTP-only cookies (primary)
-  - Authorization header (Bearer, optional)
-- ✅ Role-based access guard with `@Roles()` decorator
-- ✅ Swagger API documentation with protected routes
-- ✅ Prisma ORM integration
-- 🚧 OAuth2 support for Google and GitHub (scaffolded)
+* ✅ User registration and login
+* ✅ Password hashing with `bcrypt`
+* ✅ JWT authentication via:
+
+  * Secure **HTTP-only cookies** (primary)
+  * Authorization **Bearer header** (fallback)
+* ✅ Email verification flow:
+
+  * Verification email with JWT link on registration
+  * Endpoint for verifying tokens
+  * Resend verification feature
+* ✅ Role-based access guard with `@Roles()` decorator
+* ✅ Swagger API documentation for all endpoints
+* ✅ Prisma ORM integration with generated DTOs
+* ✅ CLI scaffolding for modules (controller, service, DTOs)
+* 🚧 OAuth2 support for Google and GitHub (scaffolded)
 
 ---
+
+
 
 ## 🛠 Tech Stack
 
@@ -50,7 +60,7 @@ A robust and secure authentication module for NestJS, using Prisma ORM, JWT auth
 git clone https://github.com/evillan0315/auth-module.git
 cd auth-module
 npm install
-````
+```
 
 ### 2. Environment Configuration
 
@@ -81,6 +91,17 @@ npm run start:dev
 ### 5. Swagger API
 
 Visit [http://localhost:3000/api](http://localhost:3000/api) for the full Swagger UI documentation.
+
+---
+
+## 🚀 API Workflows
+
+* **POST `/auth/register`** → Creates user, sends verification email
+* **GET `/auth/verify-email?token=...`** → Verifies user's email
+* **POST `/auth/resend-verification`** → Resends email verification link
+* **POST `/auth/login`** → Logs user in and issues JWT cookie
+* **POST `/auth/logout`** → Clears JWT cookie
+* **Protected endpoints** → Require valid JWT + role checks via `@Roles()`
 
 ---
 
@@ -204,22 +225,52 @@ src/
 │   │   └── auth-request.interface.ts
 │   ├── dto/
 │   │   ├── login.dto.ts
-│   │   └── register.dto.ts
+│   │   ├── register.dto.ts
+│   │   └── jwt-user.dto.ts
+│   └── strategies/
+│       └── jwt.strategy.ts
+├── mail/
+│   ├── mail.module.ts
+│   ├── mail.service.ts
+│   └── templates/
+│       ├── welcome.hbs
+│       └── verify-email.hbs
+├── libs/
+│   ├── cli.ts
+│   ├── generator.ts
+│   ├── parser.ts
+│   └── templates/
+│       ├── controller.ts.ejs
+│       ├── create-dto.ts.ejs
+│       ├── module.ts.ejs
+│       ├── service.ts.ejs
+│       ├── update-dto.ts.ejs
 ├── prisma/
 │   └── prisma.service.ts
 ```
 
 ---
 
-## 🧰 Tools
+## 🧰 Tools & Packages
 
-| Tool            | Usage                        |
-| --------------- | ---------------------------- |
-| `bcrypt`        | Hashing user passwords       |
-| `cookie-parser` | Parsing JWT from cookies     |
-| `@nestjs/jwt`   | Token signing and validation |
-| `passport`      | Strategy-based auth          |
-| `swagger`       | API docs                     |
+| Package                  | Purpose                             |
+| ------------------------ | ----------------------------------- |
+| `@nestjs-modules/mailer` | Sending emails using templates      |
+| `handlebars`             | Email templating                    |
+| `@nestjs/jwt`            | JWT token creation and verification |
+| `bcrypt`                 | Secure password hashing             |
+| `cookie-parser`          | Parsing cookies from requests       |
+| `passport`               | Authentication strategy management  |
+| `@nestjs/swagger`        | API documentation                   |
+| `@prisma/client`         | Database ORM                        |
+| `nestjs-cli` (custom)    | Scaffolding service/controller/dtos |
+
+---
+
+## 🧑‍💻 Author
+
+Made with love by [Eddie Villanueva](https://github.com/evillan0315)  
+💌 [evillan0315@gmail.com](mailto:evillan0315@gmail.com)
 
 ---
 

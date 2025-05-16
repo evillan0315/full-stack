@@ -4,4 +4,3 @@ export enum UserRole {
   MANAGER = 'MANAGER',
   // add more as needed
 }
-

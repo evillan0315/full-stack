@@ -1,23 +1,23 @@
-import { generateResource } from "./generator"; // Handles DTO/Module/Service/Controller gen
+import { generateResource } from './generator'; // Handles DTO/Module/Service/Controller gen
 //import { updateAppModule } from "./updateAppModule";
-import chokidar from "chokidar";
+import chokidar from 'chokidar';
 import * as fs from 'fs';
 import * as path from 'path';
 // Slice args from command line
 const args = process.argv.slice(2);
 
 // Check for flags
-const watch = args.includes("--watch");
+const watch = args.includes('--watch');
 
 // Extract --outDir and its value
-const outDirFlag = args.find((arg) => arg.startsWith("--outDir="));
-const outDir = outDirFlag ? outDirFlag.split("=")[1] : "src"; // default output directory
+const outDirFlag = args.find((arg) => arg.startsWith('--outDir='));
+const outDir = outDirFlag ? outDirFlag.split('=')[1] : 'src'; // default output directory
 
 // Get model name (the first non-flag argument that’s not part of --outDir)
-const modelName = args.find((arg) => !arg.startsWith("--"));
+const modelName = args.find((arg) => !arg.startsWith('--'));
 
 if (!modelName && !watch) {
-  console.error("❌ Please provide a model name or use --watch");
+  console.error('❌ Please provide a model name or use --watch');
   process.exit(1);
 }
 
@@ -31,9 +31,9 @@ if (watch) {
   console.log(
     `👀 Watching for changes in schema.prisma (output to "${outDir}")...`,
   );
-  chokidar.watch("../prisma/schema.prisma").on("change", async () => {
-    console.log("📄 Detected change in schema.prisma...");
-    const content = fs.readFileSync("schema.prisma", "utf-8");
+  chokidar.watch('../prisma/schema.prisma').on('change', async () => {
+    console.log('📄 Detected change in schema.prisma...');
+    const content = fs.readFileSync('schema.prisma', 'utf-8');
     const modelMatches = [...content.matchAll(/model\s+(\w+)\s+{/g)].map(
       (m) => m[1],
     );

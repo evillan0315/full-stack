@@ -12,10 +12,12 @@ import {
   ApiForbiddenResponse,
   ApiQuery
 } from '@nestjs/swagger';
-import { Roles } from '../admin/roles/roles.decorator';
-import { Role } from '../admin/roles/role.enum';
-import { RolesGuard } from '../admin/roles/roles.guard';
-import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+
+import { JwtAuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../auth/enums/user-role.enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 import { <%= className %>Service } from './<%= folderName %>.service';
 import { Create<%= className %>Dto, Pagination<%= className %>ResultDto, Pagination<%= className %>QueryDto } from './dto/create-<%= folderName %>.dto';
@@ -24,12 +26,12 @@ import { Update<%= className %>Dto } from './dto/update-<%= folderName %>.dto';
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('<%= className %>')
-@Controller('api/<%= folderName %>')
+@Controller('<%= folderName %>')
 export class <%= className %>Controller {
   constructor(private readonly <%= fileName %>Service: <%= className %>Service) {}
 
   @Post()
-  @Roles(Role.ADMIN, Role.SUPERADMIN)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create new <%= className %>' })
   @ApiCreatedResponse({
     description: 'Successfully created <%= className %>.',
@@ -43,7 +45,7 @@ export class <%= className %>Controller {
   }
 
   @Get()
-  @Roles(Role.ADMIN, Role.SUPERADMIN)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all <%= className %> records' })
   @ApiOkResponse({
     description: 'Array of <%= className %> records.',
@@ -72,7 +74,7 @@ export class <%= className %>Controller {
     );
   }
   @Get(':id')
-  @Roles(Role.ADMIN, Role.SUPERADMIN)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get one <%= className %> by ID' })
   @ApiOkResponse({
     description: 'The requested <%= className %> record.',
@@ -86,7 +88,7 @@ export class <%= className %>Controller {
   }
 
   @Patch(':id')
-  @Roles(Role.ADMIN, Role.SUPERADMIN)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update <%= className %> by ID' })
   @ApiOkResponse({
     description: 'Successfully updated <%= className %>.',
@@ -101,7 +103,7 @@ export class <%= className %>Controller {
   }
 
   @Delete(':id')
-  @Roles(Role.ADMIN, Role.SUPERADMIN)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete <%= className %> by ID' })
   @ApiOkResponse({
     description: 'Successfully deleted <%= className %>.',

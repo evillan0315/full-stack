@@ -1,5 +1,9 @@
 import { applyDecorators, SetMetadata } from '@nestjs/common';
-import { ApiBearerAuth, ApiForbiddenResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 export const ROLES_KEY = 'roles';
 export const Roles = (...roles: string[]) =>
@@ -9,4 +13,3 @@ export const Roles = (...roles: string[]) =>
     ApiUnauthorizedResponse({ description: 'Unauthorized' }),
     ApiForbiddenResponse({ description: 'Forbidden - insufficient role' }),
   );
-

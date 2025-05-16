@@ -27,7 +27,12 @@ export async function generateResource(modelName: string, outDir?: string) {
       path.join(__dirname, 'templates', `${tpl.name}.ts.ejs`),
       'utf8',
     );
-    const result = ejs.render(template, { className, fileName, fields, folderName });
+    const result = ejs.render(template, {
+      className,
+      fileName,
+      fields,
+      folderName,
+    });
     const outPath = path.join(targetDir, tpl.out);
     fs.writeFileSync(outPath, result);
     console.log(`✔ Generated: ${outPath}`);
@@ -44,4 +49,3 @@ function toDashCase(str: string): string {
     .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
     .toLowerCase();
 }
-

@@ -13,7 +13,10 @@ import * as hbs from 'hbs';
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const allowedOrigins = ['https://board-api.duckdns.org', "http://localhost:5001"];
+  const allowedOrigins = [
+    'https://board-api.duckdns.org',
+    'http://localhost:5001',
+  ];
 
   const configService = app.get(ConfigService);
   const NODE_ENV = configService.get<string>('NODE_ENV') || 'development';
@@ -44,8 +47,8 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
   // Swagger Configuration
   const swaggerConfig = new DocumentBuilder()
-     .setTitle('Auth API')
-     .setDescription('Authentication and Role Protected APIs')
+    .setTitle('Auth API')
+    .setDescription('Authentication and Role Protected APIs')
     .setVersion('1.0')
     .addTag('Auth')
     .addBearerAuth() // Enable Authorization Header

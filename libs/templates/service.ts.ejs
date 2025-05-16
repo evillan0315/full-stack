@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Request } from 'express';
 import { REQUEST } from '@nestjs/core';
-import { CreateJwtUserDto } from '../auth/dto/create-jwt-user.dto';
+import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Create<%= className %>Dto } from './dto/create-<%= folderName %>.dto';
 import { Update<%= className %>Dto } from './dto/update-<%= folderName %>.dto';
@@ -27,15 +27,18 @@ export class <%= className %>Service {
     const createData: any = {
       ...data,
     };
+    const isUserModel = '<%= className %>' === 'User';
     // If related 'createdBy' exists in Prisma schema, use nested connect
-    if (this.userId) {
-      createData.createdBy = {
-        connect: { id: this.userId },
-      };
-      // Optional: remove createdById if it exists to prevent conflict
-      delete createData.createdById;
-    }
 
+     if (this.userId && !isUserModel) {
+	    createData.createdBy = {
+	      connect: { id: this.userId },
+	    };
+	    // Optional: remove createdById if it exists to prevent conflict
+	    if (hasCreatedById) {
+	      delete createData.createdById;
+	    }
+	  }
 
     // Pass the data to Prisma create method
     return this.prisma.<%= fileName %>.create({
