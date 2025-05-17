@@ -24,8 +24,8 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Build Vite Frontend
-        run: pnpm build
+      - name: Install pm2
+        run: npm install -g pm2
 
       - name: Deploy to EC2
         uses: appleboy/scp-action@v0.1.7
