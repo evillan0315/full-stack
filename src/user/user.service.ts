@@ -1,11 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Request } from 'express';
 import { REQUEST } from '@nestjs/core';
-import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class UserService {
   constructor(
@@ -18,29 +20,20 @@ export class UserService {
     return this.request.user?.sub;
   }
 
-  // Handle the 'createdById' dynamically and other properties in create method
   create(data: CreateUserDto) {
-    // Check if the 'createdById' field exists in the provided schema
     const hasCreatedById = data.hasOwnProperty('createdById');
-
-    // Prepare data object for Prisma create call
-    const createData: any = {
-      ...data,
-    };
+    const createData: any = { ...data };
     const isUserModel = 'User' === 'User';
-    // If related 'createdBy' exists in Prisma schema, use nested connect
 
     if (this.userId && !isUserModel) {
       createData.createdBy = {
         connect: { id: this.userId },
       };
-      // Optional: remove createdById if it exists to prevent conflict
       if (hasCreatedById) {
         delete createData.createdById;
       }
     }
 
-    // Pass the data to Prisma create method
     return this.prisma.user.create({
       data: createData,
     });
@@ -80,7 +73,18 @@ export class UserService {
   }
 
   findOne(id: string) {
-    return this.prisma.user.findUnique({ where: { id } });
+    const isUserModel = 'User' === 'User';
+
+    return this.prisma.user.findUnique({
+      where: { id },
+      ...(isUserModel && {
+        include: {
+          Account: true,
+          Session: true,
+          Folder: true,
+        },
+      }),
+    });
   }
 
   update(id: string, data: UpdateUserDto) {
@@ -93,4 +97,52 @@ export class UserService {
   remove(id: string) {
     return this.prisma.user.delete({ where: { id } });
   }
+
+
+  async createUser(email: string, name: string, phone?: string, hash?: string) {
+    return this.prisma.user.create({
+      data: {
+        email,
+        name,
+        phone_number: phone,
+        role: Role.USER,
+        password: hash ? { create: { hash } } : undefined,
+      },
+    });
+  }
+
+  async verifyEmail(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { emailVerified: new Date() },
+    });
+  }
+
+  async validatePassword(password: string, hash: string) {
+    return bcrypt.compare(password, hash);
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
+  }
+
+  findById(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        phone_number: true,
+        createdAt: true,
+      },
+    });
+  }
+  
+  async findByEmail(email: string) {
+    return this.prisma.user.findUnique({ where: { email }, include: { password: true, Account: true } });
+  }
+
 }
+

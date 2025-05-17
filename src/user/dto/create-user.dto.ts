@@ -15,28 +15,29 @@ import { Type } from 'class-transformer';
 
 export class CreateUserDto {
   @ApiProperty({ description: 'email field' })
-  @IsEmail()
-  email: string;
+    @IsEmail()
+    email: string;
   @ApiProperty({ description: 'emailVerified field' })
-  @IsOptional()
-  @IsDate()
-  emailVerified: Date;
+    @IsOptional()
+    @IsDate()
+    emailVerified: Date;
   @ApiProperty({ description: 'image field' })
-  @IsOptional()
-  @IsString()
-  image: string;
+    @IsOptional()
+    @IsString()
+    image: string;
   @ApiProperty({ description: 'name field' })
-  @IsOptional()
-  @IsString()
-  name: string;
+    @IsOptional()
+    @IsString()
+    name: string;
   @ApiProperty({ description: 'phone_number field' })
-  @IsOptional()
-  @IsString()
-  phone_number: string;
+    @IsOptional()
+    @IsString()
+    phone_number: string;
   @ApiProperty({ description: 'deletedAt field' })
-  @IsOptional()
-  @IsDate()
-  deletedAt: Date;
+    @IsOptional()
+    @IsDate()
+    deletedAt: Date;
+
 }
 
 export class PaginationUserResultDto {
@@ -69,3 +70,4 @@ export class PaginationUserQueryDto {
   @ApiPropertyOptional({ default: 10 })
   pageSize?: number = 10;
 }
+

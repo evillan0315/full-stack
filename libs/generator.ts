@@ -3,11 +3,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { parseModel } from './parser';
 
+import { protectedModels } from './protected-models';
+
 export async function generateResource(modelName: string, outDir?: string) {
   const className = capitalize(modelName);
-  const fileName = modelName.charAt(0).toLowerCase() + modelName.slice(1); // ✅ camelCase filenames
-  const folderName = toDashCase(modelName); // ✅ dash-case folder
+  const fileName = modelName.charAt(0).toLowerCase() + modelName.slice(1);
+  const folderName = toDashCase(modelName);
   const fields = parseModel(modelName);
+
+  const isProtected = protectedModels.includes(className);
 
   const templates = [
     { name: 'controller', out: `${folderName}.controller.ts` },
@@ -17,7 +21,7 @@ export async function generateResource(modelName: string, outDir?: string) {
     { name: 'update-dto', out: `dto/update-${folderName}.dto.ts` },
   ];
 
-  const targetDir = path.join(outDir || 'output', folderName); // ✅ using dash-case for folder only
+  const targetDir = path.join(outDir || 'output', folderName);
   const dtoDir = path.join(targetDir, 'dto');
 
   fs.mkdirSync(dtoDir, { recursive: true });
@@ -32,6 +36,7 @@ export async function generateResource(modelName: string, outDir?: string) {
       fileName,
       fields,
       folderName,
+      isProtected,
     });
     const outPath = path.join(targetDir, tpl.out);
     fs.writeFileSync(outPath, result);

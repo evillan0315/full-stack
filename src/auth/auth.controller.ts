@@ -24,9 +24,17 @@ import { MailService } from '../mail/mail.service';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, CreateJwtUserDto } from './dto/auth.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
-
+import { AuthRequest } from './interfaces/auth-request.interface';
+import { GoogleAuthGuard } from './guards/google.guard';
+import { GitHubAuthGuard } from './guards/github.guard';
 import { JwtAuthGuard } from './auth.guard';
 import { Response, Request } from 'express';
+import { GitHubProfileDto, GitHubTokenDto } from './dto/github-profile.dto';
+import { GoogleProfileDto } from './dto/google-profile.dto';
+import { GoogleTokenDto } from './dto/google-token.dto';
+import { UserRole } from './enums/user-role.enum';
+import { Role } from '@prisma/client';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @ApiTags('Auth')
 @Controller('api/auth')
@@ -36,7 +44,115 @@ export class AuthController {
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
   ) {}
+  private async handleOAuthCallback(
+    provider: 'google' | 'github',
+    req: AuthRequest,
+    res: Response,
+  ) {
+    const { profile, tokens } = req.user as {
+      profile: GoogleProfileDto | GitHubProfileDto;
+      tokens: GoogleTokenDto | GitHubTokenDto;
+    };
 
+    const user = await this.authService.validateOAuthProfile(
+      provider,
+      profile,
+      tokens,
+    );
+
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role ?? Role.USER,
+      provider,
+    };
+
+    const accessToken = await this.authService.generateToken(payload);
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+
+    return res.json({
+      message: `${provider.charAt(0).toUpperCase() + provider.slice(1)} login successful`,
+      accessToken,
+      user,
+    });
+  }
+  @Post('login')
+  @ApiOperation({ summary: 'Log in a user and set JWT cookie' })
+  @ApiResponse({ status: 200, description: 'User logged in successfully' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken } = await this.authService.login(dto);
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+    return { accessToken };
+  }
+  @Post('logout')
+  @ApiOperation({ summary: 'Log out user (clear cookie)' })
+  @ApiResponse({ status: 200, description: 'Logged out successfully' })
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('accessToken');
+    return { message: 'Logged out successfully' };
+  }
+  @Get('github')
+  @UseGuards(GitHubAuthGuard)
+  @ApiOperation({ summary: 'Initiate GitHub OAuth2 login' })
+  @ApiResponse({ status: 302, description: 'Redirects to GitHub login' })
+  async githubAuth() {
+    // OAuth2 login flow initiated by Passport
+  }
+
+  @Get('github/callback')
+  @UseGuards(GitHubAuthGuard)
+  @ApiOperation({
+    summary: 'Handle GitHub OAuth2 callback and issue JWT token',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'GitHub login successful with JWT issued',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized or failed login attempt',
+  })
+  async githubAuthRedirect(@Req() req: AuthRequest, @Res() res: Response) {
+    return this.handleOAuthCallback('github', req, res);
+  }
+
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  @ApiOperation({ summary: 'Initiate Google OAuth2 login' })
+  @ApiResponse({ status: 302, description: 'Redirects to Google login' })
+  async googleAuth() {
+    // OAuth2 login flow initiated by Passport
+  }
+
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  @ApiOperation({
+    summary: 'Handle Google OAuth2 callback and issue JWT token',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Google login successful with JWT issued',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized or failed login attempt',
+  })
+  async googleAuthRedirect(@Req() req: AuthRequest, @Res() res: Response) {
+    return this.handleOAuthCallback('google', req, res);
+  }
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered successfully' })
@@ -48,40 +164,6 @@ export class AuthController {
     await this.authService.register(dto);
   }
 
-  @Post('login')
-  @ApiOperation({ summary: 'Log in a user and set JWT cookie' })
-  @ApiResponse({ status: 200, description: 'User logged in successfully' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(
-    @Body() dto: LoginDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const { accessToken } = await this.authService.login(dto);
-    res.cookie('jwt', accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-    });
-    return { accessToken };
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('me')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get current authenticated user' })
-  @ApiResponse({ status: 200, description: 'User profile returned' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getProfile(@Req() req: Request) {
-    return req['user'];
-  }
-
-  @Post('logout')
-  @ApiOperation({ summary: 'Log out user (clear cookie)' })
-  @ApiResponse({ status: 200, description: 'Logged out successfully' })
-  async logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('jwt');
-    return { message: 'Logged out successfully' };
-  }
   @Post('resend-verification')
   @ApiOperation({ summary: 'Resend email verification link' })
   @ApiBody({
@@ -98,5 +180,14 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   async verifyEmail(@Query() query: VerifyEmailDto) {
     return this.authService.verifyEmail(query.token);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current authenticated user' })
+  @ApiResponse({ status: 200, description: 'User profile returned' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getProfile(@Req() req: Request) {
+    return req['user'];
   }
 }

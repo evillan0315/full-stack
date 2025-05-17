@@ -13,7 +13,7 @@ export class MailService {
     <title>Email Verification</title>
   </head>
   <body>
-     <h1>Welcome, ${email ?? 'Registered user'}!</h1>
+     <h1>Welcome, ${name ?? 'Registered user'}!</h1>
     <p>Thank you for registering. Please verify your email address by clicking the link below:</p>
     <p><a href="${url}">Verify Email</a></p>
     <p>This link will expire in 24 hours.</p>
@@ -31,7 +31,8 @@ export class MailService {
       subject: 'Verify your email address',
       html: this.verificationEmail(email, name, url),
       context: {
-        name: name ?? 'User',
+        email,
+        name: name ?? 'Registered user',
         url,
       },
     });

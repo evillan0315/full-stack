@@ -5,14 +5,19 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './auth.strategy';
 import { JwtAuthGuard } from './auth.guard';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { GoogleAuthGuard } from './guards/google.guard';
+import { GitHubStrategy } from './strategies/github.strategy';
+import { GitHubAuthGuard } from './guards/github.guard';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
+import { OAuthService } from './oauth.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     JwtModule.registerAsync({
-      imports: [ConfigModule], // ✅ Required so JwtModule can access ConfigService
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
@@ -24,9 +29,14 @@ import { MailService } from '../mail/mail.service';
   providers: [
     AuthService,
     JwtStrategy,
+    GoogleStrategy,
+    GoogleAuthGuard,
+    GitHubStrategy,
+    GitHubAuthGuard,
     JwtAuthGuard,
     PrismaService,
     MailService,
+    OAuthService,
   ],
   exports: [AuthService],
 })

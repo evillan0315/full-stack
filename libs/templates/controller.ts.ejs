@@ -1,118 +1,141 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, HttpStatus, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  UseGuards,
+  HttpStatus,
+  Query,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiBearerAuth,
   ApiOkResponse,
-  ApiResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
-  ApiQuery
+  ApiQuery,
+  ApiResponse,
 } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../auth/enums/user-role.enum';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 import { <%= className %>Service } from './<%= folderName %>.service';
-import { Create<%= className %>Dto, Pagination<%= className %>ResultDto, Pagination<%= className %>QueryDto } from './dto/create-<%= folderName %>.dto';
+import {
+  Create<%= className %>Dto,
+  Pagination<%= className %>ResultDto,
+  Pagination<%= className %>QueryDto,
+} from './dto/create-<%= folderName %>.dto';
 import { Update<%= className %>Dto } from './dto/update-<%= folderName %>.dto';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('<%= className %>')
-@Controller('<%= folderName %>')
+@Controller('api/<%= folderName %>')
 export class <%= className %>Controller {
   constructor(private readonly <%= fileName %>Service: <%= className %>Service) {}
 
+  // ───────────────────────────────────────────────────────────
+  // CREATE
+  // ───────────────────────────────────────────────────────────
+
   @Post()
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Create new <%= className %>' })
-  @ApiCreatedResponse({
-    description: 'Successfully created <%= className %>.',
-    type: Create<%= className %>Dto,
-  })
-  @ApiBadRequestResponse({ description: 'Invalid input or validation failed.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized access (no valid token).' })
-  @ApiForbiddenResponse({ description: 'Forbidden: insufficient permissions.' })
+  @ApiOperation({ summary: 'Create a new <%= className %>' })
+  @ApiCreatedResponse({ description: 'Successfully created.', type: Create<%= className %>Dto })
+  @ApiBadRequestResponse({ description: 'Validation failed.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({ description: 'Forbidden.' })
   create(@Body() dto: Create<%= className %>Dto) {
     return this.<%= fileName %>Service.create(dto);
   }
 
+  // ───────────────────────────────────────────────────────────
+  // FIND ALL
+  // ───────────────────────────────────────────────────────────
+
   @Get()
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get all <%= className %> records' })
-  @ApiOkResponse({
-    description: 'Array of <%= className %> records.',
-    type: [Create<%= className %>Dto],
-  })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized access (no valid token).' })
-  @ApiForbiddenResponse({ description: 'Forbidden: insufficient permissions.' })
+  @ApiOperation({ summary: 'Retrieve all <%= className %> records' })
+  @ApiOkResponse({ description: 'List of <%= className %> records.', type: [Create<%= className %>Dto] })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
     return this.<%= fileName %>Service.findAll();
   }
+
+  // ───────────────────────────────────────────────────────────
+  // PAGINATED
+  // ───────────────────────────────────────────────────────────
+
   @Get('paginated')
-  @ApiOperation({ summary: 'Get paginated list of <%= className %>' })
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Paginated <%= className %> records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Paginated list of <%= className %>',
+    description: 'Paginated results',
     type: Pagination<%= className %>ResultDto,
   })
-  async findAllPaginated(@Query() query: Pagination<%= className %>QueryDto) {
+  findAllPaginated(@Query() query: Pagination<%= className %>QueryDto) {
     const { page, pageSize } = query;
-    return this.<%= fileName %>Service.findAllPaginated(
-      undefined,
-      page,
-      pageSize,
-    );
+    return this.<%= fileName %>Service.findAllPaginated(undefined, page, pageSize);
   }
+
+  // ───────────────────────────────────────────────────────────
+  // FIND ONE
+  // ───────────────────────────────────────────────────────────
+
   @Get(':id')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get one <%= className %> by ID' })
-  @ApiOkResponse({
-    description: 'The requested <%= className %> record.',
-    type: Create<%= className %>Dto,
-  })
-  @ApiNotFoundResponse({ description: '<%= className %> not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized access (no valid token).' })
-  @ApiForbiddenResponse({ description: 'Forbidden: insufficient permissions.' })
+  @ApiOperation({ summary: 'Find <%= className %> by ID' })
+  @ApiOkResponse({ description: 'Record found.', type: Create<%= className %>Dto })
+  @ApiNotFoundResponse({ description: 'Record not found.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({ description: 'Forbidden.' })
   findOne(@Param('id') id: string) {
     return this.<%= fileName %>Service.findOne(id);
   }
 
+  // ───────────────────────────────────────────────────────────
+  // UPDATE
+  // ───────────────────────────────────────────────────────────
+
   @Patch(':id')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update <%= className %> by ID' })
-  @ApiOkResponse({
-    description: 'Successfully updated <%= className %>.',
-    type: Update<%= className %>Dto,
-  })
-  @ApiBadRequestResponse({ description: 'Invalid update payload.' })
-  @ApiNotFoundResponse({ description: '<%= className %> not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized access (no valid token).' })
-  @ApiForbiddenResponse({ description: 'Forbidden: insufficient permissions.' })
+  @ApiOkResponse({ description: 'Successfully updated.', type: Update<%= className %>Dto })
+  @ApiBadRequestResponse({ description: 'Invalid data.' })
+  @ApiNotFoundResponse({ description: 'Record not found.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({ description: 'Forbidden.' })
   update(@Param('id') id: string, @Body() dto: Update<%= className %>Dto) {
     return this.<%= fileName %>Service.update(id, dto);
   }
 
+  // ───────────────────────────────────────────────────────────
+  // DELETE
+  // ───────────────────────────────────────────────────────────
+
   @Delete(':id')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete <%= className %> by ID' })
-  @ApiOkResponse({
-    description: 'Successfully deleted <%= className %>.',
-    type: String,
-  })
-  @ApiNotFoundResponse({ description: '<%= className %> not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized access (no valid token).' })
-  @ApiForbiddenResponse({ description: 'Forbidden: insufficient permissions.' })
+  @ApiOkResponse({ description: 'Successfully deleted.' })
+  @ApiNotFoundResponse({ description: 'Record not found.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({ description: 'Forbidden.' })
   remove(@Param('id') id: string) {
     return this.<%= fileName %>Service.remove(id);
   }
 }
+

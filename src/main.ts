@@ -15,7 +15,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const allowedOrigins = [
     'https://board-api.duckdns.org',
-    'http://localhost:5001',
+    'http://localhost:5000',
   ];
 
   const configService = app.get(ConfigService);

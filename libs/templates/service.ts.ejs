@@ -1,11 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Request } from 'express';
 import { REQUEST } from '@nestjs/core';
-import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 import { Create<%= className %>Dto } from './dto/create-<%= folderName %>.dto';
 import { Update<%= className %>Dto } from './dto/update-<%= folderName %>.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
+<% if (className === 'User') { %>import * as bcrypt from 'bcrypt';<% } %>
+
 @Injectable()
 export class <%= className %>Service {
   constructor(
@@ -18,69 +20,71 @@ export class <%= className %>Service {
     return this.request.user?.sub;
   }
 
-  // Handle the 'createdById' dynamically and other properties in create method
   create(data: Create<%= className %>Dto) {
-    // Check if the 'createdById' field exists in the provided schema
     const hasCreatedById = data.hasOwnProperty('createdById');
-
-    // Prepare data object for Prisma create call
-    const createData: any = {
-      ...data,
-    };
+    const createData: any = { ...data };
     const isUserModel = '<%= className %>' === 'User';
-    // If related 'createdBy' exists in Prisma schema, use nested connect
 
-     if (this.userId && !isUserModel) {
-	    createData.createdBy = {
-	      connect: { id: this.userId },
-	    };
-	    // Optional: remove createdById if it exists to prevent conflict
-	    if (hasCreatedById) {
-	      delete createData.createdById;
-	    }
-	  }
+    if (this.userId && !isUserModel) {
+      createData.createdBy = {
+        connect: { id: this.userId },
+      };
+      if (hasCreatedById) {
+        delete createData.createdById;
+      }
+    }
 
-    // Pass the data to Prisma create method
     return this.prisma.<%= fileName %>.create({
       data: createData,
     });
   }
-  
+
   async findAllPaginated(
-  where: Prisma.<%= className %>WhereInput = {},
-  page = 1,
-  pageSize = 10,
-  select?: Prisma.<%= className %>Select,
-) {
-  const skip = (page - 1) * pageSize;
-  const take = Number(pageSize); 
+    where: Prisma.<%= className %>WhereInput = {},
+    page = 1,
+    pageSize = 10,
+    select?: Prisma.<%= className %>Select,
+  ) {
+    const skip = (page - 1) * pageSize;
+    const take = Number(pageSize);
 
-  const [items, total] = await this.prisma.$transaction([
-    this.prisma.<%= fileName %>.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take,
-      ...(select ? { select } : {}),
-    }),
-    this.prisma.<%= fileName %>.count({ where }),
-  ]);
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.<%= fileName %>.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take,
+        ...(select ? { select } : {}),
+      }),
+      this.prisma.<%= fileName %>.count({ where }),
+    ]);
 
-  return {
-    items,
-    total,
-    page,
-    pageSize,
-    totalPages: Math.ceil(total / pageSize),
-  };
-}
-  
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
+
   findAll() {
     return this.prisma.<%= fileName %>.findMany();
   }
 
   findOne(id: string) {
-    return this.prisma.<%= fileName %>.findUnique({ where: { id } });
+    const isUserModel = '<%= className %>' === 'User';
+
+    return this.prisma.<%= fileName %>.findUnique({
+      where: { id },
+      ...(isUserModel && {
+        include: {
+          Account: true,
+          Session: true,
+          Folder: true,
+        },
+      }),
+    });
   }
 
   update(id: string, data: Update<%= className %>Dto) {
@@ -93,5 +97,52 @@ export class <%= className %>Service {
   remove(id: string) {
     return this.prisma.<%= fileName %>.delete({ where: { id } });
   }
+
+<% if (className === 'User') { %>
+  async createUser(email: string, name: string, phone?: string, hash?: string) {
+    return this.prisma.user.create({
+      data: {
+        email,
+        name,
+        phone_number: phone,
+        role: Role.USER,
+        password: hash ? { create: { hash } } : undefined,
+      },
+    });
+  }
+
+  async verifyEmail(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { emailVerified: new Date() },
+    });
+  }
+
+  async validatePassword(password: string, hash: string) {
+    return bcrypt.compare(password, hash);
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
+  }
+
+  findById(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        phone_number: true,
+        createdAt: true,
+      },
+    });
+  }
+  
+  async findByEmail(email: string) {
+    return this.prisma.user.findUnique({ where: { email }, include: { password: true, Account: true } });
+  }
+<% } %>
 }
 
