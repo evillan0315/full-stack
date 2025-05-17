@@ -45,6 +45,9 @@ jobs:
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/webapps/board-api
+            node --version
+            npm install -g pnpm
+            npm install -g pm2
             pnpm install
             pnpm build
             pm2 restart api-server || pm2 start ecosystem.config.cjs
