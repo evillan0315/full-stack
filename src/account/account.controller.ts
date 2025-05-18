@@ -38,9 +38,7 @@ import {
 import { UpdateAccountDto } from './dto/update-account.dto';
 
 @ApiBearerAuth()
-
 @UseGuards(JwtAuthGuard, RolesGuard)
-
 @ApiTags('Account')
 @Controller('api/account')
 export class AccountController {
@@ -51,11 +49,12 @@ export class AccountController {
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Create a new Account' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateAccountDto })
+  @ApiCreatedResponse({
+    description: 'Successfully created.',
+    type: CreateAccountDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
@@ -68,11 +67,12 @@ export class AccountController {
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Retrieve all Account records' })
-  @ApiOkResponse({ description: 'List of Account records.', type: [CreateAccountDto] })
+  @ApiOkResponse({
+    description: 'List of Account records.',
+    type: [CreateAccountDto],
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
@@ -84,9 +84,7 @@ export class AccountController {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Paginated Account records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -105,9 +103,7 @@ export class AccountController {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Find Account by ID' })
   @ApiOkResponse({ description: 'Record found.', type: CreateAccountDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -122,11 +118,12 @@ export class AccountController {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Update Account by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateAccountDto })
+  @ApiOkResponse({
+    description: 'Successfully updated.',
+    type: UpdateAccountDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
@@ -140,9 +137,7 @@ export class AccountController {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Delete Account by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -152,4 +147,3 @@ export class AccountController {
     return this.accountService.remove(id);
   }
 }
-

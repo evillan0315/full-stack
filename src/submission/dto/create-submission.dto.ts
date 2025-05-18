@@ -15,16 +15,15 @@ import { Type } from 'class-transformer';
 
 export class CreateSubmissionDto {
   @ApiProperty({ description: 'data field' })
-    @IsObject()
-    data: any;
+  @IsObject()
+  data: any;
   @ApiProperty({ description: 'type field' })
-    @IsString()
-    type: string;
+  @IsString()
+  type: string;
   @ApiProperty({ description: 'formId field' })
-    @IsOptional()
-    @IsString()
-    formId: string;
-
+  @IsOptional()
+  @IsString()
+  formId: string;
 }
 
 export class PaginationSubmissionResultDto {
@@ -57,4 +56,3 @@ export class PaginationSubmissionQueryDto {
   @ApiPropertyOptional({ default: 10 })
   pageSize?: number = 10;
 }
-

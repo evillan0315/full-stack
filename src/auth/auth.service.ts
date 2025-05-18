@@ -63,7 +63,7 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const payload:JwtPayload = {
+    const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
       role: user.role ?? Role.USER,
@@ -167,6 +167,3 @@ export class AuthService {
     return this.jwtService.signAsync(payload);
   }
 }
-
-
-

@@ -134,7 +134,9 @@ function mapPrismaTypeToTsType(
     case 'String':
       tsType = 'string';
       if (isEmailField) {
-        validators.push(decorate('IsEmail', `${label} must be a valid email address.`));
+        validators.push(
+          decorate('IsEmail', `${label} must be a valid email address.`),
+        );
       } else {
         validators.push(decorate('IsString', `${label} must be a string.`));
       }
@@ -171,4 +173,3 @@ function mapPrismaTypeToTsType(
 
   return { tsType, validators };
 }
-

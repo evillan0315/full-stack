@@ -4,21 +4,12 @@ import { CreateLogDto } from './dto/create-log.dto';
 import { UpdateLogDto } from './dto/update-log.dto';
 import { Prisma } from '@prisma/client';
 
-
-
 @Injectable()
 export class LogService {
-  constructor(
-    private prisma: PrismaService,
-    
-  ) {}
-
-  
+  constructor(private prisma: PrismaService) {}
 
   create(data: CreateLogDto) {
     const createData: any = { ...data };
-
-    
 
     return this.prisma.log.create({ data: createData });
   }
@@ -57,13 +48,7 @@ export class LogService {
   }
 
   findOne(id: string) {
-    
-
-    return this.prisma.log.findUnique(
-    
-    { where: { id } }
-    
-    );
+    return this.prisma.log.findUnique({ where: { id } });
   }
 
   update(id: string, data: UpdateLogDto) {
@@ -76,7 +61,4 @@ export class LogService {
   remove(id: string) {
     return this.prisma.log.delete({ where: { id } });
   }
-
-
 }
-

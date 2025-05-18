@@ -38,9 +38,7 @@ import {
 import { UpdateDatabaseDto } from './dto/update-database.dto';
 
 @ApiBearerAuth()
-
 @UseGuards(JwtAuthGuard, RolesGuard)
-
 @ApiTags('Database')
 @Controller('api/database')
 export class DatabaseController {
@@ -51,11 +49,12 @@ export class DatabaseController {
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Create a new Database' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateDatabaseDto })
+  @ApiCreatedResponse({
+    description: 'Successfully created.',
+    type: CreateDatabaseDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
@@ -68,11 +67,12 @@ export class DatabaseController {
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Retrieve all Database records' })
-  @ApiOkResponse({ description: 'List of Database records.', type: [CreateDatabaseDto] })
+  @ApiOkResponse({
+    description: 'List of Database records.',
+    type: [CreateDatabaseDto],
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
@@ -84,9 +84,7 @@ export class DatabaseController {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Paginated Database records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -105,9 +103,7 @@ export class DatabaseController {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Find Database by ID' })
   @ApiOkResponse({ description: 'Record found.', type: CreateDatabaseDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -122,11 +118,12 @@ export class DatabaseController {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Update Database by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateDatabaseDto })
+  @ApiOkResponse({
+    description: 'Successfully updated.',
+    type: UpdateDatabaseDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
@@ -140,9 +137,7 @@ export class DatabaseController {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Delete Database by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -152,4 +147,3 @@ export class DatabaseController {
     return this.databaseService.remove(id);
   }
 }
-

@@ -38,9 +38,7 @@ import {
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiBearerAuth()
-
 @UseGuards(JwtAuthGuard, RolesGuard)
-
 @ApiTags('User')
 @Controller('api/user')
 export class UserController {
@@ -51,11 +49,12 @@ export class UserController {
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Create a new User' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateUserDto })
+  @ApiCreatedResponse({
+    description: 'Successfully created.',
+    type: CreateUserDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
@@ -68,11 +67,12 @@ export class UserController {
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Retrieve all User records' })
-  @ApiOkResponse({ description: 'List of User records.', type: [CreateUserDto] })
+  @ApiOkResponse({
+    description: 'List of User records.',
+    type: [CreateUserDto],
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
@@ -84,9 +84,7 @@ export class UserController {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Paginated User records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -105,9 +103,7 @@ export class UserController {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Find User by ID' })
   @ApiOkResponse({ description: 'Record found.', type: CreateUserDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -122,9 +118,7 @@ export class UserController {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Update User by ID' })
   @ApiOkResponse({ description: 'Successfully updated.', type: UpdateUserDto })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
@@ -140,9 +134,7 @@ export class UserController {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Delete User by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -152,4 +144,3 @@ export class UserController {
     return this.userService.remove(id);
   }
 }
-

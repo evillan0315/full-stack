@@ -37,11 +37,8 @@ import {
 } from './dto/create-documentation.dto';
 import { UpdateDocumentationDto } from './dto/update-documentation.dto';
 
-
-
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-
 @ApiTags('Documentation')
 @Controller('api/documentation')
 export class DocumentationController {
@@ -52,11 +49,12 @@ export class DocumentationController {
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Create a new Documentation' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateDocumentationDto })
+  @ApiCreatedResponse({
+    description: 'Successfully created.',
+    type: CreateDocumentationDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
@@ -69,11 +67,12 @@ export class DocumentationController {
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Retrieve all Documentation records' })
-  @ApiOkResponse({ description: 'List of Documentation records.', type: [CreateDocumentationDto] })
+  @ApiOkResponse({
+    description: 'List of Documentation records.',
+    type: [CreateDocumentationDto],
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
@@ -85,9 +84,7 @@ export class DocumentationController {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Paginated Documentation records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -98,7 +95,11 @@ export class DocumentationController {
   })
   findAllPaginated(@Query() query: PaginationDocumentationQueryDto) {
     const { page, pageSize } = query;
-    return this.documentationService.findAllPaginated(undefined, page, pageSize);
+    return this.documentationService.findAllPaginated(
+      undefined,
+      page,
+      pageSize,
+    );
   }
 
   // ───────────────────────────────────────────────────────────
@@ -106,9 +107,7 @@ export class DocumentationController {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Find Documentation by ID' })
   @ApiOkResponse({ description: 'Record found.', type: CreateDocumentationDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -123,11 +122,12 @@ export class DocumentationController {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Update Documentation by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateDocumentationDto })
+  @ApiOkResponse({
+    description: 'Successfully updated.',
+    type: UpdateDocumentationDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
@@ -141,9 +141,7 @@ export class DocumentationController {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Delete Documentation by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -153,4 +151,3 @@ export class DocumentationController {
     return this.documentationService.remove(id);
   }
 }
-

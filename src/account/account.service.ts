@@ -6,28 +6,24 @@ import { Prisma } from '@prisma/client';
 
 import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 
-
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
-
 
 @Injectable()
 export class AccountService {
   constructor(
     private prisma: PrismaService,
-    @Inject(REQUEST) private readonly request: Request & { user?: CreateJwtUserDto },
+    @Inject(REQUEST)
+    private readonly request: Request & { user?: CreateJwtUserDto },
   ) {}
 
-  
   private get userId(): string | undefined {
     return this.request.user?.sub;
   }
-  
 
   create(data: CreateAccountDto) {
     const createData: any = { ...data };
 
-    
     const hasCreatedById = data.hasOwnProperty('createdById');
     if (this.userId) {
       createData.createdBy = {
@@ -37,7 +33,6 @@ export class AccountService {
         delete createData.createdById;
       }
     }
-    
 
     return this.prisma.account.create({ data: createData });
   }
@@ -76,13 +71,7 @@ export class AccountService {
   }
 
   findOne(id: string) {
-    
-
-    return this.prisma.account.findUnique(
-    
-    { where: { id } }
-    
-    );
+    return this.prisma.account.findUnique({ where: { id } });
   }
 
   update(id: string, data: UpdateAccountDto) {
@@ -95,7 +84,4 @@ export class AccountService {
   remove(id: string) {
     return this.prisma.account.delete({ where: { id } });
   }
-
-
 }
-

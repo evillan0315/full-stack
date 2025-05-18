@@ -15,12 +15,11 @@ import { Type } from 'class-transformer';
 
 export class CreateDocumentationDto {
   @ApiProperty({ description: 'name field' })
-    @IsString()
-    name: string;
+  @IsString()
+  name: string;
   @ApiProperty({ description: 'content field' })
-    @IsString()
-    content: string;
-
+  @IsString()
+  content: string;
 }
 
 export class PaginationDocumentationResultDto {
@@ -53,4 +52,3 @@ export class PaginationDocumentationQueryDto {
   @ApiPropertyOptional({ default: 10 })
   pageSize?: number = 10;
 }
-

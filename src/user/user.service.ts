@@ -7,28 +7,23 @@ import { Prisma, Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 
-
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
-
 
 @Injectable()
 export class UserService {
   constructor(
     private prisma: PrismaService,
-    @Inject(REQUEST) private readonly request: Request & { user?: CreateJwtUserDto },
+    @Inject(REQUEST)
+    private readonly request: Request & { user?: CreateJwtUserDto },
   ) {}
 
-  
   private get userId(): string | undefined {
     return this.request.user?.sub;
   }
-  
 
   create(data: CreateUserDto) {
     const createData: any = { ...data };
-
-    
 
     return this.prisma.user.create({ data: createData });
   }
@@ -67,19 +62,14 @@ export class UserService {
   }
 
   findOne(id: string) {
-    
-
-    return this.prisma.user.findUnique(
-    
-    {where: { id },
-        include: {
-          Account: true,
-          Session: true,
-          Folder: true,
-        },
-    }
-    
-    );
+    return this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        Account: true,
+        Session: true,
+        Folder: true,
+      },
+    });
   }
 
   update(id: string, data: UpdateUserDto) {
@@ -92,7 +82,6 @@ export class UserService {
   remove(id: string) {
     return this.prisma.user.delete({ where: { id } });
   }
-
 
   async createUser(email: string, name: string, phone?: string, hash?: string) {
     return this.prisma.user.create({
@@ -144,6 +133,4 @@ export class UserService {
       },
     });
   }
-
 }
-

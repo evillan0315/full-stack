@@ -56,4 +56,3 @@ function toDashCase(str: string): string {
     .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
     .toLowerCase();
 }
-

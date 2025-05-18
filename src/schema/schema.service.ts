@@ -6,28 +6,24 @@ import { Prisma } from '@prisma/client';
 
 import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 
-
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
-
 
 @Injectable()
 export class SchemaService {
   constructor(
     private prisma: PrismaService,
-    @Inject(REQUEST) private readonly request: Request & { user?: CreateJwtUserDto },
+    @Inject(REQUEST)
+    private readonly request: Request & { user?: CreateJwtUserDto },
   ) {}
 
-  
   private get userId(): string | undefined {
     return this.request.user?.sub;
   }
-  
 
   create(data: CreateSchemaDto) {
     const createData: any = { ...data };
 
-    
     const hasCreatedById = data.hasOwnProperty('createdById');
     if (this.userId) {
       createData.createdBy = {
@@ -37,7 +33,6 @@ export class SchemaService {
         delete createData.createdById;
       }
     }
-    
 
     return this.prisma.schema.create({ data: createData });
   }
@@ -76,13 +71,7 @@ export class SchemaService {
   }
 
   findOne(id: string) {
-    
-
-    return this.prisma.schema.findUnique(
-    
-    { where: { id } }
-    
-    );
+    return this.prisma.schema.findUnique({ where: { id } });
   }
 
   update(id: string, data: UpdateSchemaDto) {
@@ -95,7 +84,4 @@ export class SchemaService {
   remove(id: string) {
     return this.prisma.schema.delete({ where: { id } });
   }
-
-
 }
-

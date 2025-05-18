@@ -6,7 +6,6 @@ import { PrismaModule } from '../prisma/prisma.module';
 @Module({
   imports: [PrismaModule],
   controllers: [FolderController],
-  providers: [FolderService]
+  providers: [FolderService],
 })
 export class FolderModule {}
-

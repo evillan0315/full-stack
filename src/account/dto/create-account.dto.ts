@@ -15,43 +15,42 @@ import { Type } from 'class-transformer';
 
 export class CreateAccountDto {
   @ApiProperty({ description: 'type field' })
-    @IsString()
-    type: string;
+  @IsString()
+  type: string;
   @ApiProperty({ description: 'provider field' })
-    @IsString()
-    provider: string;
+  @IsString()
+  provider: string;
   @ApiProperty({ description: 'providerAccountId field' })
-    @IsString()
-    providerAccountId: string;
+  @IsString()
+  providerAccountId: string;
   @ApiProperty({ description: 'refresh_token field' })
-    @IsOptional()
-    @IsString()
-    refresh_token: string;
+  @IsOptional()
+  @IsString()
+  refresh_token: string;
   @ApiProperty({ description: 'access_token field' })
-    @IsOptional()
-    @IsString()
-    access_token: string;
+  @IsOptional()
+  @IsString()
+  access_token: string;
   @ApiProperty({ description: 'expires_at field' })
-    @IsOptional()
-    @IsInt()
-    expires_at: number;
+  @IsOptional()
+  @IsInt()
+  expires_at: number;
   @ApiProperty({ description: 'token_type field' })
-    @IsOptional()
-    @IsString()
-    token_type: string;
+  @IsOptional()
+  @IsString()
+  token_type: string;
   @ApiProperty({ description: 'scope field' })
-    @IsOptional()
-    @IsString()
-    scope: string;
+  @IsOptional()
+  @IsString()
+  scope: string;
   @ApiProperty({ description: 'id_token field' })
-    @IsOptional()
-    @IsString()
-    id_token: string;
+  @IsOptional()
+  @IsString()
+  id_token: string;
   @ApiProperty({ description: 'session_state field' })
-    @IsOptional()
-    @IsString()
-    session_state: string;
-
+  @IsOptional()
+  @IsString()
+  session_state: string;
 }
 
 export class PaginationAccountResultDto {
@@ -84,4 +83,3 @@ export class PaginationAccountQueryDto {
   @ApiPropertyOptional({ default: 10 })
   pageSize?: number = 10;
 }
-

@@ -38,9 +38,7 @@ import {
 import { UpdateSchemaDto } from './dto/update-schema.dto';
 
 @ApiBearerAuth()
-
 @UseGuards(JwtAuthGuard, RolesGuard)
-
 @ApiTags('Schema')
 @Controller('api/schema')
 export class SchemaController {
@@ -51,11 +49,12 @@ export class SchemaController {
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Create a new Schema' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateSchemaDto })
+  @ApiCreatedResponse({
+    description: 'Successfully created.',
+    type: CreateSchemaDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
@@ -68,11 +67,12 @@ export class SchemaController {
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Retrieve all Schema records' })
-  @ApiOkResponse({ description: 'List of Schema records.', type: [CreateSchemaDto] })
+  @ApiOkResponse({
+    description: 'List of Schema records.',
+    type: [CreateSchemaDto],
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
@@ -84,9 +84,7 @@ export class SchemaController {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Paginated Schema records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -105,9 +103,7 @@ export class SchemaController {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Find Schema by ID' })
   @ApiOkResponse({ description: 'Record found.', type: CreateSchemaDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -122,11 +118,12 @@ export class SchemaController {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Update Schema by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateSchemaDto })
+  @ApiOkResponse({
+    description: 'Successfully updated.',
+    type: UpdateSchemaDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
@@ -140,9 +137,7 @@ export class SchemaController {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Delete Schema by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -152,4 +147,3 @@ export class SchemaController {
     return this.schemaService.remove(id);
   }
 }
-

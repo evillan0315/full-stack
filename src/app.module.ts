@@ -11,15 +11,27 @@ import { DatabaseModule } from './database/database.module';
 import { LogModule } from './log/log.module';
 import { AccountModule } from './account/account.module';
 import { SchemaModule } from './schema/schema.module';
-import { SubmissionModule } from './submission/submission.module';
 import { DocumentationModule } from './documentation/documentation.module';
 import { FolderModule } from './folder/folder.module';
 import { FormModule } from './form/form.module';
 import { SubmissionModule } from './submission/submission.module';
 
-
 @Module({
-  imports: [AuthModule, AdminModule, MailModule, PrismaModule, UserModule, DatabaseModule, LogModule, AccountModule, SchemaModule, SubmissionModule, DocumentationModule, FolderModule, FormModule],
+  imports: [
+    AuthModule,
+    AdminModule,
+    MailModule,
+    PrismaModule,
+    UserModule,
+    DatabaseModule,
+    LogModule,
+    AccountModule,
+    SchemaModule,
+    SubmissionModule,
+    DocumentationModule,
+    FolderModule,
+    FormModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

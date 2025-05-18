@@ -37,11 +37,8 @@ import {
 } from './dto/create-submission.dto';
 import { UpdateSubmissionDto } from './dto/update-submission.dto';
 
-
-
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-
 @ApiTags('Submission')
 @Controller('api/submission')
 export class SubmissionController {
@@ -52,11 +49,12 @@ export class SubmissionController {
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Create a new Submission' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateSubmissionDto })
+  @ApiCreatedResponse({
+    description: 'Successfully created.',
+    type: CreateSubmissionDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
@@ -69,11 +67,12 @@ export class SubmissionController {
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Retrieve all Submission records' })
-  @ApiOkResponse({ description: 'List of Submission records.', type: [CreateSubmissionDto] })
+  @ApiOkResponse({
+    description: 'List of Submission records.',
+    type: [CreateSubmissionDto],
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
@@ -85,9 +84,7 @@ export class SubmissionController {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Paginated Submission records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -106,9 +103,7 @@ export class SubmissionController {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Find Submission by ID' })
   @ApiOkResponse({ description: 'Record found.', type: CreateSubmissionDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -123,11 +118,12 @@ export class SubmissionController {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Update Submission by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateSubmissionDto })
+  @ApiOkResponse({
+    description: 'Successfully updated.',
+    type: UpdateSubmissionDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
@@ -141,9 +137,7 @@ export class SubmissionController {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Delete Submission by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -153,4 +147,3 @@ export class SubmissionController {
     return this.submissionService.remove(id);
   }
 }
-

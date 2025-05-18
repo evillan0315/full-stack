@@ -37,11 +37,8 @@ import {
 } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
 
-
-
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-
 @ApiTags('Form')
 @Controller('api/form')
 export class FormController {
@@ -52,11 +49,12 @@ export class FormController {
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Create a new Form' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateFormDto })
+  @ApiCreatedResponse({
+    description: 'Successfully created.',
+    type: CreateFormDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
@@ -69,11 +67,12 @@ export class FormController {
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Retrieve all Form records' })
-  @ApiOkResponse({ description: 'List of Form records.', type: [CreateFormDto] })
+  @ApiOkResponse({
+    description: 'List of Form records.',
+    type: [CreateFormDto],
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
@@ -85,9 +84,7 @@ export class FormController {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Paginated Form records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -106,9 +103,7 @@ export class FormController {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Find Form by ID' })
   @ApiOkResponse({ description: 'Record found.', type: CreateFormDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -123,9 +118,7 @@ export class FormController {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Update Form by ID' })
   @ApiOkResponse({ description: 'Successfully updated.', type: UpdateFormDto })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
@@ -141,9 +134,7 @@ export class FormController {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Delete Form by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -153,4 +144,3 @@ export class FormController {
     return this.formService.remove(id);
   }
 }
-

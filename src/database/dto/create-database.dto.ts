@@ -15,39 +15,38 @@ import { Type } from 'class-transformer';
 
 export class CreateDatabaseDto {
   @ApiProperty({ description: 'name field' })
-    @IsString()
-    name: string;
+  @IsString()
+  name: string;
   @ApiProperty({ description: 'type field' })
-    @IsString()
-    type: string;
+  @IsString()
+  type: string;
   @ApiProperty({ description: 'host field' })
-    @IsOptional()
-    @IsString()
-    host: string;
+  @IsOptional()
+  @IsString()
+  host: string;
   @ApiProperty({ description: 'port field' })
-    @IsOptional()
-    @IsInt()
-    port: number;
+  @IsOptional()
+  @IsInt()
+  port: number;
   @ApiProperty({ description: 'username field' })
-    @IsOptional()
-    @IsString()
-    username: string;
+  @IsOptional()
+  @IsString()
+  username: string;
   @ApiProperty({ description: 'password field' })
-    @IsOptional()
-    @IsString()
-    password: string;
+  @IsOptional()
+  @IsString()
+  password: string;
   @ApiProperty({ description: 'databaseName field' })
-    @IsOptional()
-    @IsString()
-    databaseName: string;
+  @IsOptional()
+  @IsString()
+  databaseName: string;
   @ApiProperty({ description: 'connectionString field' })
-    @IsOptional()
-    @IsString()
-    connectionString: string;
+  @IsOptional()
+  @IsString()
+  connectionString: string;
   @ApiProperty({ description: 'default field' })
-    @IsBoolean()
-    default: boolean;
-
+  @IsBoolean()
+  default: boolean;
 }
 
 export class PaginationDatabaseResultDto {
@@ -80,4 +79,3 @@ export class PaginationDatabaseQueryDto {
   @ApiPropertyOptional({ default: 10 })
   pageSize?: number = 10;
 }
-

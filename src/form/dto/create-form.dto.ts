@@ -15,12 +15,11 @@ import { Type } from 'class-transformer';
 
 export class CreateFormDto {
   @ApiProperty({ description: 'name field' })
-    @IsString()
-    name: string;
+  @IsString()
+  name: string;
   @ApiProperty({ description: 'fields field' })
-    @IsObject()
-    fields: any;
-
+  @IsObject()
+  fields: any;
 }
 
 export class PaginationFormResultDto {
@@ -53,4 +52,3 @@ export class PaginationFormQueryDto {
   @ApiPropertyOptional({ default: 10 })
   pageSize?: number = 10;
 }
-

@@ -15,12 +15,11 @@ import { Type } from 'class-transformer';
 
 export class CreateSchemaDto {
   @ApiProperty({ description: 'name field' })
-    @IsString()
-    name: string;
+  @IsString()
+  name: string;
   @ApiProperty({ description: 'schema field' })
-    @IsObject()
-    schema: any;
-
+  @IsObject()
+  schema: any;
 }
 
 export class PaginationSchemaResultDto {
@@ -53,4 +52,3 @@ export class PaginationSchemaQueryDto {
   @ApiPropertyOptional({ default: 10 })
   pageSize?: number = 10;
 }
-

@@ -32,8 +32,6 @@ import {
 } from './dto/create-log.dto';
 import { UpdateLogDto } from './dto/update-log.dto';
 
-
-
 @ApiTags('Log')
 @Controller('api/log')
 export class LogController {
@@ -44,9 +42,11 @@ export class LogController {
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  
   @ApiOperation({ summary: 'Create a new Log' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateLogDto })
+  @ApiCreatedResponse({
+    description: 'Successfully created.',
+    type: CreateLogDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
@@ -59,7 +59,6 @@ export class LogController {
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  
   @ApiOperation({ summary: 'Retrieve all Log records' })
   @ApiOkResponse({ description: 'List of Log records.', type: [CreateLogDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
@@ -73,7 +72,6 @@ export class LogController {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  
   @ApiOperation({ summary: 'Paginated Log records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -92,7 +90,6 @@ export class LogController {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  
   @ApiOperation({ summary: 'Find Log by ID' })
   @ApiOkResponse({ description: 'Record found.', type: CreateLogDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -107,7 +104,6 @@ export class LogController {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  
   @ApiOperation({ summary: 'Update Log by ID' })
   @ApiOkResponse({ description: 'Successfully updated.', type: UpdateLogDto })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
@@ -123,7 +119,6 @@ export class LogController {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  
   @ApiOperation({ summary: 'Delete Log by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -133,4 +128,3 @@ export class LogController {
     return this.logService.remove(id);
   }
 }
-

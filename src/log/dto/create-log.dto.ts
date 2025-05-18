@@ -15,12 +15,11 @@ import { Type } from 'class-transformer';
 
 export class CreateLogDto {
   @ApiProperty({ description: 'data field' })
-    @IsObject()
-    data: any;
+  @IsObject()
+  data: any;
   @ApiProperty({ description: 'type field' })
-    @IsString()
-    type: string;
-
+  @IsString()
+  type: string;
 }
 
 export class PaginationLogResultDto {
@@ -53,4 +52,3 @@ export class PaginationLogQueryDto {
   @ApiPropertyOptional({ default: 10 })
   pageSize?: number = 10;
 }
-
