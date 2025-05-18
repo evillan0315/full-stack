@@ -191,6 +191,13 @@ model Submission {
   formId      String?
 }
 
+model Log {
+  id        String   @id @default(uuid())
+  data      Json
+  type      String
+  createdAt DateTime @default(now())
+}
+
 enum Role {
   ADMIN
   USER

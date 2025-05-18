@@ -29,22 +29,23 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../auth/enums/user-role.enum';
 
-import { UserService } from './user.service';
+import { SubmissionService } from './submission.service';
 import {
-  CreateUserDto,
-  PaginationUserResultDto,
-  PaginationUserQueryDto,
-} from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+  CreateSubmissionDto,
+  PaginationSubmissionResultDto,
+  PaginationSubmissionQueryDto,
+} from './dto/create-submission.dto';
+import { UpdateSubmissionDto } from './dto/update-submission.dto';
+
+
 
 @ApiBearerAuth()
-
 @UseGuards(JwtAuthGuard, RolesGuard)
 
-@ApiTags('User')
-@Controller('api/user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@ApiTags('Submission')
+@Controller('api/submission')
+export class SubmissionController {
+  constructor(private readonly submissionService: SubmissionService) {}
 
   // ───────────────────────────────────────────────────────────
   // CREATE
@@ -54,13 +55,13 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Create a new User' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateUserDto })
+  @ApiOperation({ summary: 'Create a new Submission' })
+  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateSubmissionDto })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
-  create(@Body() dto: CreateUserDto) {
-    return this.userService.create(dto);
+  create(@Body() dto: CreateSubmissionDto) {
+    return this.submissionService.create(dto);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -71,12 +72,12 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Retrieve all User records' })
-  @ApiOkResponse({ description: 'List of User records.', type: [CreateUserDto] })
+  @ApiOperation({ summary: 'Retrieve all Submission records' })
+  @ApiOkResponse({ description: 'List of Submission records.', type: [CreateSubmissionDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
-    return this.userService.findAll();
+    return this.submissionService.findAll();
   }
 
   // ───────────────────────────────────────────────────────────
@@ -87,17 +88,17 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Paginated User records' })
+  @ApiOperation({ summary: 'Paginated Submission records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Paginated results',
-    type: PaginationUserResultDto,
+    type: PaginationSubmissionResultDto,
   })
-  findAllPaginated(@Query() query: PaginationUserQueryDto) {
+  findAllPaginated(@Query() query: PaginationSubmissionQueryDto) {
     const { page, pageSize } = query;
-    return this.userService.findAllPaginated(undefined, page, pageSize);
+    return this.submissionService.findAllPaginated(undefined, page, pageSize);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -108,13 +109,13 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Find User by ID' })
-  @ApiOkResponse({ description: 'Record found.', type: CreateUserDto })
+  @ApiOperation({ summary: 'Find Submission by ID' })
+  @ApiOkResponse({ description: 'Record found.', type: CreateSubmissionDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+    return this.submissionService.findOne(id);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -125,14 +126,14 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Update User by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateUserDto })
+  @ApiOperation({ summary: 'Update Submission by ID' })
+  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateSubmissionDto })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
-  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
-    return this.userService.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateSubmissionDto) {
+    return this.submissionService.update(id, dto);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -143,13 +144,13 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Delete User by ID' })
+  @ApiOperation({ summary: 'Delete Submission by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+    return this.submissionService.remove(id);
   }
 }
 

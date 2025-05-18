@@ -23,12 +23,12 @@ import {
   ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
-
+<% if (isProtected) { %>
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../auth/enums/user-role.enum';
-
+<% } %>
 import { <%= className %>Service } from './<%= folderName %>.service';
 import {
   Create<%= className %>Dto,
@@ -37,8 +37,11 @@ import {
 } from './dto/create-<%= folderName %>.dto';
 import { Update<%= className %>Dto } from './dto/update-<%= folderName %>.dto';
 
+
+<% if (isProtected) { %>
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
+<% } %>
 @ApiTags('<%= className %>')
 @Controller('api/<%= folderName %>')
 export class <%= className %>Controller {
@@ -49,7 +52,9 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Post()
+  <% if (isProtected) { %>
   @Roles(UserRole.ADMIN)
+  <% } %>
   @ApiOperation({ summary: 'Create a new <%= className %>' })
   @ApiCreatedResponse({ description: 'Successfully created.', type: Create<%= className %>Dto })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
@@ -64,7 +69,9 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Get()
+  <% if (hasCreatedBy || isProtected) { %>
   @Roles(UserRole.ADMIN)
+  <% } %>
   @ApiOperation({ summary: 'Retrieve all <%= className %> records' })
   @ApiOkResponse({ description: 'List of <%= className %> records.', type: [Create<%= className %>Dto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
@@ -78,7 +85,9 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
+  <% if (isProtected) { %>
   @Roles(UserRole.ADMIN)
+  <% } %>
   @ApiOperation({ summary: 'Paginated <%= className %> records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -97,7 +106,9 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
+  <% if (isProtected) { %>
   @Roles(UserRole.ADMIN)
+  <% } %>
   @ApiOperation({ summary: 'Find <%= className %> by ID' })
   @ApiOkResponse({ description: 'Record found.', type: Create<%= className %>Dto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -112,7 +123,9 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
+  <% if (isProtected) { %>
   @Roles(UserRole.ADMIN)
+  <% } %>
   @ApiOperation({ summary: 'Update <%= className %> by ID' })
   @ApiOkResponse({ description: 'Successfully updated.', type: Update<%= className %>Dto })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
@@ -128,7 +141,9 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
+  <% if (isProtected) { %>
   @Roles(UserRole.ADMIN)
+  <% } %>
   @ApiOperation({ summary: 'Delete <%= className %> by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })

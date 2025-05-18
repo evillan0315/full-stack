@@ -29,22 +29,23 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../auth/enums/user-role.enum';
 
-import { UserService } from './user.service';
+import { FolderService } from './folder.service';
 import {
-  CreateUserDto,
-  PaginationUserResultDto,
-  PaginationUserQueryDto,
-} from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+  CreateFolderDto,
+  PaginationFolderResultDto,
+  PaginationFolderQueryDto,
+} from './dto/create-folder.dto';
+import { UpdateFolderDto } from './dto/update-folder.dto';
+
+
 
 @ApiBearerAuth()
-
 @UseGuards(JwtAuthGuard, RolesGuard)
 
-@ApiTags('User')
-@Controller('api/user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@ApiTags('Folder')
+@Controller('api/folder')
+export class FolderController {
+  constructor(private readonly folderService: FolderService) {}
 
   // ───────────────────────────────────────────────────────────
   // CREATE
@@ -54,13 +55,13 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Create a new User' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateUserDto })
+  @ApiOperation({ summary: 'Create a new Folder' })
+  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateFolderDto })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
-  create(@Body() dto: CreateUserDto) {
-    return this.userService.create(dto);
+  create(@Body() dto: CreateFolderDto) {
+    return this.folderService.create(dto);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -71,12 +72,12 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Retrieve all User records' })
-  @ApiOkResponse({ description: 'List of User records.', type: [CreateUserDto] })
+  @ApiOperation({ summary: 'Retrieve all Folder records' })
+  @ApiOkResponse({ description: 'List of Folder records.', type: [CreateFolderDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
-    return this.userService.findAll();
+    return this.folderService.findAll();
   }
 
   // ───────────────────────────────────────────────────────────
@@ -87,17 +88,17 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Paginated User records' })
+  @ApiOperation({ summary: 'Paginated Folder records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Paginated results',
-    type: PaginationUserResultDto,
+    type: PaginationFolderResultDto,
   })
-  findAllPaginated(@Query() query: PaginationUserQueryDto) {
+  findAllPaginated(@Query() query: PaginationFolderQueryDto) {
     const { page, pageSize } = query;
-    return this.userService.findAllPaginated(undefined, page, pageSize);
+    return this.folderService.findAllPaginated(undefined, page, pageSize);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -108,13 +109,13 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Find User by ID' })
-  @ApiOkResponse({ description: 'Record found.', type: CreateUserDto })
+  @ApiOperation({ summary: 'Find Folder by ID' })
+  @ApiOkResponse({ description: 'Record found.', type: CreateFolderDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+    return this.folderService.findOne(id);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -125,14 +126,14 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Update User by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateUserDto })
+  @ApiOperation({ summary: 'Update Folder by ID' })
+  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateFolderDto })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
-  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
-    return this.userService.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateFolderDto) {
+    return this.folderService.update(id, dto);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -143,13 +144,13 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Delete User by ID' })
+  @ApiOperation({ summary: 'Delete Folder by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+    return this.folderService.remove(id);
   }
 }
 

@@ -24,27 +24,20 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 
-import { JwtAuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../auth/enums/user-role.enum';
-
-import { UserService } from './user.service';
+import { LogService } from './log.service';
 import {
-  CreateUserDto,
-  PaginationUserResultDto,
-  PaginationUserQueryDto,
-} from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+  CreateLogDto,
+  PaginationLogResultDto,
+  PaginationLogQueryDto,
+} from './dto/create-log.dto';
+import { UpdateLogDto } from './dto/update-log.dto';
 
-@ApiBearerAuth()
 
-@UseGuards(JwtAuthGuard, RolesGuard)
 
-@ApiTags('User')
-@Controller('api/user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@ApiTags('Log')
+@Controller('api/log')
+export class LogController {
+  constructor(private readonly logService: LogService) {}
 
   // ───────────────────────────────────────────────────────────
   // CREATE
@@ -52,15 +45,13 @@ export class UserController {
 
   @Post()
   
-  @Roles(UserRole.ADMIN)
-  
-  @ApiOperation({ summary: 'Create a new User' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateUserDto })
+  @ApiOperation({ summary: 'Create a new Log' })
+  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateLogDto })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
-  create(@Body() dto: CreateUserDto) {
-    return this.userService.create(dto);
+  create(@Body() dto: CreateLogDto) {
+    return this.logService.create(dto);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -69,14 +60,12 @@ export class UserController {
 
   @Get()
   
-  @Roles(UserRole.ADMIN)
-  
-  @ApiOperation({ summary: 'Retrieve all User records' })
-  @ApiOkResponse({ description: 'List of User records.', type: [CreateUserDto] })
+  @ApiOperation({ summary: 'Retrieve all Log records' })
+  @ApiOkResponse({ description: 'List of Log records.', type: [CreateLogDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
-    return this.userService.findAll();
+    return this.logService.findAll();
   }
 
   // ───────────────────────────────────────────────────────────
@@ -85,19 +74,17 @@ export class UserController {
 
   @Get('paginated')
   
-  @Roles(UserRole.ADMIN)
-  
-  @ApiOperation({ summary: 'Paginated User records' })
+  @ApiOperation({ summary: 'Paginated Log records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Paginated results',
-    type: PaginationUserResultDto,
+    type: PaginationLogResultDto,
   })
-  findAllPaginated(@Query() query: PaginationUserQueryDto) {
+  findAllPaginated(@Query() query: PaginationLogQueryDto) {
     const { page, pageSize } = query;
-    return this.userService.findAllPaginated(undefined, page, pageSize);
+    return this.logService.findAllPaginated(undefined, page, pageSize);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -106,15 +93,13 @@ export class UserController {
 
   @Get(':id')
   
-  @Roles(UserRole.ADMIN)
-  
-  @ApiOperation({ summary: 'Find User by ID' })
-  @ApiOkResponse({ description: 'Record found.', type: CreateUserDto })
+  @ApiOperation({ summary: 'Find Log by ID' })
+  @ApiOkResponse({ description: 'Record found.', type: CreateLogDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+    return this.logService.findOne(id);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -123,16 +108,14 @@ export class UserController {
 
   @Patch(':id')
   
-  @Roles(UserRole.ADMIN)
-  
-  @ApiOperation({ summary: 'Update User by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateUserDto })
+  @ApiOperation({ summary: 'Update Log by ID' })
+  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateLogDto })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
-  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
-    return this.userService.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateLogDto) {
+    return this.logService.update(id, dto);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -141,15 +124,13 @@ export class UserController {
 
   @Delete(':id')
   
-  @Roles(UserRole.ADMIN)
-  
-  @ApiOperation({ summary: 'Delete User by ID' })
+  @ApiOperation({ summary: 'Delete Log by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+    return this.logService.remove(id);
   }
 }
 

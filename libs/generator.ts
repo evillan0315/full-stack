@@ -2,15 +2,15 @@ import * as ejs from 'ejs';
 import * as fs from 'fs';
 import * as path from 'path';
 import { parseModel } from './parser';
-
 import { protectedModels } from './protected-models';
 
 export async function generateResource(modelName: string, outDir?: string) {
   const className = capitalize(modelName);
   const fileName = modelName.charAt(0).toLowerCase() + modelName.slice(1);
   const folderName = toDashCase(modelName);
-  const fields = parseModel(modelName);
 
+  // Updated to extract fields and hasCreatedBy
+  const { fields, hasCreatedBy } = parseModel(modelName);
   const isProtected = protectedModels.includes(className);
 
   const templates = [
@@ -23,7 +23,6 @@ export async function generateResource(modelName: string, outDir?: string) {
 
   const targetDir = path.join(outDir || 'output', folderName);
   const dtoDir = path.join(targetDir, 'dto');
-
   fs.mkdirSync(dtoDir, { recursive: true });
 
   for (const tpl of templates) {
@@ -31,13 +30,16 @@ export async function generateResource(modelName: string, outDir?: string) {
       path.join(__dirname, 'templates', `${tpl.name}.ts.ejs`),
       'utf8',
     );
+
     const result = ejs.render(template, {
       className,
       fileName,
       fields,
       folderName,
       isProtected,
+      hasCreatedBy, // Pass this into templates
     });
+
     const outPath = path.join(targetDir, tpl.out);
     fs.writeFileSync(outPath, result);
     console.log(`✔ Generated: ${outPath}`);
@@ -54,3 +56,4 @@ function toDashCase(str: string): string {
     .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
     .toLowerCase();
 }
+

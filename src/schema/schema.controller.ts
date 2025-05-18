@@ -29,22 +29,22 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../auth/enums/user-role.enum';
 
-import { UserService } from './user.service';
+import { SchemaService } from './schema.service';
 import {
-  CreateUserDto,
-  PaginationUserResultDto,
-  PaginationUserQueryDto,
-} from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+  CreateSchemaDto,
+  PaginationSchemaResultDto,
+  PaginationSchemaQueryDto,
+} from './dto/create-schema.dto';
+import { UpdateSchemaDto } from './dto/update-schema.dto';
 
 @ApiBearerAuth()
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 
-@ApiTags('User')
-@Controller('api/user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@ApiTags('Schema')
+@Controller('api/schema')
+export class SchemaController {
+  constructor(private readonly schemaService: SchemaService) {}
 
   // ───────────────────────────────────────────────────────────
   // CREATE
@@ -54,13 +54,13 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Create a new User' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateUserDto })
+  @ApiOperation({ summary: 'Create a new Schema' })
+  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateSchemaDto })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
-  create(@Body() dto: CreateUserDto) {
-    return this.userService.create(dto);
+  create(@Body() dto: CreateSchemaDto) {
+    return this.schemaService.create(dto);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -71,12 +71,12 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Retrieve all User records' })
-  @ApiOkResponse({ description: 'List of User records.', type: [CreateUserDto] })
+  @ApiOperation({ summary: 'Retrieve all Schema records' })
+  @ApiOkResponse({ description: 'List of Schema records.', type: [CreateSchemaDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
-    return this.userService.findAll();
+    return this.schemaService.findAll();
   }
 
   // ───────────────────────────────────────────────────────────
@@ -87,17 +87,17 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Paginated User records' })
+  @ApiOperation({ summary: 'Paginated Schema records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Paginated results',
-    type: PaginationUserResultDto,
+    type: PaginationSchemaResultDto,
   })
-  findAllPaginated(@Query() query: PaginationUserQueryDto) {
+  findAllPaginated(@Query() query: PaginationSchemaQueryDto) {
     const { page, pageSize } = query;
-    return this.userService.findAllPaginated(undefined, page, pageSize);
+    return this.schemaService.findAllPaginated(undefined, page, pageSize);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -108,13 +108,13 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Find User by ID' })
-  @ApiOkResponse({ description: 'Record found.', type: CreateUserDto })
+  @ApiOperation({ summary: 'Find Schema by ID' })
+  @ApiOkResponse({ description: 'Record found.', type: CreateSchemaDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+    return this.schemaService.findOne(id);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -125,14 +125,14 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Update User by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateUserDto })
+  @ApiOperation({ summary: 'Update Schema by ID' })
+  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateSchemaDto })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
-  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
-    return this.userService.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateSchemaDto) {
+    return this.schemaService.update(id, dto);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -143,13 +143,13 @@ export class UserController {
   
   @Roles(UserRole.ADMIN)
   
-  @ApiOperation({ summary: 'Delete User by ID' })
+  @ApiOperation({ summary: 'Delete Schema by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+    return this.schemaService.remove(id);
   }
 }
 

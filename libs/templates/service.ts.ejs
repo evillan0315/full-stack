@@ -1,31 +1,38 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { Request } from 'express';
-import { REQUEST } from '@nestjs/core';
+import { Injectable, Inject<% if (isProtected) { %>, ForbiddenException<% } %> } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 import { Create<%= className %>Dto } from './dto/create-<%= folderName %>.dto';
 import { Update<%= className %>Dto } from './dto/update-<%= folderName %>.dto';
-import { Prisma, Role } from '@prisma/client';
-<% if (className === 'User') { %>import * as bcrypt from 'bcrypt';<% } %>
+import { Prisma<% if (className === 'User') { %>, Role<% } %> } from '@prisma/client';
+<% if (className === 'User') { %>
+import * as bcrypt from 'bcrypt';
+import { CreateJwtUserDto } from '../auth/dto/auth.dto';
+<% } else if (isProtected || hasCreatedBy) { %>
+import { CreateJwtUserDto } from '../auth/dto/auth.dto';
+<% } %>
+<% if (hasCreatedBy || isProtected) { %>
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
+<% } %>
 
 @Injectable()
 export class <%= className %>Service {
   constructor(
     private prisma: PrismaService,
-    @Inject(REQUEST)
-    private readonly request: Request & { user?: CreateJwtUserDto },
+    <% if (hasCreatedBy || isProtected) { %>@Inject(REQUEST) private readonly request: Request & { user?: CreateJwtUserDto },<% } %>
   ) {}
 
+  <% if (hasCreatedBy || isProtected) { %>
   private get userId(): string | undefined {
     return this.request.user?.sub;
   }
+  <% } %>
 
   create(data: Create<%= className %>Dto) {
-    const hasCreatedById = data.hasOwnProperty('createdById');
     const createData: any = { ...data };
-    const isUserModel = '<%= className %>' === 'User';
 
-    if (this.userId && !isUserModel) {
+    <% if (hasCreatedBy && className !== 'User') { %>
+    const hasCreatedById = data.hasOwnProperty('createdById');
+    if (this.userId) {
       createData.createdBy = {
         connect: { id: this.userId },
       };
@@ -33,10 +40,9 @@ export class <%= className %>Service {
         delete createData.createdById;
       }
     }
+    <% } %>
 
-    return this.prisma.<%= fileName %>.create({
-      data: createData,
-    });
+    return this.prisma.<%= fileName %>.create({ data: createData });
   }
 
   async findAllPaginated(
@@ -73,18 +79,21 @@ export class <%= className %>Service {
   }
 
   findOne(id: string) {
-    const isUserModel = '<%= className %>' === 'User';
+    
 
-    return this.prisma.<%= fileName %>.findUnique({
-      where: { id },
-      ...(isUserModel && {
+    return this.prisma.<%= fileName %>.findUnique(
+    <% if (className === 'User') { %>
+    {where: { id },
         include: {
           Account: true,
           Session: true,
           Folder: true,
         },
-      }),
-    });
+    }
+    <% } else { %>
+    { where: { id } }
+    <% }  %>
+    );
   }
 
   update(id: string, data: Update<%= className %>Dto) {
@@ -139,9 +148,15 @@ export class <%= className %>Service {
       },
     });
   }
-  
+
   async findByEmail(email: string) {
-    return this.prisma.user.findUnique({ where: { email }, include: { password: true, Account: true } });
+    return this.prisma.user.findUnique({
+      where: { email },
+      include: {
+        password: true,
+        Account: true,
+      },
+    });
   }
 <% } %>
 }

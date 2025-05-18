@@ -1,6 +1,6 @@
 import * as fs from 'fs';
-
 import * as path from 'path';
+
 export interface ParsedField {
   name: string;
   prismaType: string;
@@ -17,11 +17,15 @@ export interface ScalarField extends ParsedField {
   relationType: null;
 }
 
-export function parseModel(modelName: string): ScalarField[] {
+export interface ModelParseResult {
+  fields: ScalarField[];
+  hasCreatedBy: boolean;
+}
+
+export function parseModel(modelName: string): ModelParseResult {
   const schemaPath = path.resolve(process.cwd(), 'prisma/schema.prisma');
-  console.log(schemaPath, 'schemaPath');
   const content = fs.readFileSync(schemaPath, 'utf8');
-  //const content = fs.readFileSync("prisma/schema.prisma", "utf8");
+
   const modelRegex = new RegExp(`model\\s+${modelName}\\s+{([\\s\\S]*?)}`, 'm');
   const match = content.match(modelRegex);
   if (!match) throw new Error(`Model ${modelName} not found.`);
@@ -37,6 +41,8 @@ export function parseModel(modelName: string): ScalarField[] {
     'Decimal',
     'BigInt',
   ];
+
+  let hasCreatedBy = false;
 
   const fields = match[1]
     .trim()
@@ -61,9 +67,12 @@ export function parseModel(modelName: string): ScalarField[] {
             ? 'many-to-one'
             : null;
 
-      // Skip relation fields
+      if (name === 'createdBy' || name === 'createdById') {
+        hasCreatedBy = true;
+      }
+
       if (relationType !== null) {
-        return null;
+        return null; // skip relational fields from scalar list
       }
 
       const { tsType, validators } = mapPrismaTypeToTsType(
@@ -86,7 +95,10 @@ export function parseModel(modelName: string): ScalarField[] {
     })
     .filter((field): field is ScalarField => field !== null);
 
-  return fields;
+  return {
+    fields,
+    hasCreatedBy,
+  };
 }
 
 function mapPrismaTypeToTsType(
@@ -122,55 +134,41 @@ function mapPrismaTypeToTsType(
     case 'String':
       tsType = 'string';
       if (isEmailField) {
-        validators.push(
-          decorate(
-            'IsEmail',
-            `${label} must be a valid email address, sweetpea.`,
-          ),
-        );
+        validators.push(decorate('IsEmail', `${label} must be a valid email address.`));
       } else {
-        validators.push(
-          decorate('IsString', `${label} must be text, darlin'!`),
-        );
+        validators.push(decorate('IsString', `${label} must be a string.`));
       }
       break;
     case 'Int':
       tsType = 'number';
-      validators.push(decorate('IsInt', `${label} must be a number, sugar.`));
+      validators.push(decorate('IsInt', `${label} must be an integer.`));
       break;
     case 'Float':
       tsType = 'number';
-      validators.push(
-        decorate('IsNumber', `${label} should be a floatin’ number, hun.`),
-      );
+      validators.push(decorate('IsNumber', `${label} must be a float.`));
       break;
     case 'Boolean':
       tsType = 'boolean';
-      validators.push(
-        decorate('IsBoolean', `${label} must be true or false, hon.`),
-      );
+      validators.push(decorate('IsBoolean', `${label} must be true or false.`));
       break;
     case 'DateTime':
       tsType = 'Date';
-      validators.push(
-        decorate('IsDate', `${label} must be a proper date, sweetheart.`),
-      );
+      validators.push(decorate('IsDate', `${label} must be a date.`));
       break;
     case 'Json':
       tsType = 'any';
-      validators.push(
-        decorate('IsObject', `${label} must be a valid object, sugarplum.`),
-      );
+      validators.push(decorate('IsObject', `${label} must be an object.`));
       break;
     default:
       tsType = 'string';
-      validators.push(decorate('IsString', `${label} must be text, darlin'!`));
+      validators.push(decorate('IsString', `${label} must be a string.`));
       break;
   }
 
   if (isOptional) {
-    validators.unshift(decorate('IsOptional', `${label} is optional, sugar.`));
+    validators.unshift(decorate('IsOptional', `${label} is optional.`));
   }
 
   return { tsType, validators };
 }
+
