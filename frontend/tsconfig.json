@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "jsx": "preserve",             
+    "jsxImportSource": "solid-js", 
+    "target": "ESNext",
+    "isolatedModules": true,
+    "noEmit": true
+  },
+  "include": ["./**/*.ts", "./**/*.tsx"]
+}
+

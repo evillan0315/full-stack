@@ -6,9 +6,18 @@
     "deleteOutDir": true,
     "assets": [
       {
+        "include": "../public/**/*",
+        "outDir": "dist/public"
+      },
+      {
+        "include": "views/**/*",
+        "outDir": "dist"
+      },
+      {
         "include": "src/mail/templates/**/*.hbs",
         "outDir": "dist/src/mail/templates"
       }
     ]
   }
 }
+
