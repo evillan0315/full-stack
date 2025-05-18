@@ -27,11 +27,15 @@ A robust and secure authentication module for **NestJS**, using **Prisma ORM**, 
   * Verification email with JWT link on registration
   * Endpoint for verifying tokens
   * Resend verification feature
+* ✅ OAuth2 login support:
+
+  * Google OAuth2 (via Passport.js)
+  * GitHub OAuth2 (via Passport.js)
+  * Automatically issues JWT and sets it as a cookie
 * ✅ Role-based access guard with `@Roles()` decorator
 * ✅ Swagger API documentation for all endpoints
 * ✅ Prisma ORM integration with generated DTOs
 * ✅ CLI scaffolding for modules (controller, service, DTOs)
-* 🚧 OAuth2 support for Google and GitHub (scaffolded)
 
 ---
 
@@ -92,22 +96,40 @@ Visit [http://localhost:3000/api](http://localhost:3000/api) for the full Swagge
 
 ## 🚀 API Workflows
 
-* **POST `/auth/register`** → Creates user, sends verification email
-* **GET `/auth/verify-email?token=...`** → Verifies user's email
-* **POST `/auth/resend-verification`** → Resends email verification link
-* **POST `/auth/login`** → Logs user in and issues JWT cookie
-* **POST `/auth/logout`** → Clears JWT cookie
-* **Protected endpoints** → Require valid JWT + role checks via `@Roles()`
+### 📥 Registration and Verification
 
----
+| Method | Endpoint                           | Description               |
+| ------ | ---------------------------------- | ------------------------- |
+| POST   | `/api/auth/register`               | Register new user         |
+| GET    | `/api/auth/verify-email?token=...` | Verify email via token    |
+| POST   | `/api/auth/resend-verification`    | Resend email verification |
 
-## 🔑 API Endpoints
+### 🔐 Login and Logout
 
-### 📥 Register
+| Method | Endpoint           | Description                 |
+| ------ | ------------------ | --------------------------- |
+| POST   | `/api/auth/login`  | Login with email + password |
+| POST   | `/api/auth/logout` | Logout and clear JWT cookie |
 
-```
-POST /auth/register
-```
+
+
+### 🧠 OAuth2 Login (Google & GitHub)
+
+| Method | Endpoint                    | Description                   |
+| ------ | --------------------------- | ----------------------------- |
+| GET    | `/api/auth/google`          | Start Google OAuth2 login     |
+| GET    | `/api/auth/google/callback` | Handle Google OAuth2 callback |
+| GET    | `/api/auth/github`          | Start GitHub OAuth2 login     |
+| GET    | `/api/auth/github/callback` | Handle GitHub OAuth2 callback |
+
+* OAuth2 providers issue a JWT and set it as an HTTP-only cookie.
+* The user is returned along with the token for client use.
+
+### 👤 Authenticated Access
+
+| Method | Endpoint       | Description                                       |
+| ------ | -------------- | ------------------------------------------------- |
+| GET    | `/api/auth/me` | Returns current authenticated user (JWT required) |
 
 **Body**:
 
@@ -119,26 +141,9 @@ POST /auth/register
   "phone_number": "+123456789"
 }
 ```
-
-### 🔓 Login
-
-```
-POST /auth/login
-```
-
-Sets a secure `jwt` cookie. Returns access token for optional use in Authorization header.
-
-### 🧾 Get Current User
-
-```
-GET /auth/me
-```
-
-**Headers**:
-
-* `Authorization: Bearer <token>` *(optional if cookie is present)*
-
 ---
+
+
 
 ## 🛡️ Role-Based Access (RBAC)
 
@@ -186,6 +191,52 @@ Planned support for:
 
 * 🔗 Google
 * 🐱 GitHub
+
+Here’s an example of how you could document the new feature (`createdBy` detection and handling in the service template) in your `README.md`:
+
+---
+
+## CLI tool to scaffold modules with service/controller/dto
+
+### 🔄 Automatic `createdBy` Injection
+
+The resource generator now includes support for auto-injecting the authenticated user as the `createdBy` relation in create operations.
+
+#### 🧠 How It Works
+
+If the Prisma model contains either a `createdBy` or `createdById` field, and the model is **not** `User`, the generated service will:
+
+* Inject the current user from the request (via `REQUEST`).
+* Attach the authenticated user as the creator:
+
+  ```ts
+  createData.createdBy = {
+    connect: { id: this.userId },
+  };
+  ```
+* Automatically remove `createdById` from the DTO to avoid Prisma conflicts if both are present.
+
+#### ✅ Requirements
+
+* Your Prisma model must define either:
+
+  ```prisma
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
+  ```
+
+  or simply:
+
+  ```prisma
+  createdBy   User   @relation(fields: [createdBy], references: [id])
+  ```
+
+* The model must not be `User` itself to avoid circular logic during user creation.
+
+#### 🔐 Protected Models
+
+This works in conjunction with the `libs/protected-models.ts` configuration, which enables route protection and user context injection.
+
 
 ### Folder structure preview:
 
@@ -235,6 +286,7 @@ src/
 │   ├── cli.ts
 │   ├── generator.ts
 │   ├── parser.ts
+│   ├── protected-models
 │   └── templates/
 │       ├── controller.ts.ejs
 │       ├── create-dto.ts.ejs
