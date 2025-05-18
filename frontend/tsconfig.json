@@ -1,13 +1,19 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "ESNext",
-    "jsx": "preserve",             
-    "jsxImportSource": "solid-js", 
     "target": "ESNext",
-    "isolatedModules": true,
-    "noEmit": true
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "esModuleInterop": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./*"]
+    }
   },
-  "include": ["./**/*.ts", "./**/*.tsx"]
+  "include": ["index.tsx", "**/*.tsx", "**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
 

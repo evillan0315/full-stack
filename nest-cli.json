@@ -14,8 +14,8 @@
         "outDir": "dist"
       },
       {
-        "include": "src/mail/templates/**/*.hbs",
-        "outDir": "dist/src/mail/templates"
+        "include": "src/mail/templates/**/*",
+        "outDir": "dist/templates"
       }
     ]
   }
