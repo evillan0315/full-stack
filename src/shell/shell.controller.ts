@@ -4,17 +4,26 @@ import {
   Body,
   HttpException,
   HttpStatus,
+   UseGuards 
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ShellService } from './shell.service';
 import { ShellCommandDto } from './dto/shell-command.dto';
 
+import { JwtAuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../auth/enums/user-role.enum';
+
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Shell')
 @Controller('api/shell')
 export class ShellController {
   constructor(private readonly shellService: ShellService) {}
 
   @Post('run')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({
     summary: 'Execute a shell command',
     description:
