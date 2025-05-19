@@ -4,9 +4,15 @@ import {
   Body,
   HttpException,
   HttpStatus,
-   UseGuards 
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBody,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { ShellService } from './shell.service';
 import { ShellCommandDto } from './dto/shell-command.dto';
 

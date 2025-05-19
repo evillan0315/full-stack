@@ -1,11 +1,19 @@
-import { Controller, Get, Query, Post, Body, BadRequestException, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Post,
+  Body,
+  BadRequestException,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiOperation,
   ApiQuery,
   ApiResponse,
   ApiTags,
   ApiBody,
-  ApiBearerAuth
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from './database.service';
@@ -14,6 +22,7 @@ import { GetTableColumnsQueryDto } from './dto/get-table-columns-query.dto';
 import { ColumnMetadataDto } from './dto/column-metadata.dto';
 import { CreateTableDto } from './dto/create-table.dto';
 import { TableInfo } from './database.service';
+import { ExecuteSqlDto } from './dto/execute-sql.dto';
 
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -25,7 +34,10 @@ import { UserRole } from '../auth/enums/user-role.enum';
 @ApiTags('Database')
 @Controller('api/database')
 export class DatabaseController {
-  constructor(private readonly databaseService: DatabaseService, private readonly configService: ConfigService,) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get('tables')
   @Roles(UserRole.ADMIN)
@@ -71,8 +83,7 @@ export class DatabaseController {
   })
   async getTables(@Query() query: GetTablesQueryDto): Promise<TableInfo[]> {
     const connectionString =
-      query.connectionString ||
-      this.configService.get<string>('DATABASE_URL');
+      query.connectionString || this.configService.get<string>('DATABASE_URL');
 
     if (!connectionString) {
       throw new BadRequestException('Connection string is required.');
@@ -109,9 +120,7 @@ export class DatabaseController {
   async createTable(@Body() dto: CreateTableDto): Promise<string> {
     return this.databaseService.createTable(dto);
   }
- 
-  
-  
+
   @Get('columns')
   @Roles(UserRole.ADMIN)
   @ApiOperation({
@@ -191,5 +200,27 @@ export class DatabaseController {
       dataType,
       isNullable,
     });
+  }
+
+  @Post('execute')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Execute raw SQL against the target database' })
+  @ApiBody({
+    type: ExecuteSqlDto,
+    examples: {
+      validQuery: {
+        summary: 'Example of a SELECT query on the Documentation table',
+        value: {
+          sql: 'SELECT * FROM "Documentation";',
+          connectionString:
+            'postgresql://postgres:postgres@localhost:5432/appdb',
+          dbType: 'postgres',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'SQL execution result' })
+  async executeSql(@Body() dto: ExecuteSqlDto) {
+    return this.databaseService.executeSql(dto);
   }
 }

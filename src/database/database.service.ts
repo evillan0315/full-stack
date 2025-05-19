@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Client as PgClient } from 'pg';
 import * as mysql from 'mysql2/promise';
 import { MongoClient } from 'mongodb';
+import { ConfigService } from '@nestjs/config';
 import { CreateTableDto } from './dto/create-table.dto';
+import { ExecuteSqlDto } from './dto/execute-sql.dto';
 
 export interface TableColumn {
   column_name: string;
@@ -22,6 +24,8 @@ export interface MongoField {
 }
 @Injectable()
 export class DatabaseService {
+  constructor(private readonly configService: ConfigService) {}
+
   async getAllTables(
     connectionString: string,
     dbType: 'postgres' | 'mysql' | 'mongodb',
@@ -280,6 +284,46 @@ export class DatabaseService {
 
       default:
         throw new Error('Unsupported database type');
+    }
+  }
+  async executeSql(dto: ExecuteSqlDto): Promise<any> {
+    const { sql, dbType } = dto;
+    const connectionString =
+      dto.connectionString || this.configService.get<string>('DATABASE_URL');
+
+    if (!connectionString) {
+      throw new Error('Connection string is missing');
+    }
+
+    switch (dbType) {
+      case 'postgres':
+        return this.executePostgresSql(connectionString, sql);
+      case 'mysql':
+        return this.executeMysqlSql(connectionString, sql);
+      default:
+        throw new Error(`Unsupported database type: ${dbType}`);
+    }
+  }
+
+  private async executePostgresSql(connectionString: string, sql: string) {
+    console.log(sql, 'sql');
+    const client = new PgClient({ connectionString });
+    await client.connect();
+    try {
+      const result = await client.query(sql);
+      return result.rows ?? result;
+    } finally {
+      await client.end();
+    }
+  }
+
+  private async executeMysqlSql(connectionString: string, sql: string) {
+    const connection = await mysql.createConnection(connectionString);
+    try {
+      const [rows] = await connection.query(sql);
+      return rows;
+    } finally {
+      await connection.end();
     }
   }
 }
