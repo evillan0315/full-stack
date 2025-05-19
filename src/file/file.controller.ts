@@ -61,6 +61,9 @@ export class FileController {
   constructor(private readonly fileService: FileService) {}
   
   @Get('list')
+  
+  @Roles(UserRole.ADMIN)
+  
   @ApiOperation({ summary: 'List files in a directory' })
   @ApiQuery({
     name: 'directory',
@@ -80,6 +83,9 @@ export class FileController {
   ) {
     return this.fileService.getFilesByDirectory(directory, recursive);
   }
+  
+  @Roles(UserRole.ADMIN)
+  
   @Post('read')
   @ApiOperation({
     summary: 'Read file content from upload, local path, or URL',

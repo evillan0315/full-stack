@@ -61,6 +61,9 @@ export class <%= className %>Controller {
   constructor(private readonly <%= fileName %>Service: <%= className %>Service) {}
   <% if (className === 'File') { %>
   @Get('list')
+  <% if (isProtected) { %>
+  @Roles(UserRole.ADMIN)
+  <% } %>
   @ApiOperation({ summary: 'List files in a directory' })
   @ApiQuery({
     name: 'directory',
@@ -80,6 +83,9 @@ export class <%= className %>Controller {
   ) {
     return this.fileService.getFilesByDirectory(directory, recursive);
   }
+  <% if (isProtected) { %>
+  @Roles(UserRole.ADMIN)
+  <% } %>
   @Post('read')
   @ApiOperation({
     summary: 'Read file content from upload, local path, or URL',
