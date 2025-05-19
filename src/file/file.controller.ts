@@ -23,30 +23,30 @@ import {
   ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
-<% if (isProtected) { %>
+
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../auth/enums/user-role.enum';
-<% } %>
-import { <%= className %>Service } from './<%= folderName %>.service';
+
+import { FileService } from './file.service';
 import {
-  Create<%= className %>Dto,
-  Pagination<%= className %>ResultDto,
-  Pagination<%= className %>QueryDto,
-} from './dto/create-<%= folderName %>.dto';
-import { Update<%= className %>Dto } from './dto/update-<%= folderName %>.dto';
+  CreateFileDto,
+  PaginationFileResultDto,
+  PaginationFileQueryDto,
+} from './dto/create-file.dto';
+import { UpdateFileDto } from './dto/update-file.dto';
 
 
-<% if (isProtected) { %>
+
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-<% } %>
-@ApiTags('<%= className %>')
-@Controller('api/<%= folderName %>')
-export class <%= className %>Controller {
-  constructor(private readonly <%= fileName %>Service: <%= className %>Service) {}
-  <% if (className === 'File') { %>
+
+@ApiTags('File')
+@Controller('api/file')
+export class FileController {
+  constructor(private readonly fileService: FileService) {}
+  
   @Get('list')
   @ApiOperation({ summary: 'List files in a directory' })
   @ApiQuery({
@@ -67,7 +67,7 @@ export class <%= className %>Controller {
   ) {
     return this.fileService.getFilesByDirectory(directory, recursive);
   }
-  <% } %>
+  
   
   
   // ───────────────────────────────────────────────────────────
@@ -75,16 +75,16 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  <% if (isProtected) { %>
+  
   @Roles(UserRole.ADMIN)
-  <% } %>
-  @ApiOperation({ summary: 'Create a new <%= className %>' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: Create<%= className %>Dto })
+  
+  @ApiOperation({ summary: 'Create a new File' })
+  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateFileDto })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
-  create(@Body() dto: Create<%= className %>Dto) {
-    return this.<%= fileName %>Service.create(dto);
+  create(@Body() dto: CreateFileDto) {
+    return this.fileService.create(dto);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -92,15 +92,15 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  <% if (hasCreatedBy || isProtected) { %>
+  
   @Roles(UserRole.ADMIN)
-  <% } %>
-  @ApiOperation({ summary: 'Retrieve all <%= className %> records' })
-  @ApiOkResponse({ description: 'List of <%= className %> records.', type: [Create<%= className %>Dto] })
+  
+  @ApiOperation({ summary: 'Retrieve all File records' })
+  @ApiOkResponse({ description: 'List of File records.', type: [CreateFileDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
-    return this.<%= fileName %>Service.findAll();
+    return this.fileService.findAll();
   }
 
   // ───────────────────────────────────────────────────────────
@@ -108,20 +108,20 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  <% if (isProtected) { %>
+  
   @Roles(UserRole.ADMIN)
-  <% } %>
-  @ApiOperation({ summary: 'Paginated <%= className %> records' })
+  
+  @ApiOperation({ summary: 'Paginated File records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Paginated results',
-    type: Pagination<%= className %>ResultDto,
+    type: PaginationFileResultDto,
   })
-  findAllPaginated(@Query() query: Pagination<%= className %>QueryDto) {
+  findAllPaginated(@Query() query: PaginationFileQueryDto) {
     const { page, pageSize } = query;
-    return this.<%= fileName %>Service.findAllPaginated(undefined, page, pageSize);
+    return this.fileService.findAllPaginated(undefined, page, pageSize);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -129,16 +129,16 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  <% if (isProtected) { %>
+  
   @Roles(UserRole.ADMIN)
-  <% } %>
-  @ApiOperation({ summary: 'Find <%= className %> by ID' })
-  @ApiOkResponse({ description: 'Record found.', type: Create<%= className %>Dto })
+  
+  @ApiOperation({ summary: 'Find File by ID' })
+  @ApiOkResponse({ description: 'Record found.', type: CreateFileDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findOne(@Param('id') id: string) {
-    return this.<%= fileName %>Service.findOne(id);
+    return this.fileService.findOne(id);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -146,17 +146,17 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  <% if (isProtected) { %>
+  
   @Roles(UserRole.ADMIN)
-  <% } %>
-  @ApiOperation({ summary: 'Update <%= className %> by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: Update<%= className %>Dto })
+  
+  @ApiOperation({ summary: 'Update File by ID' })
+  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateFileDto })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
-  update(@Param('id') id: string, @Body() dto: Update<%= className %>Dto) {
-    return this.<%= fileName %>Service.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateFileDto) {
+    return this.fileService.update(id, dto);
   }
 
   // ───────────────────────────────────────────────────────────
@@ -164,16 +164,16 @@ export class <%= className %>Controller {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  <% if (isProtected) { %>
+  
   @Roles(UserRole.ADMIN)
-  <% } %>
-  @ApiOperation({ summary: 'Delete <%= className %> by ID' })
+  
+  @ApiOperation({ summary: 'Delete File by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   remove(@Param('id') id: string) {
-    return this.<%= fileName %>Service.remove(id);
+    return this.fileService.remove(id);
   }
 }
 

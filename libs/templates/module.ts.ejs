@@ -6,7 +6,15 @@ import { PrismaModule } from '../prisma/prisma.module';
 @Module({
   imports: [PrismaModule],
   controllers: [<%= className %>Controller],
-  providers: [<%= className %>Service]
+  providers: [
+      <%= className %>Service,
+      <% if (className === 'File') { %>
+      {
+        provide: 'EXCLUDED_FOLDERS',
+        useValue: ['node_modules', 'dist', '.git'],
+      },
+      <% } %>
+    ]
 })
 export class <%= className %>Module {}
 

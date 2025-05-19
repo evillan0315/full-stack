@@ -16,6 +16,7 @@ async function bootstrap() {
   const allowedOrigins = [
     'https://board-api.duckdns.org',
     'http://localhost:5000',
+    'http://localhost:5173',
   ];
 
   const configService = app.get(ConfigService);

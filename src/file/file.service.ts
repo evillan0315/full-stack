@@ -1,27 +1,24 @@
-import { Injectable, Inject<% if (isProtected) { %>, ForbiddenException<% } %> } from '@nestjs/common';
+import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-<% if (className === 'File') { %>
+
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Readable } from 'stream';
 import { lookup as mimeLookup } from 'mime-types';
 import { ReadFileResponseDto } from './dto/read-file-response.dto';
-<% } %>
-import { Create<%= className %>Dto } from './dto/create-<%= folderName %>.dto';
-import { Update<%= className %>Dto } from './dto/update-<%= folderName %>.dto';
-import { Prisma<% if (className === 'User') { %>, Role<% } %> } from '@prisma/client';
-<% if (className === 'User') { %>
-import * as bcrypt from 'bcrypt';
+
+import { CreateFileDto } from './dto/create-file.dto';
+import { UpdateFileDto } from './dto/update-file.dto';
+import { Prisma } from '@prisma/client';
+
 import { CreateJwtUserDto } from '../auth/dto/auth.dto';
-<% } else if (isProtected || hasCreatedBy) { %>
-import { CreateJwtUserDto } from '../auth/dto/auth.dto';
-<% } %>
-<% if (hasCreatedBy || isProtected) { %>
+
+
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
-<% } %>
 
-<% if (className === 'File') { %>
+
+
 const language = (
   filename: string,
   mimeType?: string,
@@ -74,17 +71,17 @@ const language = (
 
   return detectedMimeType ? mimeMap[detectedMimeType] : undefined;
 };
-<% } %>
+
 @Injectable()
-export class <%= className %>Service {
+export class FileService {
   constructor(
-    <% if (className === 'File') { %>
+    
     @Inject('EXCLUDED_FOLDERS') private readonly EXCLUDED_FOLDERS: string[],
-    <% } %>
+    
     private prisma: PrismaService,
-    <% if (hasCreatedBy || isProtected) { %>@Inject(REQUEST) private readonly request: Request & { user?: CreateJwtUserDto },<% } %>
+    @Inject(REQUEST) private readonly request: Request & { user?: CreateJwtUserDto },
   ) {}
-  <% if (className === 'File') { %>
+  
   private getFileTree(dir: string, recursive: boolean = false): any[] {
     if (!fs.existsSync(dir)) return [];
 
@@ -104,17 +101,17 @@ export class <%= className %>Service {
         };
       });
   }
-  <% } %>
-  <% if (hasCreatedBy || isProtected) { %>
+  
+  
   private get userId(): string | undefined {
     return this.request.user?.sub;
   }
-  <% } %>
+  
 
-  create(data: Create<%= className %>Dto) {
+  create(data: CreateFileDto) {
     const createData: any = { ...data };
 
-    <% if (hasCreatedBy && className !== 'User') { %>
+    
     const hasCreatedById = data.hasOwnProperty('createdById');
     if (this.userId) {
       createData.createdBy = {
@@ -124,29 +121,29 @@ export class <%= className %>Service {
         delete createData.createdById;
       }
     }
-    <% } %>
+    
 
-    return this.prisma.<%= fileName %>.create({ data: createData });
+    return this.prisma.file.create({ data: createData });
   }
 
   async findAllPaginated(
-    where: Prisma.<%= className %>WhereInput = {},
+    where: Prisma.FileWhereInput = {},
     page = 1,
     pageSize = 10,
-    select?: Prisma.<%= className %>Select,
+    select?: Prisma.FileSelect,
   ) {
     const skip = (page - 1) * pageSize;
     const take = Number(pageSize);
 
     const [items, total] = await this.prisma.$transaction([
-      this.prisma.<%= fileName %>.findMany({
+      this.prisma.file.findMany({
         where,
         orderBy: { createdAt: 'desc' },
         skip,
         take,
         ...(select ? { select } : {}),
       }),
-      this.prisma.<%= fileName %>.count({ where }),
+      this.prisma.file.count({ where }),
     ]);
 
     return {
@@ -159,38 +156,30 @@ export class <%= className %>Service {
   }
 
   findAll() {
-    return this.prisma.<%= fileName %>.findMany();
+    return this.prisma.file.findMany();
   }
 
   findOne(id: string) {
     
 
-    return this.prisma.<%= fileName %>.findUnique(
-    <% if (className === 'User') { %>
-    {where: { id },
-        include: {
-          Account: true,
-          Session: true,
-          Folder: true,
-        },
-    }
-    <% } else { %>
+    return this.prisma.file.findUnique(
+    
     { where: { id } }
-    <% }  %>
+    
     );
   }
 
-  update(id: string, data: Update<%= className %>Dto) {
-    return this.prisma.<%= fileName %>.update({
+  update(id: string, data: UpdateFileDto) {
+    return this.prisma.file.update({
       where: { id },
       data,
     });
   }
 
   remove(id: string) {
-    return this.prisma.<%= fileName %>.delete({ where: { id } });
+    return this.prisma.file.delete({ where: { id } });
   }
-<% if (className === 'File') { %>
+
   async getFilesByDirectory(
     directory: string = '',
     recursive: boolean = false,
@@ -221,58 +210,7 @@ export class <%= className %>Service {
       data: content,
     };
   }
-<% } %>
-<% if (className === 'User') { %>
-  async createUser(email: string, name: string, phone?: string, hash?: string) {
-    return this.prisma.user.create({
-      data: {
-        email,
-        name,
-        phone_number: phone,
-        role: Role.USER,
-        password: hash ? { create: { hash } } : undefined,
-      },
-    });
-  }
 
-  async verifyEmail(userId: string) {
-    return this.prisma.user.update({
-      where: { id: userId },
-      data: { emailVerified: new Date() },
-    });
-  }
 
-  async validatePassword(password: string, hash: string) {
-    return bcrypt.compare(password, hash);
-  }
-
-  async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, 10);
-  }
-
-  findById(userId: string) {
-    return this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        phone_number: true,
-        createdAt: true,
-      },
-    });
-  }
-
-  async findByEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: { email },
-      include: {
-        password: true,
-        Account: true,
-      },
-    });
-  }
-<% } %>
 }
 

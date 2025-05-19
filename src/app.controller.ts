@@ -96,7 +96,16 @@ export class AppController {
       isLoading: false,
     };
   }
-
+  @Get('editor')
+  @Render('pages/monaco')
+  getEditor(@Res() res: Response) {
+    return {
+      title: 'Monaco',
+      code: 'hello',
+      language: 'javascript',
+      layout: 'layouts/editor'
+    };
+  }
   @Post('login')
   @Redirect('/dashboard')
   @ApiOperation({ summary: 'Log in a user and set JWT cookie' })

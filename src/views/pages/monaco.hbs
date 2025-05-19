@@ -1,0 +1,15 @@
+  <div id="editor"></div>
+  <script>
+    require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs' }});
+    require(['vs/editor/editor.main'], function () {
+      monaco.editor.create(document.getElementById('editor'), {
+        value: [
+          'function helloWorld() {',
+          '\tconsole.log("{{language}}");',
+          '}'
+        ].join('\n'),
+        language: '"{{language}}"',
+        theme: 'vs-dark'
+      });
+    });
+  </script>

@@ -15,6 +15,7 @@ import { DocumentationModule } from './documentation/documentation.module';
 import { FolderModule } from './folder/folder.module';
 import { FormModule } from './form/form.module';
 import { SubmissionModule } from './submission/submission.module';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { SubmissionModule } from './submission/submission.module';
     DocumentationModule,
     FolderModule,
     FormModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
