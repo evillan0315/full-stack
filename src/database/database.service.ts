@@ -1,87 +1,285 @@
-import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateDatabaseDto } from './dto/create-database.dto';
-import { UpdateDatabaseDto } from './dto/update-database.dto';
-import { Prisma } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { Client as PgClient } from 'pg';
+import * as mysql from 'mysql2/promise';
+import { MongoClient } from 'mongodb';
+import { CreateTableDto } from './dto/create-table.dto';
 
-import { CreateJwtUserDto } from '../auth/dto/auth.dto';
+export interface TableColumn {
+  column_name: string;
+  data_type: string;
+  is_nullable: string;
+  column_default: string | null;
+}
 
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
+export interface TableInfo {
+  tableName: string;
+  columns: TableColumn[];
+}
 
+export interface MongoField {
+  fieldName: string;
+  fieldType: string;
+}
 @Injectable()
 export class DatabaseService {
-  constructor(
-    private prisma: PrismaService,
-    @Inject(REQUEST)
-    private readonly request: Request & { user?: CreateJwtUserDto },
-  ) {}
-
-  private get userId(): string | undefined {
-    return this.request.user?.sub;
-  }
-
-  create(data: CreateDatabaseDto) {
-    const createData: any = { ...data };
-
-    const hasCreatedById = data.hasOwnProperty('createdById');
-    if (this.userId) {
-      createData.createdBy = {
-        connect: { id: this.userId },
-      };
-      if (hasCreatedById) {
-        delete createData.createdById;
-      }
+  async getAllTables(
+    connectionString: string,
+    dbType: 'postgres' | 'mysql' | 'mongodb',
+  ): Promise<TableInfo[]> {
+    switch (dbType) {
+      case 'postgres':
+        return this.getPostgresTables(connectionString);
+      case 'mysql':
+        return this.getMysqlTables(connectionString);
+      case 'mongodb':
+        return this.getMongoCollections(connectionString);
+      default:
+        throw new Error('Unsupported database type');
     }
-
-    return this.prisma.database.create({ data: createData });
   }
 
-  async findAllPaginated(
-    where: Prisma.DatabaseWhereInput = {},
-    page = 1,
-    pageSize = 10,
-    select?: Prisma.DatabaseSelect,
-  ) {
-    const skip = (page - 1) * pageSize;
-    const take = Number(pageSize);
+  private async getPostgresTables(
+    connectionString: string,
+  ): Promise<TableInfo[]> {
+    const client = new PgClient({ connectionString });
+    await client.connect();
 
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.database.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take,
-        ...(select ? { select } : {}),
-      }),
-      this.prisma.database.count({ where }),
-    ]);
+    try {
+      const tableResult = await client.query(`
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_type = 'BASE TABLE';
+      `);
+      const tables = tableResult.rows.map((row) => row.table_name);
 
-    return {
-      items,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
-    };
+      const tableDetails: TableInfo[] = [];
+
+      for (const tableName of tables) {
+        const columnResult = await client.query(
+          `
+          SELECT column_name, data_type, is_nullable, column_default
+          FROM information_schema.columns
+          WHERE table_schema = 'public' AND table_name = $1;
+        `,
+          [tableName],
+        );
+
+        tableDetails.push({
+          tableName,
+          columns: columnResult.rows,
+        });
+      }
+      return tableDetails;
+    } finally {
+      await client.end();
+    }
   }
 
-  findAll() {
-    return this.prisma.database.findMany();
+  private async getMysqlTables(connectionString: string): Promise<TableInfo[]> {
+    const connection = await mysql.createConnection(connectionString);
+    try {
+      const [tables] = await connection.query(
+        `SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE();`,
+      );
+
+      const tableDetails: TableInfo[] = [];
+
+      for (const row of tables as any[]) {
+        const tableName = row.TABLE_NAME;
+        const [columns] = await connection.query(
+          `SELECT column_name, data_type, is_nullable, column_default
+           FROM information_schema.columns
+           WHERE table_schema = DATABASE() AND table_name = ?`,
+          [tableName],
+        );
+
+        // Normalize MySQL columns keys to lowercase
+        const normalizedColumns: TableColumn[] = (columns as any[]).map(
+          (col) => ({
+            column_name: col.COLUMN_NAME,
+            data_type: col.DATA_TYPE,
+            is_nullable: col.IS_NULLABLE,
+            column_default: col.COLUMN_DEFAULT,
+          }),
+        );
+
+        tableDetails.push({
+          tableName,
+          columns: normalizedColumns,
+        });
+      }
+      return tableDetails;
+    } finally {
+      await connection.end();
+    }
   }
 
-  findOne(id: string) {
-    return this.prisma.database.findUnique({ where: { id } });
-  }
+  private async getMongoCollections(
+    connectionString: string,
+  ): Promise<TableInfo[]> {
+    const mongoClient = new MongoClient(connectionString);
+    await mongoClient.connect();
+    try {
+      const db = mongoClient.db();
+      const collections = await db.collections();
 
-  update(id: string, data: UpdateDatabaseDto) {
-    return this.prisma.database.update({
-      where: { id },
-      data,
-    });
-  }
+      const collectionDetails: TableInfo[] = [];
 
-  remove(id: string) {
-    return this.prisma.database.delete({ where: { id } });
+      for (const collection of collections) {
+        const sampleDoc = await collection.findOne({});
+        const columns: TableColumn[] = sampleDoc
+          ? Object.entries(sampleDoc).map(([key, value]) => ({
+              column_name: key,
+              data_type: typeof value,
+              is_nullable: 'YES', // MongoDB fields are nullable by default
+              column_default: null,
+            }))
+          : [];
+
+        collectionDetails.push({
+          tableName: collection.collectionName,
+          columns,
+        });
+      }
+      return collectionDetails;
+    } finally {
+      await mongoClient.close();
+    }
+  }
+  async getTableColumns(
+    connectionString: string,
+    tableName: string,
+    filters?: { columnName?: string; dataType?: string; isNullable?: string },
+  ): Promise<any[]> {
+    const client = new PgClient({ connectionString });
+    //const client = new Client({ connectionString });
+
+    try {
+      await client.connect();
+
+      const queryParts = [
+        `SELECT column_name, data_type, is_nullable, column_default`,
+        `FROM information_schema.columns`,
+        `WHERE table_schema = 'public' AND table_name = $1`,
+      ];
+      const values: any[] = [tableName];
+      let paramIndex = 2;
+
+      if (filters?.columnName) {
+        queryParts.push(`AND column_name ILIKE $${paramIndex++}`);
+        values.push(`%${filters.columnName}%`);
+      }
+      if (filters?.dataType) {
+        queryParts.push(`AND data_type = $${paramIndex++}`);
+        values.push(filters.dataType);
+      }
+      if (filters?.isNullable) {
+        queryParts.push(`AND is_nullable = $${paramIndex++}`);
+        values.push(filters.isNullable);
+      }
+
+      const query = queryParts.join(' ');
+      const result = await client.query(query, values);
+
+      return result.rows;
+    } catch (error) {
+      console.error(`Failed to fetch columns for table "${tableName}":`, error);
+      throw error;
+    } finally {
+      await client.end();
+    }
+  }
+  async createTable(
+    dto: CreateTableDto & { dbType: 'postgres' | 'mysql' | 'mongodb' },
+  ): Promise<string> {
+    const { connectionString, tableName, columns, dbType } = dto;
+
+    switch (dbType) {
+      case 'postgres': {
+        const client = new PgClient({ connectionString });
+
+        // Build column definitions for Postgres
+        const columnDefinitions = columns
+          .map(
+            ({ columnName, dataType }) =>
+              `"${columnName.replace(/"/g, '""')}" ${dataType}`,
+          )
+          .join(', ');
+
+        const createQuery = `CREATE TABLE IF NOT EXISTS "${tableName.replace(
+          /"/g,
+          '""',
+        )}" (${columnDefinitions});`;
+
+        try {
+          await client.connect();
+          await client.query(createQuery);
+          return `Postgres table "${tableName}" created successfully.`;
+        } catch (error) {
+          console.error('Failed to create Postgres table:', error);
+          throw error;
+        } finally {
+          await client.end();
+        }
+      }
+
+      case 'mysql': {
+        const connection = await mysql.createConnection(connectionString);
+
+        // Build column definitions for MySQL
+        // Note: MySQL uses backticks (`) for identifiers instead of double quotes
+        const columnDefinitions = columns
+          .map(
+            ({ columnName, dataType }) =>
+              `\`${columnName.replace(/`/g, '``')}\` ${dataType}`,
+          )
+          .join(', ');
+
+        const createQuery = `CREATE TABLE IF NOT EXISTS \`${tableName.replace(
+          /`/g,
+          '``',
+        )}\` (${columnDefinitions});`;
+
+        try {
+          await connection.execute(createQuery);
+          return `MySQL table "${tableName}" created successfully.`;
+        } catch (error) {
+          console.error('Failed to create MySQL table:', error);
+          throw error;
+        } finally {
+          await connection.end();
+        }
+      }
+
+      case 'mongodb': {
+        const mongoClient = new MongoClient(connectionString);
+
+        try {
+          await mongoClient.connect();
+          const db = mongoClient.db();
+
+          // In MongoDB, collections are created implicitly when inserting documents.
+          // You can create an empty collection explicitly:
+          const collections = await db
+            .listCollections({ name: tableName })
+            .toArray();
+          if (collections.length === 0) {
+            await db.createCollection(tableName);
+            return `MongoDB collection "${tableName}" created successfully.`;
+          } else {
+            return `MongoDB collection "${tableName}" already exists.`;
+          }
+        } catch (error) {
+          console.error('Failed to create MongoDB collection:', error);
+          throw error;
+        } finally {
+          await mongoClient.close();
+        }
+      }
+
+      default:
+        throw new Error('Unsupported database type');
+    }
   }
 }

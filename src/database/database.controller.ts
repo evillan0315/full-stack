@@ -1,149 +1,182 @@
+import { Controller, Get, Query, Post, Body, BadRequestException } from '@nestjs/common';
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Patch,
-  Delete,
-  UseGuards,
-  HttpStatus,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiTags,
   ApiOperation,
-  ApiBearerAuth,
-  ApiOkResponse,
-  ApiCreatedResponse,
-  ApiNotFoundResponse,
-  ApiBadRequestResponse,
-  ApiUnauthorizedResponse,
-  ApiForbiddenResponse,
   ApiQuery,
   ApiResponse,
+  ApiTags,
+  ApiBody,
 } from '@nestjs/swagger';
-
-import { JwtAuthGuard } from '../auth/auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../auth/enums/user-role.enum';
-
+import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from './database.service';
-import {
-  CreateDatabaseDto,
-  PaginationDatabaseResultDto,
-  PaginationDatabaseQueryDto,
-} from './dto/create-database.dto';
-import { UpdateDatabaseDto } from './dto/update-database.dto';
+import { GetTablesQueryDto } from './dto/get-tables-query.dto';
+import { GetTableColumnsQueryDto } from './dto/get-table-columns-query.dto';
+import { ColumnMetadataDto } from './dto/column-metadata.dto';
+import { CreateTableDto } from './dto/create-table.dto';
+import { TableInfo } from './database.service';
 
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Database')
 @Controller('api/database')
 export class DatabaseController {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly databaseService: DatabaseService, private readonly configService: ConfigService,) {}
 
-  // ───────────────────────────────────────────────────────────
-  // CREATE
-  // ───────────────────────────────────────────────────────────
-
-  @Post()
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Create a new Database' })
-  @ApiCreatedResponse({
-    description: 'Successfully created.',
-    type: CreateDatabaseDto,
+  @Get('tables')
+  @ApiOperation({ summary: 'List all tables and their columns' })
+  @ApiQuery({
+    name: 'connectionString',
+    description:
+      'Optional custom database connection string. Defaults to DATABASE_URL if omitted.',
+    required: false,
+    example: 'postgresql://postgres:password@localhost:5432/mydb',
   })
-  @ApiBadRequestResponse({ description: 'Validation failed.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
-  create(@Body() dto: CreateDatabaseDto) {
-    return this.databaseService.create(dto);
-  }
-
-  // ───────────────────────────────────────────────────────────
-  // FIND ALL
-  // ───────────────────────────────────────────────────────────
-
-  @Get()
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Retrieve all Database records' })
-  @ApiOkResponse({
-    description: 'List of Database records.',
-    type: [CreateDatabaseDto],
+  @ApiQuery({
+    name: 'dbType',
+    enum: ['postgres', 'mysql', 'mongodb'],
+    required: true,
+    description: 'Type of database',
+    example: 'postgres',
   })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
-  findAll() {
-    return this.databaseService.findAll();
-  }
-
-  // ───────────────────────────────────────────────────────────
-  // PAGINATED
-  // ───────────────────────────────────────────────────────────
-
-  @Get('paginated')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Paginated Database records' })
-  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
-  @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Paginated results',
-    type: PaginationDatabaseResultDto,
+    status: 200,
+    description: 'List of tables with column metadata',
+    schema: {
+      example: [
+        {
+          tableName: 'users',
+          columns: [
+            {
+              column_name: 'id',
+              data_type: 'integer',
+              is_nullable: 'NO',
+              column_default: "nextval('users_id_seq'::regclass)",
+            },
+            {
+              column_name: 'email',
+              data_type: 'text',
+              is_nullable: 'NO',
+              column_default: null,
+            },
+          ],
+        },
+      ],
+    },
   })
-  findAllPaginated(@Query() query: PaginationDatabaseQueryDto) {
-    const { page, pageSize } = query;
-    return this.databaseService.findAllPaginated(undefined, page, pageSize);
+  async getTables(@Query() query: GetTablesQueryDto): Promise<TableInfo[]> {
+    const connectionString =
+      query.connectionString ||
+      this.configService.get<string>('DATABASE_URL');
+
+    if (!connectionString) {
+      throw new BadRequestException('Connection string is required.');
+    }
+
+    return this.databaseService.getAllTables(connectionString, query.dbType);
   }
-
-  // ───────────────────────────────────────────────────────────
-  // FIND ONE
-  // ───────────────────────────────────────────────────────────
-
-  @Get(':id')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Find Database by ID' })
-  @ApiOkResponse({ description: 'Record found.', type: CreateDatabaseDto })
-  @ApiNotFoundResponse({ description: 'Record not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
-  findOne(@Param('id') id: string) {
-    return this.databaseService.findOne(id);
-  }
-
-  // ───────────────────────────────────────────────────────────
-  // UPDATE
-  // ───────────────────────────────────────────────────────────
-
-  @Patch(':id')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Update Database by ID' })
-  @ApiOkResponse({
-    description: 'Successfully updated.',
-    type: UpdateDatabaseDto,
+  @Post('create-table')
+  @ApiOperation({ summary: 'Create a new table' })
+  @ApiResponse({ status: 201, description: 'Table created successfully' })
+  @ApiBody({
+    type: CreateTableDto,
+    examples: {
+      example1: {
+        summary: 'Create users table',
+        value: {
+          connectionString:
+            'postgresql://postgres:password@localhost:5432/mydb',
+          dbType: 'postgres', // added dbType here
+          tableName: 'users',
+          columns: [
+            { columnName: 'id', dataType: 'SERIAL PRIMARY KEY' },
+            { columnName: 'email', dataType: 'TEXT NOT NULL' },
+            {
+              columnName: 'created_at',
+              dataType: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+            },
+          ],
+        },
+      },
+    },
   })
-  @ApiBadRequestResponse({ description: 'Invalid data.' })
-  @ApiNotFoundResponse({ description: 'Record not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
-  update(@Param('id') id: string, @Body() dto: UpdateDatabaseDto) {
-    return this.databaseService.update(id, dto);
+  async createTable(@Body() dto: CreateTableDto): Promise<string> {
+    return this.databaseService.createTable(dto);
   }
+  @Get('columns')
+  @ApiOperation({
+    summary: 'Get all columns from a specific table with optional filters',
+  })
+  @ApiQuery({
+    name: 'connectionString',
+    description: 'PostgreSQL connection string',
+    required: false,
+    example: 'postgresql://postgres:password@localhost:5432/mydb',
+  })
+  @ApiQuery({
+    name: 'tableName',
+    description: 'Name of the table to query columns from',
+    required: true,
+    example: 'users',
+  })
+  @ApiQuery({
+    name: 'columnName',
+    description: 'Filter by column name (optional)',
+    required: false,
+    example: 'email',
+  })
+  @ApiQuery({
+    name: 'dataType',
+    description: 'Filter by data type (optional)',
+    required: false,
+    example: 'text',
+  })
+  @ApiQuery({
+    name: 'isNullable',
+    description: 'Filter by nullable status (optional)',
+    required: false,
+    example: 'NO',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Array of column metadata matching filters',
+    type: ColumnMetadataDto,
+    isArray: true,
+    schema: {
+      example: [
+        {
+          column_name: 'id',
+          data_type: 'integer',
+          is_nullable: 'NO',
+          column_default: "nextval('users_id_seq'::regclass)",
+        },
+        {
+          column_name: 'email',
+          data_type: 'text',
+          is_nullable: 'NO',
+          column_default: null,
+        },
+      ],
+    },
+  })
+  @Get('columns')
+  async getTableColumns(@Query() query: GetTableColumnsQueryDto) {
+    const {
+      connectionString: providedConnectionString,
+      tableName,
+      columnName,
+      dataType,
+      isNullable,
+    } = query;
 
-  // ───────────────────────────────────────────────────────────
-  // DELETE
-  // ───────────────────────────────────────────────────────────
+    const connectionString =
+      providedConnectionString ||
+      this.configService.get<string>('DATABASE_URL');
 
-  @Delete(':id')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Delete Database by ID' })
-  @ApiOkResponse({ description: 'Successfully deleted.' })
-  @ApiNotFoundResponse({ description: 'Record not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
-  remove(@Param('id') id: string) {
-    return this.databaseService.remove(id);
+    if (!connectionString) {
+      throw new BadRequestException('Connection string is required.');
+    }
+
+    return this.databaseService.getTableColumns(connectionString, tableName, {
+      columnName,
+      dataType,
+      isNullable,
+    });
   }
 }
