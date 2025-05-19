@@ -9,6 +9,9 @@ import {
   UseGuards,
   HttpStatus,
   Query,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,7 +25,10 @@ import {
   ApiForbiddenResponse,
   ApiQuery,
   ApiResponse,
+  ApiConsumes,
+  ApiBody
 } from '@nestjs/swagger';
+import axios from 'axios';
 
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -36,6 +42,13 @@ import {
   PaginationFileQueryDto,
 } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
+
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { diskStorage } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ReadFileDto } from './dto/read-file.dto';
+import { ReadFileResponseDto } from './dto/read-file-response.dto';
 
 
 
@@ -66,6 +79,84 @@ export class FileController {
     @Query('recursive') recursive: boolean = false,
   ) {
     return this.fileService.getFilesByDirectory(directory, recursive);
+  }
+  @Post('read')
+  @ApiOperation({
+    summary: 'Read file content from upload, local path, or URL',
+  })
+  @ApiResponse({ status: 200, type: ReadFileResponseDto })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Upload a file (optional if using filePath or url)',
+        },
+        filePath: {
+          type: 'string',
+          description: 'Path to a file on the local file system',
+        },
+        url: {
+          type: 'string',
+          description: 'URL of a remote file to fetch content from',
+        },
+        generateBlobUrl: {
+          type: 'boolean',
+          description: 'Return as base64 blob-style data URL',
+        },
+      },
+      required: [],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'File content returned successfully.',
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async readFileContent(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: ReadFileDto,
+  ): Promise<ReadFileResponseDto> {
+    let buffer: Buffer;
+    let filename = 'file';
+    let filePath = '';
+    if (file?.buffer) {
+      buffer = file.buffer;
+      filename = file.originalname || filename;
+    } else if (body.filePath) {
+      try {
+        buffer = await fs.readFile(body.filePath);
+        filePath = body.filePath;
+        filename = body.filePath.split('/').pop() || filename;
+      } catch {
+        throw new BadRequestException(
+          `Unable to read file from path: ${body.filePath}`,
+        );
+      }
+    } else if (body.url) {
+      try {
+        const res = await axios.get(body.url, { responseType: 'arraybuffer' });
+        buffer = Buffer.from(res.data);
+        filePath = body.url;
+        filename = body.url.split('/').pop() || filename;
+      } catch {
+        throw new BadRequestException(
+          `Unable to fetch file from URL: ${body.url}`,
+        );
+      }
+    } else {
+      throw new BadRequestException('Please provide a file, filePath, or url.');
+    }
+
+    return this.fileService.readFile(
+      buffer,
+      filename,
+      body.generateBlobUrl,
+      filePath,
+    );
   }
   
   
