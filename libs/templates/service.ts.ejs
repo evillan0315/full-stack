@@ -208,6 +208,7 @@ export class <%= className %>Service {
     asBlob = false,
     filepath: string,
   ): ReadFileResponseDto {
+    const lang = language(filename, mimeLookup(filename));
     const mimeType = language(filename, mimeLookup(filename));
 
     const content = asBlob
@@ -218,6 +219,7 @@ export class <%= className %>Service {
       filepath,
       filename,
       mimeType: mimeLookup(mimeType) || 'text/plain',
+      language: lang,
       data: content,
     };
   }

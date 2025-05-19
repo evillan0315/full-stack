@@ -162,7 +162,6 @@ export class AuthController {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
       });
-
       return res.redirect('/dashboard');
     } catch (error) {
       console.error('OAuth redirect error:', error);

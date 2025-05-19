@@ -59,21 +59,22 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
+  if (swaggerEnabled && NODE_ENV !== 'production') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Auth API')
+      .setDescription('Authentication and Role Protected APIs')
+      .setVersion('1.0')
+      .addTag('Auth')
+      .addBearerAuth()
+      .addCookieAuth('jwt')
+      .build();
 
-  // Swagger Configuration
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('Auth API')
-    .setDescription('Authentication and Role Protected APIs')
-    .setVersion('1.0')
-    .addTag('Auth')
-    .addBearerAuth() // Enable Authorization Header
-    .addCookieAuth('jwt')
-    .build();
-
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, document);
-  console.log('🥞 Swagger is enabled at /api');
-
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api', app, document);
+    console.log('🥞 Swagger is enabled at /api');
+  } else {
+    console.log('🚫 Swagger is disabled in production.');
+  }
   // Graceful shutdown setup
   app.enableShutdownHooks(); // Handle graceful shutdown
   await app.listen(port);
