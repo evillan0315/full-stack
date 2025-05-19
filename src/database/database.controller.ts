@@ -1,10 +1,11 @@
-import { Controller, Get, Query, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, BadRequestException, UseGuards } from '@nestjs/common';
 import {
   ApiOperation,
   ApiQuery,
   ApiResponse,
   ApiTags,
   ApiBody,
+  ApiBearerAuth
 } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from './database.service';
@@ -14,12 +15,20 @@ import { ColumnMetadataDto } from './dto/column-metadata.dto';
 import { CreateTableDto } from './dto/create-table.dto';
 import { TableInfo } from './database.service';
 
+import { JwtAuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../auth/enums/user-role.enum';
+
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Database')
 @Controller('api/database')
 export class DatabaseController {
   constructor(private readonly databaseService: DatabaseService, private readonly configService: ConfigService,) {}
 
   @Get('tables')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'List all tables and their columns' })
   @ApiQuery({
     name: 'connectionString',
@@ -72,6 +81,7 @@ export class DatabaseController {
     return this.databaseService.getAllTables(connectionString, query.dbType);
   }
   @Post('create-table')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a new table' })
   @ApiResponse({ status: 201, description: 'Table created successfully' })
   @ApiBody({
@@ -99,7 +109,11 @@ export class DatabaseController {
   async createTable(@Body() dto: CreateTableDto): Promise<string> {
     return this.databaseService.createTable(dto);
   }
+ 
+  
+  
   @Get('columns')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({
     summary: 'Get all columns from a specific table with optional filters',
   })
@@ -155,7 +169,6 @@ export class DatabaseController {
       ],
     },
   })
-  @Get('columns')
   async getTableColumns(@Query() query: GetTableColumnsQueryDto) {
     const {
       connectionString: providedConnectionString,
