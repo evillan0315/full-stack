@@ -13,16 +13,10 @@ import { Prisma } from '@prisma/client';
 
 import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 
-
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 
-
-
-const language = (
-  filename: string,
-  mimeType?: string,
-): string | undefined => {
+const language = (filename: string, mimeType?: string): string | undefined => {
   if (!filename) return;
 
   const ext = filename.split('.').pop()?.toLowerCase();
@@ -75,13 +69,13 @@ const language = (
 @Injectable()
 export class FileService {
   constructor(
-    
     @Inject('EXCLUDED_FOLDERS') private readonly EXCLUDED_FOLDERS: string[],
-    
+
     private prisma: PrismaService,
-    @Inject(REQUEST) private readonly request: Request & { user?: CreateJwtUserDto },
+    @Inject(REQUEST)
+    private readonly request: Request & { user?: CreateJwtUserDto },
   ) {}
-  
+
   private getFileTree(dir: string, recursive: boolean = false): any[] {
     if (!fs.existsSync(dir)) return [];
 
@@ -101,17 +95,14 @@ export class FileService {
         };
       });
   }
-  
-  
+
   private get userId(): string | undefined {
     return this.request.user?.sub;
   }
-  
 
   create(data: CreateFileDto) {
     const createData: any = { ...data };
 
-    
     const hasCreatedById = data.hasOwnProperty('createdById');
     if (this.userId) {
       createData.createdBy = {
@@ -121,7 +112,6 @@ export class FileService {
         delete createData.createdById;
       }
     }
-    
 
     return this.prisma.file.create({ data: createData });
   }
@@ -160,13 +150,7 @@ export class FileService {
   }
 
   findOne(id: string) {
-    
-
-    return this.prisma.file.findUnique(
-    
-    { where: { id } }
-    
-    );
+    return this.prisma.file.findUnique({ where: { id } });
   }
 
   update(id: string, data: UpdateFileDto) {
@@ -212,7 +196,4 @@ export class FileService {
       data: content,
     };
   }
-
-
 }
-

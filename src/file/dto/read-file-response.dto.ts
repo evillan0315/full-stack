@@ -11,7 +11,7 @@ export class ReadFileResponseDto {
 
   @ApiPropertyOptional({ description: 'MIME type of the file' })
   mimeType?: string;
-  
+
   @ApiPropertyOptional({ description: 'Language of the file' })
   language?: string;
 

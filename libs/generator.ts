@@ -11,6 +11,7 @@ export async function generateResource(modelName: string, outDir?: string) {
 
   // Updated to extract fields and hasCreatedBy
   const { fields, hasCreatedBy } = parseModel(modelName);
+  console.log(fields, 'fields');
   const isProtected = protectedModels.includes(className);
 
   const templates = [
@@ -19,12 +20,14 @@ export async function generateResource(modelName: string, outDir?: string) {
     { name: 'module', out: `${folderName}.module.ts` },
     { name: 'create-dto', out: `dto/create-${folderName}.dto.ts` },
     { name: 'update-dto', out: `dto/update-${folderName}.dto.ts` },
+    { name: 'views-controller', out: `views/views.controller.ts` },
   ];
 
   const targetDir = path.join(outDir || 'output', folderName);
   const dtoDir = path.join(targetDir, 'dto');
+  const viewsDir = path.join(targetDir, 'views');
   fs.mkdirSync(dtoDir, { recursive: true });
-
+  fs.mkdirSync(viewsDir, { recursive: true });
   for (const tpl of templates) {
     const template = fs.readFileSync(
       path.join(__dirname, 'templates', `${tpl.name}.ts.ejs`),

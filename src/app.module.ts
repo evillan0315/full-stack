@@ -16,6 +16,8 @@ import { FolderModule } from './folder/folder.module';
 import { FormModule } from './form/form.module';
 import { SubmissionModule } from './submission/submission.module';
 import { FileModule } from './file/file.module';
+import { UtilsModule } from './utils/utils.module';
+import { ShellModule } from './shell/shell.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { FileModule } from './file/file.module';
     FolderModule,
     FormModule,
     FileModule,
+    UtilsModule,
+    ShellModule,
   ],
   controllers: [AppController],
   providers: [AppService],

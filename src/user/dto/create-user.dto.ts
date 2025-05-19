@@ -33,10 +33,6 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   phone_number: string;
-  @ApiProperty({ description: 'deletedAt field' })
-  @IsOptional()
-  @IsDate()
-  deletedAt: Date;
 }
 
 export class PaginationUserResultDto {

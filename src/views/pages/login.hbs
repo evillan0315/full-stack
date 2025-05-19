@@ -1,6 +1,6 @@
 <div class="flex min-h-screen items-center justify-center">
   <div class="w-full max-w-md">
-    <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-md dark:border-gray-700 dark:bg-gray-900">
+    <div class="rounded-xl border border-neutral-200 bg-white p-6 shadow-md dark:border-neutral-700 dark:bg-neutral-950">
       <form action="/login" method="POST" class="space-y-6">
         {{#if error}}
           <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200">
@@ -51,7 +51,7 @@
             </label>
           </div>
 
-          <div class="text-sm">
+          <div class="text-sm hidden">
             <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
               Forgot your password?
             </a>
@@ -61,7 +61,7 @@
         <div>
           <button
             type="submit"
-            class="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-blue-800 p-3 text-gray-200 hover:bg-gray-600"
+            class="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-gray-700 p-3 text-gray-200 hover:bg-gray-600"
             {{#if isLoading}}disabled{{/if}}
           >
             <span class="iconify text-gray-900" data-icon="mdi:login" data-width="24" data-height="24"></span>

@@ -9,6 +9,9 @@ import {
   UseGuards,
   HttpStatus,
   Query,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,7 +25,10 @@ import {
   ApiForbiddenResponse,
   ApiQuery,
   ApiResponse,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
+import axios from 'axios';
 
 import { LogService } from './log.service';
 import {

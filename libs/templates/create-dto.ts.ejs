@@ -17,7 +17,7 @@ export class Create<%= className %>Dto {
 <% fields
   .filter(field =>
     field.relationType !== 'one-to-many' &&
-    !['id', 'createdAt', 'updatedAt', 'createdById'].includes(field.name)
+    !['id', 'createdAt', 'updatedAt', 'createdById', 'deletedAt'].includes(field.name)
   )
   .forEach(field => { -%>
   @ApiProperty({ description: '<%= field.name %> field' })

@@ -9,6 +9,7 @@ import * as express from 'express';
 import { join } from 'path';
 import { Logger } from '@nestjs/common';
 import * as hbs from 'hbs';
+import { registerHandlebarsHelpers } from './common/helpers/hbs-helpers';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -43,7 +44,7 @@ async function bootstrap() {
   hbs.registerHelper('log', (message) => {
     console.log('[HBS]', message);
   });
-
+  registerHandlebarsHelpers();
   //app.useStaticAssets(join(__dirname, '..', 'public'));
   app.use(cookieParser());
   app.enableCors({

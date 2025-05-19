@@ -97,16 +97,16 @@ export class AppController {
     };
   }
   @Get('editor')
-@Render('pages/monaco')
-getEditor(@Query('filepath') filepath: string, @Query('url') url: string) {
-  return {
-    title: 'Monaco',
-    filepath,
-    url,
-    language: 'javascript', // could be made dynamic from the extension
-    layout: 'layouts/editor',
-  };
-}
+  @Render('pages/monaco')
+  getEditor(@Query('filepath') filepath: string, @Query('url') url: string) {
+    return {
+      title: 'Monaco',
+      filepath,
+      url,
+      language: 'javascript', // could be made dynamic from the extension
+      layout: 'layouts/editor',
+    };
+  }
 
   @Post('login')
   @Redirect('/dashboard')

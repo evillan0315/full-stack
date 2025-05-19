@@ -203,6 +203,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'User profile returned' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getProfile(@Req() req: Request) {
-    return req['user'];
+    const me = req['user'];
+    return me;
   }
 }
