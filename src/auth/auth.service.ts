@@ -160,7 +160,7 @@ export class AuthService {
     profile: GoogleProfileDto | GitHubProfileDto,
     tokens: GoogleTokenDto | GitHubTokenDto,
   ) {
-    return this.oauthService.validate(provider, profile, tokens);
+    return await this.oauthService.validate(provider, profile, tokens);
   }
 
   async generateToken(payload: JwtPayload): Promise<string> {

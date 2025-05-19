@@ -2,18 +2,21 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./*"]
-    }
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+    "jsxImportSource": "solid-js",
+    "types": ["vite/client", "@iconify-icon/solid"]
   },
-  "include": ["index.tsx", "**/*.tsx", "**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules/"]
 }
-

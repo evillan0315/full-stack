@@ -24,13 +24,25 @@ async function bootstrap() {
   const base_url =
     configService.get<string>('BASE_URL') || `http://localhost:${port}`;
   const swaggerEnabled = configService.get<boolean>('SWAGGER_ENABLED') || false;
+  // Set default layout
+  app.set('view options', {
+    layout: 'layouts/main',
+  });
   app.setBaseViewsDir(join(__dirname, '..', 'views')); // For runtime
   app.setViewEngine('hbs');
-
+  console.log(
+    'Registering partials from:',
+    join(__dirname, '..', 'views/partials'),
+  );
   hbs.registerPartials(join(__dirname, '..', 'views/partials'));
   app.useStaticAssets(join(__dirname, '..', '..', 'public'), {
     prefix: '/public/', // Optional: accessed via http://localhost:3000/public/
   });
+
+  hbs.registerHelper('log', (message) => {
+    console.log('[HBS]', message);
+  });
+
   //app.useStaticAssets(join(__dirname, '..', 'public'));
   app.use(cookieParser());
   app.enableCors({
@@ -47,8 +59,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  
-  
   // Swagger Configuration
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Auth API')

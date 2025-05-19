@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/index.tsx","./src/vite-env.d.ts","./src/components/signInWithGithub.tsx","./src/components/signInWithGoogle.tsx","./src/components/common/Button.tsx","./src/components/common/ContentCard.tsx","./src/pages/Login.tsx","./src/types/documentation.ts"],"version":"5.7.3"}

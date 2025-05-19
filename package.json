@@ -22,7 +22,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@felte/solid": "^1.2.14",
     "@google/generative-ai": "^0.24.1",
+    "@iconify-icon/solid": "^3.0.0",
+    "@kobalte/core": "^0.13.9",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
@@ -33,6 +36,7 @@
     "@nestjs/platform-socket.io": "^11.1.1",
     "@nestjs/swagger": "^11.2.0",
     "@prisma/client": "^6.8.1",
+    "@solidjs/router": "^0.15.3",
     "@tailwindcss/cli": "^4.1.7",
     "@tailwindcss/vite": "^4.1.7",
     "axios": "^1.9.0",

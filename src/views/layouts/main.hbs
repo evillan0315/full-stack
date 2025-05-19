@@ -10,15 +10,43 @@
   
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200">
-  {{> header}}
+  <div class="max-w-screen overflow-x-hidden">
+      <div class="fixed inset-x-0 top-0 z-10 border-b border-black/5 dark:border-white/10">
+        <header class="flex gap-2">
+	  <nav class="bg-gray-100 dark:bg-gray-900 w-full">
+	    <ul class="container flex items-center p-3 text-gray-900 dark:text-gray-200">
+	      <li class="border-b-2 mx-1.5 sm:mx-6">
+		<a href="/">Home</a>
+	      </li>
+	      {{#if isAuthenticated}}
+	      <li class="border-b-2 mx-1.5 sm:mx-6">
+		<a href="/dashboard">Dashboard</a>
+	      </li>
 
-  <main class="h-screen overflow-hidden">
+	      
+		<li class="border-b-2 mx-1.5 sm:mx-6">
+		  <form method="POST" action="/logout">
+		    <button type="submit" class="text-red-600 hover:underline">Logout</button>
+		  </form>
+		</li>
+	      {{else}}
+		<li class="border-b-2 mx-1.5 sm:mx-6">
+		  <a href="/login">Login</a>
+		</li>
+	      {{/if}}
+	    </ul>
+	  </nav>
+	</header>
+      </div>
+      <main>
     {{{body}}}
-    <div id="solid-root"></div>
   </main>
-
-  {{> footer}}
-
+  {{#if footer}}
+  <footer>
+  <p>&copy; 2025 {{footer}}</p>
+</footer>
+{{/if}}
+  </div>
   <script type="module" src="/public/assets/index.js" defer></script>
 </body>
 </html>

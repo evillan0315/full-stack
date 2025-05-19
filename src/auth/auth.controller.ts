@@ -9,6 +9,7 @@ import {
   BadRequestException,
   Query,
   NotFoundException,
+  Redirect,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -47,8 +48,7 @@ export class AuthController {
   private async handleOAuthCallback(
     provider: 'google' | 'github',
     req: AuthRequest,
-    res: Response,
-  ) {
+  ): Promise<{ accessToken: string; user: any }> {
     const { profile, tokens } = req.user as {
       profile: GoogleProfileDto | GitHubProfileDto;
       tokens: GoogleTokenDto | GitHubTokenDto;
@@ -69,17 +69,7 @@ export class AuthController {
 
     const accessToken = await this.authService.generateToken(payload);
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-    });
-
-    return res.json({
-      message: `${provider.charAt(0).toUpperCase() + provider.slice(1)} login successful`,
-      accessToken,
-      user,
-    });
+    return { accessToken, user };
   }
   @Post('login')
   @ApiOperation({ summary: 'Log in a user and set JWT cookie' })
@@ -126,7 +116,20 @@ export class AuthController {
     description: 'Unauthorized or failed login attempt',
   })
   async githubAuthRedirect(@Req() req: AuthRequest, @Res() res: Response) {
-    return this.handleOAuthCallback('github', req, res);
+    try {
+      const { accessToken } = await this.handleOAuthCallback('github', req);
+
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
+
+      return res.redirect('/dashboard');
+    } catch (error) {
+      console.error('OAuth redirect error:', error);
+      return res.redirect('/login?error=OAuth%20Login%20Failed');
+    }
   }
 
   @Get('google')
@@ -151,7 +154,20 @@ export class AuthController {
     description: 'Unauthorized or failed login attempt',
   })
   async googleAuthRedirect(@Req() req: AuthRequest, @Res() res: Response) {
-    return this.handleOAuthCallback('google', req, res);
+    try {
+      const { accessToken } = await this.handleOAuthCallback('google', req);
+
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
+
+      return res.redirect('/dashboard');
+    } catch (error) {
+      console.error('OAuth redirect error:', error);
+      return res.redirect('/login?error=OAuth%20Login%20Failed');
+    }
   }
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })

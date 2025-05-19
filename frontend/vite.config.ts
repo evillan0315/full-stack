@@ -1,14 +1,12 @@
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
+import path from 'path'; // ← Add this line
 
-import path from 'path';
-
-export default defineConfig({
+export default defineConfig((env) => ({
   plugins: [solidPlugin()],
-  publicDir: false,
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'index.tsx'),
+      entry: path.resolve(__dirname, 'src/index.tsx'),
       name: 'SolidApp',
       formats: ['es'],
       fileName: () => 'index.js',
@@ -18,10 +16,20 @@ export default defineConfig({
     assetsInlineLimit: 0,
     emptyOutDir: true,
   },
-  server: {
-    host: '0.0.0.0',
-    port: 3000,
-    strictPort: true,
-    allowedHosts: ['board-api.duckdns.org'],
-  },
-});
+  /*server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+    cors: {
+      origin: ['*'],
+      methods: ['GET', 'POST', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+    },
+  },*/
+}));
+
