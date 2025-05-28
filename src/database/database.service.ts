@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
 import { Client as PgClient } from 'pg';
 import * as mysql from 'mysql2/promise';
 import { MongoClient } from 'mongodb';
@@ -30,15 +34,22 @@ export class DatabaseService {
     connectionString: string,
     dbType: 'postgres' | 'mysql' | 'mongodb',
   ): Promise<TableInfo[]> {
-    switch (dbType) {
-      case 'postgres':
-        return this.getPostgresTables(connectionString);
-      case 'mysql':
-        return this.getMysqlTables(connectionString);
-      case 'mongodb':
-        return this.getMongoCollections(connectionString);
-      default:
-        throw new Error('Unsupported database type');
+    try {
+      switch (dbType) {
+        case 'postgres':
+          return await this.getPostgresTables(connectionString);
+        case 'mysql':
+          return await this.getMysqlTables(connectionString);
+        case 'mongodb':
+          return await this.getMongoCollections(connectionString);
+        default:
+          throw new BadRequestException(`Unsupported database type: ${dbType}`);
+      }
+    } catch (error) {
+      console.error(`[DatabaseService] getAllTables error:`, error);
+      throw new InternalServerErrorException(
+        `Failed to retrieve tables from ${dbType} database.`,
+      );
     }
   }
 
@@ -46,17 +57,18 @@ export class DatabaseService {
     connectionString: string,
   ): Promise<TableInfo[]> {
     const client = new PgClient({ connectionString });
-    await client.connect();
 
     try {
+      await client.connect();
+
       const tableResult = await client.query(`
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema = 'public'
           AND table_type = 'BASE TABLE';
       `);
-      const tables = tableResult.rows.map((row) => row.table_name);
 
+      const tables = tableResult.rows.map((row) => row.table_name);
       const tableDetails: TableInfo[] = [];
 
       for (const tableName of tables) {
@@ -74,31 +86,52 @@ export class DatabaseService {
           columns: columnResult.rows,
         });
       }
+
       return tableDetails;
+    } catch (error) {
+      console.error(`[DatabaseService] getPostgresTables error:`, error);
+      throw new InternalServerErrorException(
+        'Failed to fetch PostgreSQL tables.',
+      );
     } finally {
-      await client.end();
+      await client
+        .end()
+        .catch((err) =>
+          console.warn(
+            'Failed to close PostgreSQL connection gracefully:',
+            err,
+          ),
+        );
     }
   }
 
   private async getMysqlTables(connectionString: string): Promise<TableInfo[]> {
-    const connection = await mysql.createConnection(connectionString);
+    let connection: mysql.Connection | undefined;
+
     try {
+      connection = await mysql.createConnection(connectionString);
+
       const [tables] = await connection.query(
-        `SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE();`,
+        `SELECT table_name AS TABLE_NAME 
+       FROM information_schema.tables 
+       WHERE table_schema = DATABASE();`,
       );
 
       const tableDetails: TableInfo[] = [];
 
       for (const row of tables as any[]) {
         const tableName = row.TABLE_NAME;
+
         const [columns] = await connection.query(
-          `SELECT column_name, data_type, is_nullable, column_default
-           FROM information_schema.columns
-           WHERE table_schema = DATABASE() AND table_name = ?`,
+          `SELECT column_name AS COLUMN_NAME, 
+                data_type AS DATA_TYPE, 
+                is_nullable AS IS_NULLABLE, 
+                column_default AS COLUMN_DEFAULT
+         FROM information_schema.columns
+         WHERE table_schema = DATABASE() AND table_name = ?`,
           [tableName],
         );
 
-        // Normalize MySQL columns keys to lowercase
         const normalizedColumns: TableColumn[] = (columns as any[]).map(
           (col) => ({
             column_name: col.COLUMN_NAME,
@@ -113,18 +146,30 @@ export class DatabaseService {
           columns: normalizedColumns,
         });
       }
+
       return tableDetails;
+    } catch (error) {
+      console.error('[DatabaseService] getMysqlTables error:', error);
+      throw new InternalServerErrorException('Failed to fetch MySQL tables.');
     } finally {
-      await connection.end();
+      if (connection) {
+        try {
+          await connection.end();
+        } catch (endErr) {
+          console.warn('Failed to close MySQL connection:', endErr);
+        }
+      }
     }
   }
-
   private async getMongoCollections(
     connectionString: string,
   ): Promise<TableInfo[]> {
-    const mongoClient = new MongoClient(connectionString);
-    await mongoClient.connect();
+    let mongoClient: MongoClient | null = null;
+
     try {
+      mongoClient = new MongoClient(connectionString);
+      await mongoClient.connect();
+
       const db = mongoClient.db();
       const collections = await db.collections();
 
@@ -146,9 +191,21 @@ export class DatabaseService {
           columns,
         });
       }
+
       return collectionDetails;
+    } catch (error) {
+      console.error('[DatabaseService] getMongoCollections error:', error);
+      throw new InternalServerErrorException(
+        'Failed to retrieve MongoDB collections.',
+      );
     } finally {
-      await mongoClient.close();
+      if (mongoClient) {
+        try {
+          await mongoClient.close();
+        } catch (closeErr) {
+          console.warn('Failed to close MongoDB connection:', closeErr);
+        }
+      }
     }
   }
   async getTableColumns(
@@ -306,24 +363,46 @@ export class DatabaseService {
   }
 
   private async executePostgresSql(connectionString: string, sql: string) {
-    console.log(sql, 'sql');
-    const client = new PgClient({ connectionString });
-    await client.connect();
+    let client: PgClient | null = null;
     try {
+      console.log(sql, 'sql');
+      client = new PgClient({ connectionString });
+      await client.connect();
       const result = await client.query(sql);
       return result.rows ?? result;
+    } catch (error) {
+      console.error('[PostgresSQL] Execution error:', error);
+      throw new Error(
+        'PostgreSQL execution failed: ' + (error as Error).message,
+      );
     } finally {
-      await client.end();
+      if (client) {
+        try {
+          await client.end();
+        } catch (closeErr) {
+          console.warn('[PostgresSQL] Failed to close connection:', closeErr);
+        }
+      }
     }
   }
 
   private async executeMysqlSql(connectionString: string, sql: string) {
-    const connection = await mysql.createConnection(connectionString);
+    let connection: mysql.Connection | null = null;
     try {
+      connection = await mysql.createConnection(connectionString);
       const [rows] = await connection.query(sql);
       return rows;
+    } catch (error) {
+      console.error('[MySQL] Execution error:', error);
+      throw new Error('MySQL execution failed: ' + (error as Error).message);
     } finally {
-      await connection.end();
+      if (connection) {
+        try {
+          await connection.end();
+        } catch (closeErr) {
+          console.warn('[MySQL] Failed to close connection:', closeErr);
+        }
+      }
     }
   }
 }

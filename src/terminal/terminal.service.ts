@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { spawn } from 'child_process';
 
 @Injectable()
-export class ShellService {
+export class TerminalService {
   runCommand(command: string, cwd: string, client: any) {
     const shell = spawn(command, {
       shell: '/bin/bash',

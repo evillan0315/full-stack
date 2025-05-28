@@ -69,6 +69,7 @@ export class UserService {
         Account: true,
         Session: true,
         Folder: true,
+        password: true,
       },
     });
   }

@@ -13,8 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        JwtStrategy.extractFromCookie,
-        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        JwtStrategy.extractFromCookieOrHeader,
       ]),
       ignoreExpiration: false,
       secretOrKey: config.get<string>('JWT_SECRET'),
@@ -22,16 +21,40 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  private static extractFromCookie(req: Request): string | null {
+  /**
+   * Extract JWT from cookies or Authorization header if present (optional).
+   */
+  private static extractFromCookieOrHeader(req: any): string | null {
+    // HTTP Cookies
     if (req?.cookies?.accessToken) {
       return req.cookies.accessToken;
     }
+
+    // WebSocket Cookies
+    const cookieHeader = req?.handshake?.headers?.cookie;
+    if (cookieHeader) {
+      const cookies = Object.fromEntries(
+        cookieHeader.split(';').map((cookie) => {
+          const [key, value] = cookie.trim().split('=');
+          return [key, decodeURIComponent(value)];
+        }),
+      );
+      if (cookies['accessToken']) {
+        return cookies['accessToken'];
+      }
+    }
+
+    // Optional Bearer header (HTTP only)
+    const authHeader = req?.headers?.authorization;
+    if (authHeader?.startsWith('Bearer ')) {
+      return authHeader.split(' ')[1];
+    }
+
     return null;
   }
 
   async validate(req: Request, payload: any) {
     const user = await this.authService.validateUser(payload.sub);
-    if (!user) return null;
-    return user;
+    return user ?? null;
   }
 }
