@@ -65,7 +65,22 @@ export class AppController {
       isAuthenticated: Boolean(user),
     };
   }
-
+  @Get('terminal')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.MANAGER)
+  @Render('pages/terminal')
+  @ApiOperation({ summary: 'Render protected terminal page' })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Terminal rendered' })
+  @ApiResponse({ status: 403, description: 'Forbidden - insufficient role' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getTerminal(@CurrentUser() user: any) {
+    return {
+      title: 'Terminal',
+      message: `Welcome to your terminal, ${user.name}`,
+      isAuthenticated: Boolean(user),
+    };
+  }
   @Get('login')
   @Render('pages/login')
   @ApiOperation({ summary: 'Render login page' })

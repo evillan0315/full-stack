@@ -1,13 +1,15 @@
-import { defineConfig } from 'vite';
-import solidPlugin from 'vite-plugin-solid';
-import path from 'path'; // ← Add this line
+import { defineConfig, loadEnv } from 'vite';
+import solid from 'vite-plugin-solid';
+import path from 'path'; 
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
 
-export default defineConfig((env) => ({
-  plugins: [solidPlugin()],
-  build: {
+  return {
+    plugins: [solid()],
+    build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.tsx'),
-      name: 'SolidApp',
+      name: 'Terminal',
       formats: ['es'],
       fileName: () => 'index.js',
     },
@@ -16,20 +18,20 @@ export default defineConfig((env) => ({
     assetsInlineLimit: 0,
     emptyOutDir: true,
   },
-  /*server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+    server: {
+      proxy: {
+        '/api': {
+          target: env.VITE_API_URL,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ''),
+        },
+      },
+      cors: {
+        origin: ['*'],
+        methods: ['GET', 'POST', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true,
       },
     },
-    cors: {
-      origin: ['*'],
-      methods: ['GET', 'POST', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
-      credentials: true,
-    },
-  },*/
-}));
-
+  };
+});

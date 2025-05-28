@@ -1,78 +1,148 @@
-# Cognito Auth SolidJS Frontend
+## 📁 Project Name: Bash AI
 
-This is a SolidJS version of the Cognito Auth Frontend application, built with:
+### 🧠 Description
 
-- [SolidJS](https://www.solidjs.com/) - A declarative, efficient, and flexible JavaScript library for building user interfaces
-- [Vite](https://vitejs.dev/) - Next Generation Frontend Tooling
-- [TailwindCSS](https://tailwindcss.com/) - A utility-first CSS framework
-- [Solid Router](https://github.com/solidjs/solid-router) - Routing for SolidJS
-- [TanStack Query](https://tanstack.com/query/latest) - Powerful asynchronous state management for SolidJS
+**Smart Terminal AI** is an intelligent, web-based terminal interface powered by NestJS and SolidJS, integrated with state-of-the-art AI models like **ChatGPT** and **Google Gemini**. This smart terminal allows users to interact with system commands, code snippets, and AI assistance in real-time—blending traditional shell-like functionality with natural language processing capabilities.
 
-## Features
+Ideal for developers, tech educators, and productivity enthusiasts, this platform streamlines command execution, automates troubleshooting, and acts as your AI-powered development assistant.
 
-- User authentication with AWS Cognito
-- Protected routes
-- Dashboard with service cards
-- EC2 instance management
-- RDS instance management
-- PostgreSQL database management
+---
 
-## Getting Started
+## 🚀 Features
 
-### Prerequisites
+### 💻 Terminal Interface
 
-- Node.js 14.x or higher
-- npm 7.x or higher
+- Interactive smart terminal in the browser (built with **SolidJS**)
+- Supports basic shell commands (via backend)
+- Context-aware command suggestions
+- Autocomplete and history tracking
 
-### Installation
+### 🤖 AI Assistant Integration
 
-1. Clone the repository
-2. Install dependencies:
+- Use **ChatGPT** for natural language prompts, debugging help, and code generation
+- Tap into **Google Gemini** for advanced reasoning, document analysis, and multi-modal interactions
+- AI-powered command completion and shell explanation
+- Multi-language support for development and DevOps
 
-```bash
-cd cognito-auth-solidjs
-npm install
-```
+### 🔐 Authentication
 
-3. Create a `.env` file in the root directory with the following content:
+- OAuth2 with AWS Cognito (Google login support)
+- Role-based access control (RBAC)
 
-```
-VITE_API_URL=http://localhost:5000/api
-```
+### 📡 Realtime Communication
 
-4. Start the development server:
+- WebSocket-powered live command streaming
+- Live terminal feedback and AI interactions
 
-```bash
-npm run dev
-```
+### 🗃️ Backend Services
 
-5. Open your browser and navigate to `http://localhost:3000`
+- NestJS REST & WebSocket APIs
+- Secure command execution environment
+- Custom command & script management
+- AI prompt pipelines with retry and memory
 
-## Project Structure
+### 📄 Documentation
 
-```
-src/
-├── components/       # Reusable UI components
-│   └── common/       # Common UI components like Button, Card, etc.
-├── hooks/            # Custom hooks for data fetching and state management
-├── pages/            # Page components
-├── services/         # API services
-├── types/            # TypeScript type definitions
-├── utils/            # Utility functions
-├── App.tsx           # Main application component
-└── index.tsx         # Application entry point
-```
+- Swagger API documentation with full CRUD operations for commands and sessions
+- CLI tools for developer automation
 
-## Building for Production
+---
 
-To build the application for production, run:
+## 📦 Tech Stack
+
+| Layer       | Technology                            |
+| ----------- | ------------------------------------- |
+| Frontend    | SolidJS, TailwindCSS, TypeScript      |
+| Backend     | NestJS, WebSocket, Prisma, TypeScript |
+| AI Services | OpenAI (ChatGPT), Google Gemini       |
+| Auth        | AWS Cognito + OAuth2 (Google)         |
+| Realtime    | WebSocket (NestJS Gateway)            |
+| Database    | PostgreSQL or DynamoDB (configurable) |
+| Deployment  | Docker, AWS EC2 / Lambda              |
+
+---
+
+## 📁 Folder Structure
 
 ```bash
-npm run build
+smart-terminal-ai/
+├── apps/
+│   ├── frontend/           # SolidJS terminal UI
+│   └── backend/            # NestJS API + WebSocket
+├── packages/
+│   ├── ai-sdk/             # Unified AI interface for OpenAI/Gemini
+│   └── shared/             # Shared types & utilities
+├── docker/
+│   └── nginx/              # Optional reverse proxy setup
+├── prisma/                 # Prisma schema
+├── .env                    # Environment variables
+└── README.md
 ```
 
-The build artifacts will be stored in the `dist/` directory.
+---
 
-## License
+## ⚙️ Getting Started
+
+```bash
+# Clone the repo
+git clone https://github.com/yourusername/smart-terminal-ai.git
+cd smart-terminal-ai
+
+# Install dependencies
+pnpm install
+
+# Setup environment
+cp .env.example .env
+
+# Run backend
+pnpm --filter backend dev
+
+# Run frontend
+pnpm --filter frontend dev
+```
+
+---
+
+## 🔐 Authentication Setup
+
+Configure AWS Cognito:
+
+1. Create a Cognito User Pool + Google Identity Provider.
+2. Update `.env` with Cognito and Google client credentials.
+3. Use provided `/auth` endpoints to login via Google.
+
+---
+
+## ✨ AI Integration Setup
+
+- **ChatGPT (OpenAI)**: Add your `OPENAI_API_KEY` to `.env`
+- **Google Gemini**: Add your `GOOGLE_API_KEY`
+
+You can switch between AI models using config or user preferences.
+
+---
+
+## 🛠️ Future Roadmap
+
+- 🧩 Plugin system for custom commands/scripts
+- 📜 AI memory & session-based context
+- 🧠 Auto-correct and AI explanations for command errors
+- 🧪 Unit + E2E tests for all modules
+- 🔌 CLI companion for local terminal usage
+
+---
+
+## 🧑‍💻 Author
+
+**Eddie Villanueva**  
+[GitHub](https://github.com/evillan0315) | [LinkedIn](https://www.linkedin.com/in/evillanueva0315) | [Email](mailto:evillan0315@gmail.com)
+
+---
+
+## 📝 License
 
 This project is licensed under the MIT License.
+
+---
+
+Would you like me to generate the repo structure and starter files as well, sugar?
