@@ -11,6 +11,98 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { lookup as mimeLookup } from 'mime-types';
 import * as dotenv from 'dotenv';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeStringify from 'rehype-stringify';
+import remarkStringify from 'remark-stringify';
+import { Root } from 'mdast';
+const style = `
+  <style>
+     body {
+       margin: 0;
+       padding: 0;
+       color: #999;
+       background-color: black; font-family: Arial, sans-serif; 
+     }
+    .markdown-body { padding: 10px; max-width: 90%; margin: 0 auto; }
+    .markdown-body h1 {  }
+    .markdown-body .group:hover button {
+	  opacity: 1;
+	}
+
+	.markdown-body .transition-opacity {
+	  transition-property: opacity;
+	}
+	.prose p {
+	}
+	h1 {
+	  margin-bottom: 20px;
+	  font-size: 1.8em;
+	}
+	h2 {
+	  margin-bottom: 16px;
+	  margin-top: 16px;
+	  font-size: 1.6em;
+	}
+	h3 {
+	  margin-top: 12px;
+	  margin-bottom: 12px;
+	  font-size: 1.4em;
+	}
+	h4 {
+	  margin-top: 12px;
+	  margin-bottom: 12px;
+	  font-size: 1.3em;
+	}
+	h5 {
+	  margin-top: 12px;
+	  margin-bottom: 12px;
+	  font-size: 1.2em;
+	}
+	h2 > code {
+	 font-size: 1em;
+	}
+	h3 > code {
+	 font-size: .9em;
+	}
+	p {
+	 margin-bottom: 0.5rem;   /* Space between items */
+	}
+	ul {
+	  list-style-type: disc;   /* Bullet style */
+	  padding-left: 1.5rem;    /* Indent */
+	  margin-bottom: 1rem;     /* Optional spacing */
+	}
+	ul li {
+	  margin-bottom: 0.5rem;   /* Space between items */
+	}
+	ol{
+	  list-style-type: decimal; /* Numbered list */
+	  padding-left: 1.5rem;
+	  margin-bottom: 1rem;
+	}
+
+	ol li {
+	  margin-bottom: 0.5rem;
+	}
+	hr {
+	  border-color: #111;
+	  margin-top: 20px;
+	  margin-bottom: 10px;
+	}
+	pre {
+	  padding: 14px;
+	  border: 1px solid #333;
+	  border-radius: 10px;
+	  background: #222;
+	  overflow: auto;
+	}
+	pre code {
+	  color: #999;
+	}
+  </style>
+`;
 
 @Injectable()
 export class UtilsService {
@@ -336,5 +428,36 @@ export class UtilsService {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+  /**
+   * Convert Markdown to MDAST JSON AST
+   */
+  async markdownToJson(markdown: string): Promise<Root> {
+    const processor = unified().use(remarkParse);
+    const tree = processor.parse(markdown);
+    return tree;
+  }
+
+  /**
+   * Convert JSON AST back to Markdown
+   */
+  async jsonToMarkdown(ast: Root): Promise<string> {
+    const processor = unified().use(remarkStringify);
+    const markdown = processor.stringify(ast);
+    return markdown;
+  }
+
+  /**
+   * Convert Markdown to HTML
+   */
+
+  async markdownToHtml(markdown: string): Promise<string> {
+    const file = await unified()
+      .use(remarkParse)
+      .use(remarkRehype)
+      .use(rehypeStringify)
+      .process(markdown);
+
+    return `${style}<div class="markdown-body">${String(file)}</div>`;
   }
 }

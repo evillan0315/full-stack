@@ -1,4 +1,4 @@
-import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
+import { Injectable, Inject, ForbiddenException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 import * as fs from 'fs-extra';
@@ -6,6 +6,10 @@ import * as path from 'path';
 import { Readable } from 'stream';
 import { lookup as mimeLookup } from 'mime-types';
 import { ReadFileResponseDto } from './dto/read-file-response.dto';
+import { get as httpGet } from 'http';
+import { get as httpsGet } from 'https';
+import { URL } from 'url';
+
 
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
@@ -13,10 +17,16 @@ import { Prisma } from '@prisma/client';
 
 import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 
-const language = (filename: string, mimeType?: string): string | undefined => {
+import { REQUEST } from '@nestjs/core';
+import { Request, Response } from 'express';
+
+
+
+const language = (
+  filename: string,
+  mimeType?: string,
+): string | undefined => {
   if (!filename) return;
 
   const ext = filename.split('.').pop()?.toLowerCase();
@@ -69,13 +79,13 @@ const language = (filename: string, mimeType?: string): string | undefined => {
 @Injectable()
 export class FileService {
   constructor(
+    
     @Inject('EXCLUDED_FOLDERS') private readonly EXCLUDED_FOLDERS: string[],
-
+    
     private prisma: PrismaService,
-    @Inject(REQUEST)
-    private readonly request: Request & { user?: CreateJwtUserDto },
+    @Inject(REQUEST) private readonly request: Request & { user?: CreateJwtUserDto },
   ) {}
-
+  
   private getFileTree(dir: string, recursive: boolean = false): any[] {
     if (!fs.existsSync(dir)) return [];
 
@@ -95,14 +105,17 @@ export class FileService {
         };
       });
   }
-
+  
+  
   private get userId(): string | undefined {
     return this.request.user?.sub;
   }
+  
 
   create(data: CreateFileDto) {
     const createData: any = { ...data };
 
+    
     const hasCreatedById = data.hasOwnProperty('createdById');
     if (this.userId) {
       createData.createdBy = {
@@ -112,6 +125,7 @@ export class FileService {
         delete createData.createdById;
       }
     }
+    
 
     return this.prisma.file.create({ data: createData });
   }
@@ -150,7 +164,13 @@ export class FileService {
   }
 
   findOne(id: string) {
-    return this.prisma.file.findUnique({ where: { id } });
+    
+
+    return this.prisma.file.findUnique(
+    
+    { where: { id } }
+    
+    );
   }
 
   update(id: string, data: UpdateFileDto) {
@@ -196,4 +216,39 @@ export class FileService {
       data: content,
     };
   }
+  async proxyImage(url: string, res: Response): Promise<void> {
+    if (!url) {
+      throw new BadRequestException('Missing image URL');
+    }
+
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+        throw new BadRequestException('Unsupported protocol');
+      }
+    } catch {
+      throw new BadRequestException('Invalid image URL');
+    }
+
+    const client = parsedUrl.protocol === 'https:' ? httpsGet : httpGet;
+
+    try {
+      client(url, (imageRes) => {
+        const contentType = imageRes.headers['content-type'] || 'image/jpeg';
+        res.setHeader('Content-Type', contentType);
+        imageRes.pipe(res);
+        imageRes.on('error', () => {
+          res.status(500).send('Error streaming image data');
+        });
+      }).on('error', () => {
+        res.status(500).send('Error fetching image');
+      });
+    } catch {
+      throw new InternalServerErrorException('Unexpected proxy error');
+    }
+  }
+
+
 }
+

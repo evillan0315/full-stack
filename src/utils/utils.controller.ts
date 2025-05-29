@@ -21,7 +21,7 @@ import {
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
-
+import { Root } from 'mdast';
 import { Response } from 'express';
 import { MarkdownDto } from './dto/markdown.dto';
 import { UploadEnvDto } from './dto/upload-env.dto';
@@ -207,5 +207,137 @@ export class UtilsController {
     @Body() body: UploadEnvDto,
   ) {
     return this.utilsService.parseEnvFile(file, body.filepath);
+  }
+  @Post('extract-title')
+  @ApiOperation({ summary: 'Extracts the title from Markdown content' })
+  @ApiResponse({
+    status: 200,
+    description: 'Title successfully extracted',
+    schema: {
+      example: {
+        title: 'Hello World',
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input' })
+  extractTitle(@Body() body: MarkdownDto) {
+    const match = body.content.match(/^#{1,2}\s+(.*)/m);
+    const title = match ? match[1].trim() : null;
+    return title;
+  }
+
+  // Utili for handling SQL
+  @Post('parse-select')
+  @ApiOperation({
+    summary: 'Convert SELECT SQL to JSON',
+    description:
+      'Parses a simple SELECT SQL string into a structured JSON object.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        sql: {
+          type: 'string',
+          example: 'SELECT id, name FROM users WHERE active = 1',
+        },
+      },
+    },
+  })
+  parseSelect(@Body('sql') sql: string) {
+    try {
+      return this.utilsService.parseSqlToJson(sql);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Post('parse-insert')
+  @ApiOperation({
+    summary: 'Convert INSERT SQL to JSON',
+    description:
+      'Parses a simple INSERT SQL string into a structured JSON object.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        sql: {
+          type: 'string',
+          example: "INSERT INTO users (id, name) VALUES (1, 'Alice')",
+        },
+      },
+    },
+  })
+  parseInsert(@Body('sql') sql: string) {
+    try {
+      return this.utilsService.parseInsertSqlToJson(sql);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Post('json-to-insert')
+  @ApiOperation({
+    summary: 'Convert JSON to INSERT SQL',
+    description: 'Generates a simple INSERT SQL string from a JSON object.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        table: { type: 'string', example: 'users' },
+        data: {
+          type: 'object',
+          example: { id: 1, name: 'Alice' },
+        },
+      },
+    },
+  })
+  jsonToSql(@Body() body: { table: string; data: Record<string, any> }) {
+    try {
+      return { sql: this.utilsService.jsonToInsertSql(body) };
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+  @Post('to-json')
+  @ApiOperation({ summary: 'Convert Markdown to JSON AST' })
+  @ApiBody({
+    schema: { example: { markdown: '# Hello\n\nThis is **bold**.' } },
+  })
+  @ApiResponse({ status: 201, description: 'MDAST JSON returned.' })
+  async convertToJson(@Body('markdown') markdown: string): Promise<Root> {
+    return this.utilsService.markdownToJson(markdown);
+  }
+  @Post('to-markdown')
+  @ApiOperation({ summary: 'Convert JSON AST to Markdown' })
+  @ApiBody({
+    schema: {
+      example: {
+        ast: {
+          type: 'root',
+          children: [
+            {
+              type: 'heading',
+              depth: 1,
+              children: [{ type: 'text', value: 'Hello' }],
+            },
+          ],
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Markdown string returned.' })
+  async convertToMarkdown(@Body('ast') ast: Root): Promise<string> {
+    return this.utilsService.jsonToMarkdown(ast);
+  }
+
+  @Post('to-html')
+  @ApiOperation({ summary: 'Convert Markdown to HTML' })
+  @ApiBody({ schema: { example: { markdown: '# Hello\n\nParagraph here.' } } })
+  @ApiResponse({ status: 201, description: 'HTML string returned.' })
+  async convertToHtml(@Body('markdown') markdown: string): Promise<string> {
+    return this.utilsService.markdownToHtml(markdown);
   }
 }

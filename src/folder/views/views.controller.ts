@@ -39,11 +39,11 @@ import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserRole } from '../../auth/enums/user-role.enum';
 
-import { FileService } from '../file.service';
+import { FolderService } from '../folder.service';
 import {
-  CreateFileDto,
-} from '../dto/create-file.dto';
-import { UpdateFileDto } from '../dto/update-file.dto';
+  CreateFolderDto,
+} from '../dto/create-folder.dto';
+import { UpdateFolderDto } from '../dto/update-folder.dto';
 
 
 
@@ -51,19 +51,19 @@ import { UpdateFileDto } from '../dto/update-file.dto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 
 @ApiTags('Views')
-@Controller('file')
+@Controller('folder')
 export class ViewsController {
-  constructor(private readonly fileService: FileService) {}
+  constructor(private readonly folderService: FolderService) {}
   
   @Get()
   
   @Roles(UserRole.ADMIN)
   
   @Render('pages/lists')
-  @ApiOperation({ summary: 'Render file lists view' })
-  @ApiResponse({ status: 200, description: 'List file view rendered' })
+  @ApiOperation({ summary: 'Render folder lists view' })
+  @ApiResponse({ status: 200, description: 'List folder view rendered' })
   async getLists(@Req() req: Request) {
-    const lists = await this.fileService.findAll();
+    const lists = await this.folderService.findAll();
      const visibleFields = ([
   {
     "name": "id",
@@ -90,18 +90,6 @@ export class ViewsController {
     ]
   },
   {
-    "name": "content",
-    "prismaType": "String",
-    "tsType": "string",
-    "type": "string",
-    "isOptional": false,
-    "isRelation": false,
-    "relationType": null,
-    "validators": [
-      "@IsString()"
-    ]
-  },
-  {
     "name": "path",
     "prismaType": "String",
     "tsType": "string",
@@ -114,7 +102,7 @@ export class ViewsController {
     ]
   },
   {
-    "name": "folderId",
+    "name": "parentId",
     "prismaType": "String",
     "tsType": "string",
     "type": "string",
@@ -123,6 +111,18 @@ export class ViewsController {
     "relationType": null,
     "validators": [
       "@IsOptional()",
+      "@IsString()"
+    ]
+  },
+  {
+    "name": "createdById",
+    "prismaType": "String",
+    "tsType": "string",
+    "type": "string",
+    "isOptional": false,
+    "isRelation": false,
+    "relationType": null,
+    "validators": [
       "@IsString()"
     ]
   },
@@ -150,25 +150,13 @@ export class ViewsController {
       "@IsOptional()",
       "@IsDate()"
     ]
-  },
-  {
-    "name": "createdById",
-    "prismaType": "String",
-    "tsType": "string",
-    "type": "string",
-    "isOptional": false,
-    "isRelation": false,
-    "relationType": null,
-    "validators": [
-      "@IsString()"
-    ]
   }
 ]).filter(
     field => !['id', 'createdAt', 'updatedAt', 'createdById', 'deletedAt'].includes(field.name)
   );
     return {
-      title: 'Lists File',
-      model: 'file',
+      title: 'Lists Folder',
+      model: 'folder',
       fields: visibleFields,
       lists: lists,
       isAuthenticated: Boolean(true)
@@ -180,8 +168,8 @@ export class ViewsController {
   @Roles(UserRole.ADMIN)
   
   @Render('pages/create')
-  @ApiOperation({ summary: 'Render file creation form' })
-  @ApiResponse({ status: 200, description: 'Create file form rendered' })
+  @ApiOperation({ summary: 'Render folder creation form' })
+  @ApiResponse({ status: 200, description: 'Create folder form rendered' })
   getCreateForm(@Req() req: Request) {
     const visibleFields = ([
   {
@@ -209,18 +197,6 @@ export class ViewsController {
     ]
   },
   {
-    "name": "content",
-    "prismaType": "String",
-    "tsType": "string",
-    "type": "string",
-    "isOptional": false,
-    "isRelation": false,
-    "relationType": null,
-    "validators": [
-      "@IsString()"
-    ]
-  },
-  {
     "name": "path",
     "prismaType": "String",
     "tsType": "string",
@@ -233,7 +209,7 @@ export class ViewsController {
     ]
   },
   {
-    "name": "folderId",
+    "name": "parentId",
     "prismaType": "String",
     "tsType": "string",
     "type": "string",
@@ -242,6 +218,18 @@ export class ViewsController {
     "relationType": null,
     "validators": [
       "@IsOptional()",
+      "@IsString()"
+    ]
+  },
+  {
+    "name": "createdById",
+    "prismaType": "String",
+    "tsType": "string",
+    "type": "string",
+    "isOptional": false,
+    "isRelation": false,
+    "relationType": null,
+    "validators": [
       "@IsString()"
     ]
   },
@@ -269,26 +257,14 @@ export class ViewsController {
       "@IsOptional()",
       "@IsDate()"
     ]
-  },
-  {
-    "name": "createdById",
-    "prismaType": "String",
-    "tsType": "string",
-    "type": "string",
-    "isOptional": false,
-    "isRelation": false,
-    "relationType": null,
-    "validators": [
-      "@IsString()"
-    ]
   }
 ]).filter(
       field => !['id', 'createdAt', 'updatedAt', 'createdById', 'deletedAt'].includes(field.name)
     );
     return {
-      title: 'Create File',
+      title: 'Create Folder',
       action: 'Create',
-      model: 'file',
+      model: 'folder',
       fields: visibleFields,
       isAuthenticated: Boolean(true)
     };
@@ -298,16 +274,16 @@ export class ViewsController {
   
   @Roles(UserRole.ADMIN)
   
-@ApiOperation({ summary: 'Handle file creation form submission' })
-@ApiCreatedResponse({ description: 'File created successfully' })
+@ApiOperation({ summary: 'Handle folder creation form submission' })
+@ApiCreatedResponse({ description: 'Folder created successfully' })
 @ApiBadRequestResponse({ description: 'Invalid input data' })
 async create(
-  @Body() createDto: CreateFileDto,
+  @Body() createDto: CreateFolderDto,
   @Res() res: Response
 ) {
   try {
-    await this.fileService.create(createDto);
-    return res.redirect('/file');
+    await this.folderService.create(createDto);
+    return res.redirect('/folder');
   } catch (error) {
     throw new BadRequestException(error.message);
   }

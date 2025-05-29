@@ -1,4 +1,4 @@
-import { Injectable, Inject<% if (isProtected) { %>, ForbiddenException<% } %> } from '@nestjs/common';
+import { Injectable, Inject<% if (isProtected) { %>, ForbiddenException<% } %>, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 <% if (className === 'File') { %>
 import * as fs from 'fs-extra';
@@ -6,6 +6,10 @@ import * as path from 'path';
 import { Readable } from 'stream';
 import { lookup as mimeLookup } from 'mime-types';
 import { ReadFileResponseDto } from './dto/read-file-response.dto';
+import { get as httpGet } from 'http';
+import { get as httpsGet } from 'https';
+import { URL } from 'url';
+
 <% } %>
 import { Create<%= className %>Dto } from './dto/create-<%= folderName %>.dto';
 import { Update<%= className %>Dto } from './dto/update-<%= folderName %>.dto';
@@ -18,7 +22,7 @@ import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 <% } %>
 <% if (hasCreatedBy || isProtected) { %>
 import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 <% } %>
 
 <% if (className === 'File') { %>
@@ -223,6 +227,38 @@ export class <%= className %>Service {
       language: lang,
       data: content,
     };
+  }
+  async proxyImage(url: string, res: Response): Promise<void> {
+    if (!url) {
+      throw new BadRequestException('Missing image URL');
+    }
+
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+        throw new BadRequestException('Unsupported protocol');
+      }
+    } catch {
+      throw new BadRequestException('Invalid image URL');
+    }
+
+    const client = parsedUrl.protocol === 'https:' ? httpsGet : httpGet;
+
+    try {
+      client(url, (imageRes) => {
+        const contentType = imageRes.headers['content-type'] || 'image/jpeg';
+        res.setHeader('Content-Type', contentType);
+        imageRes.pipe(res);
+        imageRes.on('error', () => {
+          res.status(500).send('Error streaming image data');
+        });
+      }).on('error', () => {
+        res.status(500).send('Error fetching image');
+      });
+    } catch {
+      throw new InternalServerErrorException('Unexpected proxy error');
+    }
   }
 <% } %>
 <% if (className === 'User') { %>

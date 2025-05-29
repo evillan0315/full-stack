@@ -13,26 +13,23 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
-export class CreateFileDto {
+export class CreateFolderDto {
   @ApiProperty({ description: 'name field' })
     @IsString()
     name: string;
-  @ApiProperty({ description: 'content field' })
-    @IsString()
-    content: string;
   @ApiProperty({ description: 'path field' })
     @IsString()
     path: string;
-  @ApiProperty({ description: 'folderId field' })
+  @ApiProperty({ description: 'parentId field' })
     @IsOptional()
     @IsString()
-    folderId: string;
+    parentId: string;
 
 }
 
-export class PaginationFileResultDto {
-  @ApiProperty({ type: [CreateFileDto] })
-  items: CreateFileDto[];
+export class PaginationFolderResultDto {
+  @ApiProperty({ type: [CreateFolderDto] })
+  items: CreateFolderDto[];
 
   @ApiProperty()
   total: number;
@@ -47,7 +44,7 @@ export class PaginationFileResultDto {
   totalPages: number;
 }
 
-export class PaginationFileQueryDto {
+export class PaginationFolderQueryDto {
   @IsOptional()
   @Type(() => Number)
   @IsPositive()

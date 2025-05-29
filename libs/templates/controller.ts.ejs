@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Post,
+  Res,
+  Req,
   Body,
   Param,
   Patch,
@@ -49,13 +51,19 @@ import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ReadFileDto } from './dto/read-file.dto';
 import { ReadFileResponseDto } from './dto/read-file-response.dto';
+import { Response } from 'express';
 <% } %>
 
 <% if (isProtected) { %>
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 <% } %>
-@ApiTags('<%= className %>')
+
+@ApiTags(<% if (className === 'File' || className === 'Folder') { %>
+  'File & Folder'
+<% } else { %>
+  '<%= className %>'
+<% } %>)
 @Controller('api/<%= folderName %>')
 export class <%= className %>Controller {
   constructor(private readonly <%= fileName %>Service: <%= className %>Service) {}
@@ -163,6 +171,20 @@ export class <%= className %>Controller {
       body.generateBlobUrl,
       filePath,
     );
+  }
+  @Get('proxy')
+  @ApiOperation({ summary: 'Proxies an image URL and returns the image content' })
+  @ApiQuery({
+    name: 'url',
+    required: true,
+    description: 'The URL of the image to proxy',
+    type: String,
+  })
+  @ApiResponse({ status: 200, description: 'Image successfully proxied' })
+  @ApiResponse({ status: 400, description: 'Missing or invalid image URL' })
+  @ApiResponse({ status: 500, description: 'Error fetching or streaming image' })
+  async proxy(@Query('url') url: string, @Res() res: Response): Promise<void> {
+    await this.fileService.proxyImage(url, res);
   }
   <% } %>
   

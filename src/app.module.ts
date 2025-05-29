@@ -11,6 +11,7 @@ import { UtilsModule } from './utils/utils.module';
 //import { MigrationService } from './migration/migration.service';
 import { DatabaseModule } from './database/database.module';
 import { TerminalModule } from './terminal/terminal.module';
+import { FolderModule } from './folder/folder.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TerminalModule } from './terminal/terminal.module';
     UtilsModule,
     DatabaseModule,
     TerminalModule,
+    FolderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
