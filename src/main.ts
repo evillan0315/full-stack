@@ -42,10 +42,9 @@ async function bootstrap() {
   });
 
   hbs.registerHelper('log', (message) => {
-    console.log('[HBS]', message);
+
   });
   registerHandlebarsHelpers();
-  //app.useStaticAssets(join(__dirname, '..', 'public'));
   app.use(cookieParser());
   app.enableCors({
     origin: (origin, callback) => {
