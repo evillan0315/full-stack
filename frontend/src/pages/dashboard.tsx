@@ -1,20 +1,22 @@
-import { createSignal, createEffect} from 'solid-js';
-
+import { createSignal, createEffect } from 'solid-js';
+import { A, useLocation, useNavigate, useParams } from '@solidjs/router';
+import { API, useAppContext } from '../context';
 
 interface DashboardEntry {
   content: string;
 }
 
 export default function Dashboard() {
-  const [homeDir, setHomeDir] = createSignal('');
+  const params = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const context = useAppContext()!;
 
-  return (
-    <div class="flex min-h-screen items-center justify-center">
+  createEffect(() => {
+    if (!context.user()) {
+      navigate(`/login`);
+    }
+  });
 
-
-
-</div>
-    
-
-  );
+  return <div class="flex min-h-screen items-center justify-center"></div>;
 }

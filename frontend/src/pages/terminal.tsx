@@ -1,4 +1,6 @@
 import { createSignal, onMount, createEffect, For, onCleanup } from 'solid-js';
+import { A, useLocation, useNavigate, useParams } from '@solidjs/router';
+import { API, useAppContext } from '../context';
 import { io, Socket } from 'socket.io-client';
 
 interface TerminalEntry {
@@ -17,7 +19,10 @@ export default function Terminal() {
   const [showContextMenu, setShowContextMenu] = createSignal(false);
   const [contextMenuPosition, setContextMenuPosition] = createSignal({ x: 0, y: 0 });
   const [filteredOptions, setFilteredOptions] = createSignal<string[]>([]);
-
+  const params = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const context = useAppContext()!;
   let outputRef: HTMLDivElement | undefined;
   let inputRef: HTMLInputElement | undefined;
   if (inputRef) inputRef.disabled = true;
@@ -127,13 +132,15 @@ export default function Terminal() {
     setShowContextMenu(false);
     addEntry('message', `Selected: ${selectedOption}`);
   };
-  createEffect(scrollToBottom);
 
+  createEffect(() => {
+    if (!context.user()?.email) {
+      navigate(`/login`);
+    }
+    scrollToBottom();
+  });
   return (
-
     <div class="flex h-screen flex-col bg-white dark:bg-neutral-900 dark:text-white pt-10">
-     
-
       <div
         class="flex-1 overflow-auto scroll-smooth px-4 py-2 text-sm"
         ref={outputRef}
@@ -219,24 +226,23 @@ export default function Terminal() {
       <div class="relative flex items-center justify-between gap-2 pb-4">
         <span class={`ml-4 ${status() === 'Connected' ? 'text-green-400' : 'text-red-400'}`}>$</span>
         <input
-  ref={inputRef}
-  class={`flex-1 dark:bg-netural-950 ${
-    status() === 'Connected' ? 'text-green-400' : 'text-red-400'
-  } rounded-md px-1 text-sm focus:outline-none focus:ring-0`}
-  type="text"
-  placeholder={`${status() === 'Connected' ? 'Type a command...' : status()}`}
-  value={cmd()}
-  autofocus
-  onInput={handleInput}
-  onKeyDown={(e) => {
-    if (e.key === 'Enter') {
-      sendCommand();
-      setShowContextMenu(false);
-    }
-  }}
-/>
+          ref={inputRef}
+          class={`flex-1 dark:bg-netural-950 ${
+            status() === 'Connected' ? 'text-green-400' : 'text-red-400'
+          } rounded-md px-1 text-sm focus:outline-none focus:ring-0`}
+          type="text"
+          placeholder={`${status() === 'Connected' ? 'Type a command...' : status()}`}
+          value={cmd()}
+          autofocus
+          onInput={handleInput}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              sendCommand();
+              setShowContextMenu(false);
+            }
+          }}
+        />
       </div>
     </div>
-
   );
 }

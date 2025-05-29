@@ -41,9 +41,7 @@ async function bootstrap() {
     prefix: '/public/', // Optional: accessed via http://localhost:3000/public/
   });
 
-  hbs.registerHelper('log', (message) => {
-
-  });
+  hbs.registerHelper('log', (message) => {});
   registerHandlebarsHelpers();
   app.use(cookieParser());
   app.enableCors({

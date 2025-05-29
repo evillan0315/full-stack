@@ -162,7 +162,7 @@ export class AuthController {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
       });
-      return res.redirect('/dashboard');
+      return res.redirect(`/dashboard`);
     } catch (error) {
       console.error('OAuth redirect error:', error);
       return res.redirect('/login?error=OAuth%20Login%20Failed');
@@ -204,6 +204,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getProfile(@Req() req: Request) {
     const me = req['user'];
+    
     return me;
   }
 }

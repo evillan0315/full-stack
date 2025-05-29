@@ -8,6 +8,7 @@
           </div>
         {{/if}}
 
+        <!-- Email Field -->
         <div>
           <label for="email" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
             Email address
@@ -18,11 +19,12 @@
             type="email"
             autocomplete="email"
             required
-            class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             placeholder="you@example.com"
+            class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           />
         </div>
 
+        <!-- Password Field -->
         <div>
           <label for="password" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
             Password
@@ -33,11 +35,12 @@
             type="password"
             autocomplete="current-password"
             required
-            class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             placeholder="••••••••"
+            class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           />
         </div>
 
+        <!-- Remember Me & Forgot Password -->
         <div class="flex items-center justify-between">
           <div class="flex items-center">
             <input
@@ -50,7 +53,6 @@
               Remember me
             </label>
           </div>
-
           <div class="text-sm hidden">
             <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
               Forgot your password?
@@ -58,6 +60,7 @@
           </div>
         </div>
 
+        <!-- Submit Button -->
         <div>
           <button
             type="submit"
@@ -68,31 +71,30 @@
             {{#if isLoading}}Signing in...{{else}}Sign in{{/if}}
           </button>
         </div>
-
-
       </form>
+
+      <!-- Sign in with Google -->
       <form action="/api/auth/google" method="GET">
-  <button
-    type="submit"
-    class="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-gray-700 p-3 text-white hover:bg-gray-600"
-  >
-    <span class="iconify" data-icon="flat-color-icons:google" data-width="20" data-height="20"></span>
-    Sign in with Google
-  </button>
-</form>
+        <button
+          type="submit"
+          class="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-gray-700 p-3 text-white hover:bg-gray-600"
+        >
+          <span class="iconify" data-icon="flat-color-icons:google" data-width="20" data-height="20"></span>
+          Sign in with Google
+        </button>
+      </form>
 
-<form action="/api/auth/github" method="GET">
-  <button
-    type="submit"
-    class="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-gray-700 p-3 text-white hover:bg-gray-600"
-  >
-    <span class="iconify" data-icon="flat-color-icons:google" data-width="20" data-height="20"></span>
-    Sign in with Github
-  </button>
-</form>
+      <!-- Sign in with GitHub -->
+      <form action="/api/auth/github" method="GET">
+        <button
+          type="submit"
+          class="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-gray-700 p-3 text-white hover:bg-gray-600"
+        >
+          <span class="iconify" data-icon="mdi:github" data-width="20" data-height="20"></span>
+          Sign in with GitHub
+        </button>
+      </form>
     </div>
-
-    
   </div>
 </div>
 

@@ -45,6 +45,7 @@ export class TerminalGateway
 
   async handleConnection(client: Socket) {
     let token;
+    console.log(client.data.user);
     const cookies = client.handshake?.headers?.cookie;
     if (cookies) {
       const parsedCookies = cookie.parse(cookies);

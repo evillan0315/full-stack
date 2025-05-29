@@ -37,7 +37,8 @@ export default defineConfig(() => {
     },
     define: {
       'import.meta.env.BASE_URL': JSON.stringify(process.env.BASE_URL),
+      'import.meta.env.GITHUB_CALLBACK_URL': JSON.stringify(process.env.GITHUB_CALLBACK_URL),
+      'import.meta.env.GOOGLE_CALLBACK_URL': JSON.stringify(process.env.GOOGLE_CALLBACK_URL),
     },
   };
 });
-

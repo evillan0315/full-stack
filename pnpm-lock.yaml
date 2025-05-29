@@ -173,6 +173,12 @@ importers:
       socket.io-client:
         specifier: ^4.8.1
         version: 4.8.1
+      solid-dismiss:
+        specifier: ^1.8.2
+        version: 1.8.2(solid-js@1.9.6)
+      solid-heroicons:
+        specifier: ^3.2.4
+        version: 3.2.4(solid-js@1.9.6)
       stream:
         specifier: ^0.0.3
         version: 0.0.3
@@ -5636,6 +5642,16 @@ packages:
   socket.io@4.8.1:
     resolution: {integrity: sha512-oZ7iUCxph8WYRHHcjBEc9unw3adt5CmSNlppj/5Q4k2RIrhl8Z5yY2Xr4j9zj0+wzVZ0bxmYoGSzKJnRl6A4yg==}
     engines: {node: '>=10.2.0'}
+
+  solid-dismiss@1.8.2:
+    resolution: {integrity: sha512-fQeI+X5eVZWVRpkwnNHHXGrTkF3NzCOEKDTle7CCmsV4X0legjD2/rnnzVfWMFqCMJd7byfdrlMVVqjoZAuBDQ==}
+    peerDependencies:
+      solid-js: '1'
+
+  solid-heroicons@3.2.4:
+    resolution: {integrity: sha512-u6BMdFLvkJnvUGYzdFcWp1wvJ4hb9Y1zd3AbZ9D3bUmmiy9jBzNZX+RcqBCI2EKRvdQwAb1UB9bkESfqfhayDg==}
+    peerDependencies:
+      solid-js: '>= ^1.2.5'
 
   solid-js@1.9.6:
     resolution: {integrity: sha512-PoasAJvLk60hRtOTe9ulvALOdLjjqxuxcGZRolBQqxOnXrBXHGzqMT4ijNhGsDAYdOgEa8ZYaAE94PSldrFSkA==}
@@ -12633,6 +12649,14 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+
+  solid-dismiss@1.8.2(solid-js@1.9.6):
+    dependencies:
+      solid-js: 1.9.6
+
+  solid-heroicons@3.2.4(solid-js@1.9.6):
+    dependencies:
+      solid-js: 1.9.6
 
   solid-js@1.9.6:
     dependencies:

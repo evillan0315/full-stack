@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Res,
   Post,
   Body,
   Param,
@@ -29,7 +30,8 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import axios from 'axios';
-
+import { Response } from 'express';
+import { get } from 'https'; // or 'http' depending on the URL
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -49,6 +51,7 @@ import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ReadFileDto } from './dto/read-file.dto';
 import { ReadFileResponseDto } from './dto/read-file-response.dto';
+
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -158,7 +161,23 @@ export class FileController {
       filePath,
     );
   }
+  @Get('proxy')
+  async proxy(@Query('url') url: string, @Res() res: Response) {
+    if (!url) {
+      return res.status(400).send('Missing image URL');
+    }
 
+    try {
+      get(url, (imageRes) => {
+        res.setHeader('Content-Type', imageRes.headers['content-type'] || 'image/jpeg');
+        imageRes.pipe(res);
+      }).on('error', () => {
+        res.status(500).send('Error fetching image');
+      });
+    } catch {
+      res.status(500).send('Internal server error');
+    }
+  }
   // ───────────────────────────────────────────────────────────
   // CREATE
   // ───────────────────────────────────────────────────────────

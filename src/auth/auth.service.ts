@@ -152,6 +152,7 @@ export class AuthService {
         role: true,
         phone_number: true,
         createdAt: true,
+        image: true,
       },
     });
   }
