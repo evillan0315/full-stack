@@ -1,0 +1,48 @@
+<div class="min-h-screen p-6 bg-neutral-50 dark:bg-neutral-800">
+  <div class="w-full max-w-7xl mx-auto">
+    <h1 class="text-2xl font-semibold mb-6">{{title}}</h1>
+
+    <div class="overflow-x-auto bg-white shadow dark:bg-neutral-900 rounded-md ">
+      <table class="min-w-full border border-neutral-200 dark:border-neutral-700 ">
+        <thead class="bg-neutral-100 dark:bg-neutral-950 ">
+          <tr>
+            {{#each fields}}
+              <th class="px-4 py-3 text-left text-sm font-medium text-neutral-700 dark:text-neutral-200 border-b dark:border-neutral-700">
+                {{capitalize name}}
+              </th>
+            {{/each}}
+            <th class="px-4 py-3 text-left text-sm font-medium text-neutral-700 dark:text-neutral-200 border-b dark:border-neutral-700">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each lists}}
+            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
+
+              {{#each ../fields}}
+  <td class="px-4 py-2 border-b text-sm text-neutral-800 dark:text-neutral-300 dark:border-neutral-700">
+    {{#and (ifEquals ../model "user") (ifEquals name "image")}}
+      <img src="{{lookup ../this name}}" alt="{{name}}" class="h-10 w-10 object-cover rounded-full" />
+    {{else}}
+      {{lookup ../this name}}
+    {{/and}}
+  </td>
+{{/each}}
+              <td class="px-4 py-2 border-b text-sm text-blue-600 dark:border-neutral-700">
+                <!-- Replace with actual routes or handlers -->
+                <a href="/{{../model}}/edit/{{this.id}}" class="hover:underline">Edit</a> |
+                <a href="/{{../model}}/delete/{{this.id}}" class="hover:underline text-red-500">Delete</a>
+              </td>
+            </tr>
+          {{else}}
+            <tr>
+              <td colspan="{{add (length fields) 1}}" class="px-4 py-4 text-center text-neutral-500 dark:text-neutral-100">
+                No records found.
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

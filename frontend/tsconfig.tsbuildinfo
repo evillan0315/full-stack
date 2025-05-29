@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/index.tsx","./src/vite-env.d.ts","./src/components/TerminalInput.tsx","./src/pages/edit.tsx","./src/pages/home.tsx","./src/pages/login.tsx","./src/pages/terminal.tsx","./src/utils/date.ts","./src/utils/exportFiles.tsx","./src/utils/isDarkTheme.ts","./src/utils/serviceWorker.ts"],"errors":true,"version":"5.7.3"}
