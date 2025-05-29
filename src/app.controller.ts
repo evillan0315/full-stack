@@ -49,11 +49,11 @@ export class AppController {
   }
 
   @Get('dashboard')
-  //@UseGuards(JwtAuthGuard, RolesGuard)
-  //@Roles(UserRole.ADMIN, UserRole.USER, UserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.MANAGER)
   @Render('pages/index')
   @ApiOperation({ summary: 'Render protected dashboard page' })
-  //@ApiBearerAuth()
+  @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Dashboard rendered' })
   @ApiResponse({ status: 403, description: 'Forbidden - insufficient role' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -64,11 +64,11 @@ export class AppController {
     };
   }
   @Get('terminal')
-  //@UseGuards(JwtAuthGuard, RolesGuard)
-  //@Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Render('pages/index')
   @ApiOperation({ summary: 'Render protected terminal page' })
-  //@ApiBearerAuth()
+  @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Terminal rendered' })
   @ApiResponse({ status: 403, description: 'Forbidden - insufficient role' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

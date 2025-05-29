@@ -4,7 +4,7 @@ import { Icon } from 'solid-heroicons';
 
 import { onCleanup, createSignal, Show, Component, createEffect } from 'solid-js';
 
-import { share, link, arrowDownTray, xCircle, bars_3, moon, sun, commandLine } from 'solid-heroicons/outline';
+import { share, link, arrowDownTray, xCircle, bars_3, moon, sun, commandLine, computerDesktop, arrowRight, userCircle } from 'solid-heroicons/outline';
 
 import { API, useAppContext } from '../context';
 
@@ -37,6 +37,9 @@ const Header: Component<HeaderProps> = (props) => {
   function closeMobileMenu() {
     setShowMenu(false);
   }
+  function openProfile() {
+    console.log('Profile')
+  }
   createEffect(async () => {
     if (context.user()?.email) {
       if (context.user()?.image) {
@@ -63,19 +66,16 @@ const Header: Component<HeaderProps> = (props) => {
     }
   };
   return (
-    <header class="dark:bg-neutral-950 border-b-2px z-12 sticky top-0 flex items-center bg-white gap-x-4 border-slate-200 p-1 px-2 text-sm dark:border-neutral-800">
+    <header class="dark:bg-neutral-900 border-b z-12 sticky top-0 flex items-center bg-white gap-x-4 border-slate-200 p-1 px-2 text-sm dark:border-neutral-800 mb-1">
       {props.children || (
-      <a
-          href="/dashboard"
-          
-          title="Dashboard"
-        >
-        <h1 class="leading-0 uppercase tracking-widest">
+
+        <A href="/" class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1">
+                <h1 class="leading-0 uppercase tracking-widest">
         
-          <b>Dash</b> Playground
+          <b>Project</b> Board
           
         </h1>
-        </a>
+              </A>
       )}
       <Dismiss
         classList={{
@@ -89,13 +89,12 @@ const Header: Component<HeaderProps> = (props) => {
         setOpen={setShowMenu}
         show
       >
-        <a
-          href="/terminal"
-          class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1"
-          title="Terminal"
-        >
-          <Icon path={commandLine} class="h-6" />
-        </a>
+       <A href="/dashboard" class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1">
+                <Icon path={computerDesktop} class="h-6" />
+              </A>
+      <A href="/terminal" class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1">
+                <Icon path={commandLine} class="h-6" />
+              </A>
       </Dismiss>
       <button
         type="button"
@@ -116,7 +115,7 @@ const Header: Component<HeaderProps> = (props) => {
         <Show
           when={isAuthenticated()}
           fallback={
-            <a class="bg-solid-default mx-1 rounded px-3 py-2 text-lg text-slate-50" href={`/login`} rel="external">
+            <a class="bg-neutral-800 mx-1 rounded px-3 py-2 text-lg text-slate-50" href={`/login`} rel="external">
               Login
             </a>
           }
@@ -141,10 +140,10 @@ const Header: Component<HeaderProps> = (props) => {
           </button>
 
           <Dismiss menuButton={() => profileBtn} open={showProfile} setOpen={setShowProfile}>
-            <div class="dark:bg-neutral-950 absolute right-0 flex flex-col items-left justify-center bg-white shadow-md rounded-lg p-4 w-60">
+            <div class="dark:bg-neutral-900 absolute right-0 flex flex-col items-left justify-center bg-neutral-100 rounded-lg w-60 border border-neutral-600 dark:text-neutral-100 shadow-lg">
               {' '}
               {/* Set width here */}
-              <div class="flex space-x-3">
+              <div class="flex space-x-3 px-2 py-4 border-b border-neutral-600">
                 {' '}
                 {/* Added flex for inline */}
                 <Show
@@ -172,10 +171,16 @@ const Header: Component<HeaderProps> = (props) => {
                 </div>
               </div>
               <button
-                onClick={signOut}
-                class="w-full px-2 py-2 text-left text-xs hover:bg-gray-300 dark:hover:bg-gray-800 rounded-md mt-2"
-              >
-                Sign Out
+                  class="flex items-center gap-2 px-4 py-2 text-left text-neutral-100 hover:bg-neutral-800"
+                  onClick={openProfile}
+                >
+                <Icon path={userCircle} class="h-7" /> Profile
+              </button>
+              <button
+                  class="flex items-center gap-2 px-4 py-2 text-left text-neutral-100 hover:bg-neutral-800"
+                  onClick={signOut}
+                >
+                <Icon path={arrowRight} class="h-7" /> Sign Out
               </button>
             </div>
           </Dismiss>

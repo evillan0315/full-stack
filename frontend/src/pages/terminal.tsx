@@ -2,7 +2,7 @@ import { createSignal, onMount, createEffect, For, onCleanup } from 'solid-js';
 import { A, useLocation, useNavigate, useParams } from '@solidjs/router';
 import { API, useAppContext } from '../context';
 import { io, Socket } from 'socket.io-client';
-
+import Header from '../components/Header';
 interface TerminalEntry {
   type: 'message' | 'command' | 'error' | 'outputMessage';
   content: string;
@@ -80,7 +80,7 @@ export default function Terminal() {
   };
 
   onMount(() => {
-    scrollToBottom();
+    //scrollToBottom();
 
     const s = io(`${import.meta.env.BASE_URL}/terminal`, {
       transports: ['websocket'],
@@ -133,16 +133,13 @@ export default function Terminal() {
     addEntry('message', `Selected: ${selectedOption}`);
   };
 
-  createEffect(() => {
-    if (!context.user()?.email) {
-      navigate(`/login`);
-    }
-    scrollToBottom();
-  });
+  createEffect(scrollToBottom);
   return (
-    <div class="flex h-screen flex-col bg-white dark:bg-neutral-900 dark:text-white pt-10">
+    
+    <div class="flex h-screen  flex-col bg-white dark:bg-neutral-900/5 dark:text-white rounded-md">
+      <Header />
       <div
-        class="flex-1 overflow-auto scroll-smooth px-4 py-2 text-sm"
+        class="flex-1 overflow-auto scroll-smooth px-4 py-2 text-sm "
         ref={outputRef}
         style={{ 'scroll-behavior': 'smooth' }}
       >

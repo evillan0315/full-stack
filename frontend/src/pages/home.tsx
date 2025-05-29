@@ -1,6 +1,7 @@
 import { createSignal, createEffect } from 'solid-js';
 import { A, useLocation, useNavigate, useParams, useSearchParams } from '@solidjs/router';
 import { API, useAppContext } from '../context';
+import Header from '../components/Header';
 interface HomeEntry {
   content: string;
 }
@@ -16,5 +17,15 @@ export default function Home() {
       console.log(context.user());
     }
   });
-  return <div class="flex min-h-screen items-center justify-center"></div>;
+  return (
+  <div class="flex h-screen  flex-col bg-white dark:bg-neutral-900 dark:text-white">
+  <Header />
+  <div
+        class="flex-1 overflow-auto scroll-smooth px-4 py-2 text-sm"
+        style={{ 'scroll-behavior': 'smooth' }}
+      >
+      
+     </div>
+  </div>
+  );
 }
