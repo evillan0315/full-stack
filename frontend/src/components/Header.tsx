@@ -65,9 +65,17 @@ const Header: Component<HeaderProps> = (props) => {
   return (
     <header class="dark:bg-neutral-950 border-b-2px z-12 sticky top-0 flex items-center bg-white gap-x-4 border-slate-200 p-1 px-2 text-sm dark:border-neutral-800">
       {props.children || (
+      <a
+          href="/dashboard"
+          
+          title="Dashboard"
+        >
         <h1 class="leading-0 uppercase tracking-widest">
-          <b>Code</b> Playground
+        
+          <b>Dash</b> Playground
+          
         </h1>
+        </a>
       )}
       <Dismiss
         classList={{

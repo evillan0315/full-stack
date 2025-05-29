@@ -13,7 +13,7 @@ export default function Dashboard() {
   const context = useAppContext()!;
 
   createEffect(() => {
-    if (!context.user()) {
+    if (!context.user()?.email) {
       navigate(`/login`);
     }
   });
