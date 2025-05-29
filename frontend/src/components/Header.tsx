@@ -18,6 +18,8 @@ import {
   userCircle,
   cube,
   lockClosed,
+  rocketLaunch,
+  cog
 } from 'solid-heroicons/outline';
 
 import { API, useAppContext } from '../context';
@@ -52,7 +54,13 @@ const Header: Component<HeaderProps> = (props) => {
     setShowMenu(false);
   }
   function openProfile() {
-    console.log('Profile');
+    window.location.href = '/profile';
+  }
+  function openApi() {
+    window.location.href = '/api';
+  }
+  function openSettings() {
+    window.location.href = '/settings';
   }
   createEffect(async () => {
     if (context.user()?.email) {
@@ -168,7 +176,7 @@ const Header: Component<HeaderProps> = (props) => {
             <div class="dark:bg-neutral-900 absolute right-0 flex flex-col items-left justify-center bg-neutral-100 rounded-lg w-60 border border-neutral-600 dark:text-neutral-100 shadow-lg">
               {' '}
               {/* Set width here */}
-              <div class="flex space-x-3 px-2 py-4 border-b border-neutral-600">
+              <div class="flex space-x-3 px-2 py-4 border-b border-neutral-600" onClick={openProfile}>
                 {' '}
                 {/* Added flex for inline */}
                 <Show
@@ -199,9 +207,16 @@ const Header: Component<HeaderProps> = (props) => {
               </div>
               <button
                 class="flex items-center gap-2 px-4 py-2 text-left text-neutral-100 hover:bg-neutral-800"
-                onClick={openProfile}
+                onClick={openSettings}
               >
-                <Icon path={userCircle} class="h-7" /> Profile
+                <Icon path={cog} class="h-7" /> Settings
+              </button>
+             
+              <button
+                class="flex items-center gap-2 px-4 py-2 text-left text-neutral-100 hover:bg-neutral-800"
+                onClick={openApi}
+              >
+                <Icon path={rocketLaunch} class="h-7" /> API Documentation
               </button>
               <button
                 class="flex items-center gap-2 px-4 py-2 text-left text-neutral-100 hover:bg-neutral-800"
