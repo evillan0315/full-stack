@@ -88,16 +88,16 @@ const LoginComponent = () => {
     <Show when={!loading()} fallback={<Loading />}>
       <div class="bg-white dark:bg-neutral-900 h-screen w-full">
         <div class="flex min-h-screen items-center justify-center">
-          <div class="w-full max-w-md rounded-lg bg-neutral-950 p-8 shadow-lg">
+          <div class="w-full max-w-md rounded-lg bg-neutral-950 p-8 border border-neutral-300 dark:border-neutral-600 shadow-lg">
             <h2 class="text-center text-2xl font-bold text-white">Welcome Back 👋</h2>
             {error() && <p class="text-center text-sm text-red-400">{error()}</p>}
             <form class="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label class="block text-gray-400">Username</label>
+                <label class="block text-gray-400">Email</label>
                 <input
-                  type="text"
-                  placeholder="Enter username"
-                  class="mt-1 w-full rounded-md border border-neutral-600 bg-neutral-700 p-3 text-white placeholder-neutral-400 focus:ring-2 focus:ring-blue-500"
+                  type="email"
+                  placeholder="Enter email"
+                  class="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-600 bg-neutral-200 dark:bg-neutral-800 p-3 text-neutral-900 dark:text-neutral-100  placeholder-neutral-400 focus:ring-2 focus:ring-blue-500"
                   value={username()}
                   onInput={(e) => setUsername(e.currentTarget.value)}
                 />
@@ -107,7 +107,7 @@ const LoginComponent = () => {
                 <input
                   type="password"
                   placeholder="••••••••"
-                  class="mt-1 w-full rounded-md border border-neutral-600 bg-neutral-700 p-3 text-white placeholder-neutral-400 focus:ring-2 focus:ring-blue-500"
+                  class="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-600 bg-neutral-200 dark:bg-neutral-800 p-3 text-neutral-900 dark:text-neutral-100  placeholder-neutral-400 focus:ring-2 focus:ring-blue-500"
                   value={password()}
                   onInput={(e) => setPassword(e.currentTarget.value)}
                 />

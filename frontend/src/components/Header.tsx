@@ -4,7 +4,7 @@ import { Icon } from 'solid-heroicons';
 
 import { onCleanup, createSignal, Show, Component, createEffect } from 'solid-js';
 
-import { share, link, arrowDownTray, xCircle, bars_3, moon, sun, commandLine, computerDesktop, arrowRight, userCircle } from 'solid-heroicons/outline';
+import { share, link, arrowDownTray, xCircle, bars_3, moon, sun, commandLine, computerDesktop, arrowRight, userCircle, cube, lockClosed } from 'solid-heroicons/outline';
 
 import { API, useAppContext } from '../context';
 
@@ -70,9 +70,9 @@ const Header: Component<HeaderProps> = (props) => {
       {props.children || (
 
         <A href="/" class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1">
-                <h1 class="leading-0 uppercase tracking-widest">
+                <h1 class="leading-0 uppercase tracking-widest flex items-center gap-2 text-left">
         
-          <b>Project</b> Board
+          <Icon path={cube} class="h-6" /> <b>Project</b> Board
           
         </h1>
               </A>
@@ -89,12 +89,14 @@ const Header: Component<HeaderProps> = (props) => {
         setOpen={setShowMenu}
         show
       >
+      <Show when={isAuthenticated()}>
        <A href="/dashboard" class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1">
                 <Icon path={computerDesktop} class="h-6" />
               </A>
       <A href="/terminal" class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1">
                 <Icon path={commandLine} class="h-6" />
               </A>
+              </Show>
       </Dismiss>
       <button
         type="button"
@@ -115,9 +117,10 @@ const Header: Component<HeaderProps> = (props) => {
         <Show
           when={isAuthenticated()}
           fallback={
-            <a class="bg-neutral-800 mx-1 rounded px-3 py-2 text-lg text-slate-50" href={`/login`} rel="external">
-              Login
-            </a>
+            <A href="/login" class="flex cursor-alias flex-row items-center gap-2 rounded px-2 py-1 opacity-80 hover:opacity-100 md:px-1 border border-neutral-600 rounded-md">
+            
+              <Icon path={lockClosed} class="h-6" /> Login
+            </A>
           }
         >
           <button ref={profileBtn}>
@@ -180,7 +183,7 @@ const Header: Component<HeaderProps> = (props) => {
                   class="flex items-center gap-2 px-4 py-2 text-left text-neutral-100 hover:bg-neutral-800"
                   onClick={signOut}
                 >
-                <Icon path={arrowRight} class="h-7" /> Sign Out
+                <Icon path={arrowRight} class="h-7" /> Logout
               </button>
             </div>
           </Dismiss>
