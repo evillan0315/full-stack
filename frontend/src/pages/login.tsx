@@ -135,9 +135,8 @@ const Login = () => {
   let user;
   createEffect(() => {
     if (context.user()?.email) {
-        navigate('/dashboard');
-        
-      }
+      navigate('/dashboard');
+    }
   });
 
   return (

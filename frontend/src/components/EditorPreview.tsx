@@ -21,10 +21,7 @@ const EditorPreview: Component<EditorPreviewProps> = (props) => {
   return (
     <div class="h-full">
       {/* Top (Markdown Viewer) */}
-      <div
-        class="p-4 overflow-auto"
-        style={{ height: showResizer() ? `${dividerY()}px` : '100%' }}
-      >
+      <div class="p-4 overflow-auto" style={{ height: showResizer() ? `${dividerY()}px` : '100%' }}>
         <MarkdownViewer content={props.previewContent} />
       </div>
 
@@ -40,4 +37,3 @@ const EditorPreview: Component<EditorPreviewProps> = (props) => {
 };
 
 export default EditorPreview;
-

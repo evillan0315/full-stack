@@ -84,11 +84,8 @@ export class AppController {
   @ApiQuery({ name: 'error', required: false, type: String })
   @ApiResponse({ status: 200, description: 'Login page rendered' })
   @ApiResponse({ status: 302, description: 'Redirected if already logged in' })
-  async getLogin(
-    @Req() req: Request,
-  ) {
+  async getLogin(@Req() req: Request) {
     const token = req.cookies?.accessToken;
-
 
     return {
       message: `Please Login`,
@@ -106,7 +103,7 @@ export class AppController {
       layout: 'layouts/editor',
     };
   }
-  
+
   @Post('logout')
   @Redirect('/login')
   @ApiOperation({ summary: 'Log out a user and clear JWT cookie' })

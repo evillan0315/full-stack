@@ -8,14 +8,12 @@ import { PrismaModule } from '../prisma/prisma.module';
   imports: [PrismaModule],
   controllers: [FileController, ViewsController],
   providers: [
-      FileService,
-      
-      {
-        provide: 'EXCLUDED_FOLDERS',
-        useValue: ['node_modules', 'dist', '.git'],
-      },
-      
-    ]
+    FileService,
+
+    {
+      provide: 'EXCLUDED_FOLDERS',
+      useValue: ['node_modules', 'dist', '.git'],
+    },
+  ],
 })
 export class FileModule {}
-

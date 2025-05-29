@@ -9,4 +9,3 @@ export interface User {
   updateAt?: string;
   createdAt?: string;
 }
-

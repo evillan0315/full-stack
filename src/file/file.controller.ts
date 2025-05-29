@@ -13,7 +13,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
-  BadRequestException
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -28,7 +28,7 @@ import {
   ApiQuery,
   ApiResponse,
   ApiConsumes,
-  ApiBody
+  ApiBody,
 } from '@nestjs/swagger';
 import axios from 'axios';
 
@@ -53,23 +53,15 @@ import { ReadFileDto } from './dto/read-file.dto';
 import { ReadFileResponseDto } from './dto/read-file-response.dto';
 import { Response } from 'express';
 
-
-
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-
-
-@ApiTags(
-  'File & Folder'
-)
+@ApiTags('File & Folder')
 @Controller('api/file')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
-  
+
   @Get('list')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'List files in a directory' })
   @ApiQuery({
     name: 'directory',
@@ -89,9 +81,8 @@ export class FileController {
   ) {
     return this.fileService.getFilesByDirectory(directory, recursive);
   }
-  
+
   @Roles(UserRole.ADMIN)
-  
   @Post('read')
   @ApiOperation({
     summary: 'Read file content from upload, local path, or URL',
@@ -171,7 +162,9 @@ export class FileController {
     );
   }
   @Get('proxy')
-  @ApiOperation({ summary: 'Proxies an image URL and returns the image content' })
+  @ApiOperation({
+    summary: 'Proxies an image URL and returns the image content',
+  })
   @ApiQuery({
     name: 'url',
     required: true,
@@ -180,23 +173,25 @@ export class FileController {
   })
   @ApiResponse({ status: 200, description: 'Image successfully proxied' })
   @ApiResponse({ status: 400, description: 'Missing or invalid image URL' })
-  @ApiResponse({ status: 500, description: 'Error fetching or streaming image' })
+  @ApiResponse({
+    status: 500,
+    description: 'Error fetching or streaming image',
+  })
   async proxy(@Query('url') url: string, @Res() res: Response): Promise<void> {
     await this.fileService.proxyImage(url, res);
   }
-  
-  
-  
+
   // ───────────────────────────────────────────────────────────
   // CREATE
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Create a new File' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateFileDto })
+  @ApiCreatedResponse({
+    description: 'Successfully created.',
+    type: CreateFileDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
@@ -209,11 +204,12 @@ export class FileController {
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Retrieve all File records' })
-  @ApiOkResponse({ description: 'List of File records.', type: [CreateFileDto] })
+  @ApiOkResponse({
+    description: 'List of File records.',
+    type: [CreateFileDto],
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
@@ -225,9 +221,7 @@ export class FileController {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Paginated File records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -246,9 +240,7 @@ export class FileController {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Find File by ID' })
   @ApiOkResponse({ description: 'Record found.', type: CreateFileDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -263,9 +255,7 @@ export class FileController {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Update File by ID' })
   @ApiOkResponse({ description: 'Successfully updated.', type: UpdateFileDto })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
@@ -281,9 +271,7 @@ export class FileController {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Delete File by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -293,4 +281,3 @@ export class FileController {
     return this.fileService.remove(id);
   }
 }
-

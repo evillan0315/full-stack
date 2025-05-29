@@ -4,7 +4,21 @@ import { Icon } from 'solid-heroicons';
 
 import { onCleanup, createSignal, Show, Component, createEffect } from 'solid-js';
 
-import { share, link, arrowDownTray, xCircle, bars_3, moon, sun, commandLine, computerDesktop, arrowRight, userCircle, cube, lockClosed } from 'solid-heroicons/outline';
+import {
+  share,
+  link,
+  arrowDownTray,
+  xCircle,
+  bars_3,
+  moon,
+  sun,
+  commandLine,
+  computerDesktop,
+  arrowRight,
+  userCircle,
+  cube,
+  lockClosed,
+} from 'solid-heroicons/outline';
 
 import { API, useAppContext } from '../context';
 
@@ -38,7 +52,7 @@ const Header: Component<HeaderProps> = (props) => {
     setShowMenu(false);
   }
   function openProfile() {
-    console.log('Profile')
+    console.log('Profile');
   }
   createEffect(async () => {
     if (context.user()?.email) {
@@ -57,7 +71,7 @@ const Header: Component<HeaderProps> = (props) => {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       setIsAuthenticated(false);
-      
+
       // Redirect to login page
       location.reload();
       navigate('/login');
@@ -68,14 +82,14 @@ const Header: Component<HeaderProps> = (props) => {
   return (
     <header class="dark:bg-neutral-900 border-b z-12 sticky top-0 flex items-center bg-white gap-x-4 border-slate-200 p-1 px-2 text-sm dark:border-neutral-800 mb-1">
       {props.children || (
-
-        <A href="/" class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1">
-                <h1 class="leading-0 uppercase tracking-widest flex items-center gap-2 text-left">
-        
-          <Icon path={cube} class="h-6" /> <b>Project</b> Board
-          
-        </h1>
-              </A>
+        <A
+          href="/"
+          class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1"
+        >
+          <h1 class="leading-0 uppercase tracking-widest flex items-center gap-2 text-left">
+            <Icon path={cube} class="h-6" /> <b>Project</b> Board
+          </h1>
+        </A>
       )}
       <Dismiss
         classList={{
@@ -89,14 +103,20 @@ const Header: Component<HeaderProps> = (props) => {
         setOpen={setShowMenu}
         show
       >
-      <Show when={isAuthenticated()}>
-       <A href="/dashboard" class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1">
-                <Icon path={computerDesktop} class="h-6" />
-              </A>
-      <A href="/terminal" class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1">
-                <Icon path={commandLine} class="h-6" />
-              </A>
-              </Show>
+        <Show when={isAuthenticated()}>
+          <A
+            href="/dashboard"
+            class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1"
+          >
+            <Icon path={computerDesktop} class="h-6" />
+          </A>
+          <A
+            href="/terminal"
+            class="flex cursor-alias flex-row items-center space-x-2 rounded px-2 py-2 opacity-80 hover:opacity-100 md:px-1"
+          >
+            <Icon path={commandLine} class="h-6" />
+          </A>
+        </Show>
       </Dismiss>
       <button
         type="button"
@@ -117,8 +137,10 @@ const Header: Component<HeaderProps> = (props) => {
         <Show
           when={isAuthenticated()}
           fallback={
-            <A href="/login" class="flex cursor-alias flex-row items-center gap-2 rounded px-2 py-1 opacity-80 hover:opacity-100 md:px-1 border border-neutral-600 rounded-md">
-            
+            <A
+              href="/login"
+              class="flex cursor-alias flex-row items-center gap-2 rounded px-2 py-1 opacity-80 hover:opacity-100 md:px-1 border border-neutral-600 rounded-md"
+            >
               <Icon path={lockClosed} class="h-6" /> Login
             </A>
           }
@@ -169,20 +191,22 @@ const Header: Component<HeaderProps> = (props) => {
                   {/* Ensures text aligns properly with avatar */}
                   <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
                     {context.user()?.name || context.user()?.email || 'User'} <br />
-                    <span class="text-xs text-gray-600 dark:text-gray-400 capitalize">{context.user()?.role || 'Member'}</span>
+                    <span class="text-xs text-gray-600 dark:text-gray-400 capitalize">
+                      {context.user()?.role || 'Member'}
+                    </span>
                   </p>
                 </div>
               </div>
               <button
-                  class="flex items-center gap-2 px-4 py-2 text-left text-neutral-100 hover:bg-neutral-800"
-                  onClick={openProfile}
-                >
+                class="flex items-center gap-2 px-4 py-2 text-left text-neutral-100 hover:bg-neutral-800"
+                onClick={openProfile}
+              >
                 <Icon path={userCircle} class="h-7" /> Profile
               </button>
               <button
-                  class="flex items-center gap-2 px-4 py-2 text-left text-neutral-100 hover:bg-neutral-800"
-                  onClick={signOut}
-                >
+                class="flex items-center gap-2 px-4 py-2 text-left text-neutral-100 hover:bg-neutral-800"
+                onClick={signOut}
+              >
                 <Icon path={arrowRight} class="h-7" /> Logout
               </button>
             </div>

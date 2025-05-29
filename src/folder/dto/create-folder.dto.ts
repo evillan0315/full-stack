@@ -15,16 +15,15 @@ import { Type } from 'class-transformer';
 
 export class CreateFolderDto {
   @ApiProperty({ description: 'name field' })
-    @IsString()
-    name: string;
+  @IsString()
+  name: string;
   @ApiProperty({ description: 'path field' })
-    @IsString()
-    path: string;
+  @IsString()
+  path: string;
   @ApiProperty({ description: 'parentId field' })
-    @IsOptional()
-    @IsString()
-    parentId: string;
-
+  @IsOptional()
+  @IsString()
+  parentId: string;
 }
 
 export class PaginationFolderResultDto {
@@ -57,4 +56,3 @@ export class PaginationFolderQueryDto {
   @ApiPropertyOptional({ default: 10 })
   pageSize?: number = 10;
 }
-

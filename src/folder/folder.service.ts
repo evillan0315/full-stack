@@ -1,4 +1,10 @@
-import { Injectable, Inject, ForbiddenException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  ForbiddenException,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateFolderDto } from './dto/create-folder.dto';
@@ -7,30 +13,24 @@ import { Prisma } from '@prisma/client';
 
 import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 
-
 import { REQUEST } from '@nestjs/core';
 import { Request, Response } from 'express';
-
-
 
 @Injectable()
 export class FolderService {
   constructor(
-    
     private prisma: PrismaService,
-    @Inject(REQUEST) private readonly request: Request & { user?: CreateJwtUserDto },
+    @Inject(REQUEST)
+    private readonly request: Request & { user?: CreateJwtUserDto },
   ) {}
-  
-  
+
   private get userId(): string | undefined {
     return this.request.user?.sub;
   }
-  
 
   create(data: CreateFolderDto) {
     const createData: any = { ...data };
 
-    
     const hasCreatedById = data.hasOwnProperty('createdById');
     if (this.userId) {
       createData.createdBy = {
@@ -40,7 +40,6 @@ export class FolderService {
         delete createData.createdById;
       }
     }
-    
 
     return this.prisma.folder.create({ data: createData });
   }
@@ -79,13 +78,7 @@ export class FolderService {
   }
 
   findOne(id: string) {
-    
-
-    return this.prisma.folder.findUnique(
-    
-    { where: { id } }
-    
-    );
+    return this.prisma.folder.findUnique({ where: { id } });
   }
 
   update(id: string, data: UpdateFolderDto) {
@@ -98,7 +91,4 @@ export class FolderService {
   remove(id: string) {
     return this.prisma.folder.delete({ where: { id } });
   }
-
-
 }
-

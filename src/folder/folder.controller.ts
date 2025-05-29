@@ -13,7 +13,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
-  BadRequestException
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -28,7 +28,7 @@ import {
   ApiQuery,
   ApiResponse,
   ApiConsumes,
-  ApiBody
+  ApiBody,
 } from '@nestjs/swagger';
 import axios from 'axios';
 
@@ -45,31 +45,24 @@ import {
 } from './dto/create-folder.dto';
 import { UpdateFolderDto } from './dto/update-folder.dto';
 
-
-
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-
-
-@ApiTags(
-  'File & Folder'
-)
+@ApiTags('File & Folder')
 @Controller('api/folder')
 export class FolderController {
   constructor(private readonly folderService: FolderService) {}
-  
-  
-  
+
   // ───────────────────────────────────────────────────────────
   // CREATE
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Create a new Folder' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateFolderDto })
+  @ApiCreatedResponse({
+    description: 'Successfully created.',
+    type: CreateFolderDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
@@ -82,11 +75,12 @@ export class FolderController {
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Retrieve all Folder records' })
-  @ApiOkResponse({ description: 'List of Folder records.', type: [CreateFolderDto] })
+  @ApiOkResponse({
+    description: 'List of Folder records.',
+    type: [CreateFolderDto],
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
@@ -98,9 +92,7 @@ export class FolderController {
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Paginated Folder records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -119,9 +111,7 @@ export class FolderController {
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Find Folder by ID' })
   @ApiOkResponse({ description: 'Record found.', type: CreateFolderDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -136,11 +126,12 @@ export class FolderController {
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Update Folder by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateFolderDto })
+  @ApiOkResponse({
+    description: 'Successfully updated.',
+    type: UpdateFolderDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
@@ -154,9 +145,7 @@ export class FolderController {
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Delete Folder by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -166,4 +155,3 @@ export class FolderController {
     return this.folderService.remove(id);
   }
 }
-
