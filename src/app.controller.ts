@@ -67,7 +67,7 @@ export class AppController {
   }
   @Get('terminal')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.MANAGER)
+  @Roles(UserRole.ADMIN)
   @Render('pages/terminal')
   @ApiOperation({ summary: 'Render protected terminal page' })
   @ApiBearerAuth()
