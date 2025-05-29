@@ -77,7 +77,7 @@ export default function Terminal() {
   onMount(() => {
     scrollToBottom();
 
-    const s = io(`${import.meta.env.VITE_API_URL}/terminal`, {
+    const s = io(`${import.meta.env.BASE_URL}/terminal`, {
       transports: ['websocket'],
       withCredentials: true,
     });

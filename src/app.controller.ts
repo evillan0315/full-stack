@@ -98,7 +98,7 @@ export class AppController {
       try {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
         if (payload) {
-          return res.redirect('/dashboard');
+          return res.redirect('/terminal');
         }
       } catch (err) {
         // Token invalid or expired; continue rendering login
@@ -124,7 +124,7 @@ export class AppController {
   }
 
   @Post('login')
-  @Redirect('/dashboard')
+  @Redirect('/terminal')
   @ApiOperation({ summary: 'Log in a user and set JWT cookie' })
   @ApiBody({ type: LoginDto })
   @ApiResponse({
@@ -142,7 +142,7 @@ export class AppController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
-    return { url: '/dashboard' };
+    return { url: '/terminal' };
   }
   @Post('logout')
   @Redirect('/login')

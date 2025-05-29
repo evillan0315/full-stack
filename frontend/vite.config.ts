@@ -1,27 +1,29 @@
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import solid from 'vite-plugin-solid';
-import path from 'path'; 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
+import path from 'path';
+import dotenv from 'dotenv';
 
+// Load environment variables
+dotenv.config({ path: '../.env' }); // or '../.env'
+export default defineConfig(() => {
   return {
     plugins: [solid()],
     build: {
-    lib: {
-      entry: path.resolve(__dirname, 'src/index.tsx'),
-      name: 'Terminal',
-      formats: ['es'],
-      fileName: () => 'index.js',
+      lib: {
+        entry: path.resolve(__dirname, 'src/index.tsx'),
+        name: 'Terminal',
+        formats: ['es'],
+        fileName: () => 'index.js',
+      },
+      outDir: '../public/assets',
+      target: 'esnext',
+      assetsInlineLimit: 0,
+      emptyOutDir: true,
     },
-    outDir: '../public/assets',
-    target: 'esnext',
-    assetsInlineLimit: 0,
-    emptyOutDir: true,
-  },
     server: {
       proxy: {
         '/api': {
-          target: env.VITE_API_URL,
+          target: process.env.BASE_URL,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
@@ -33,5 +35,9 @@ export default defineConfig(({ mode }) => {
         credentials: true,
       },
     },
+    define: {
+      'import.meta.env.BASE_URL': JSON.stringify(process.env.BASE_URL),
+    },
   };
 });
+
