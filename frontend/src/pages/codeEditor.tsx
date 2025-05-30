@@ -5,7 +5,7 @@ import FileManager from '../components/FileManager';
 import api from "../services/api";
 export default function CodeEditor() {
   const [dividerX, setDividerX] = createSignal(0);
-  const [filePath, setFilePath] = createSignal('./frontend/index.html');
+  const [filePath, setFilePath] = createSignal('./README.md');
   const [fileContent, setFileContent] = createSignal<string>('');
 
   onMount(async () => {
@@ -14,7 +14,6 @@ export default function CodeEditor() {
   });
   
   const loadFile = async (path: string) => {
-    console.log(path, 'path');
     try {
       const formData = new FormData();
       formData.append("filePath", path);
@@ -42,7 +41,7 @@ export default function CodeEditor() {
           <FileManager onFileSelect={loadFile} />
         </div>
         <div class="flex-1 h-full overflow-hidden">
-          <Editor filePath={filePath()} content={fileContent()} language="typescript" />
+          <Editor theme="dark" filePath={filePath()} content={fileContent()} language="typescript" />
         </div>
       </div>
     </div>

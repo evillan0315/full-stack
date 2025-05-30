@@ -20,7 +20,7 @@ function buildTree(files: FileItem[]): FileItem[] {
   const map = new Map<string, FileItem & { children: FileItem[] }>();
   for (const file of files) {
     console.log(file, 'file');
-    map.set(file.path, { ...file, children: file.children });
+    map.set(file.path, { ...file, children: file.children || [] });
   }
 
   const tree: FileItem[] = [];
@@ -40,7 +40,6 @@ function buildTree(files: FileItem[]): FileItem[] {
 
 const FileNode = (props: { file: FileItem; onSelect: (path: string) => void }) => {
   const [open, setOpen] = createSignal(false);
-  console.log(props.file, props.file.isDirectory);
   const toggle = () => {
     if (props.file.isDirectory && props.file.children.length > 0) {
       setOpen((prev) => !prev);

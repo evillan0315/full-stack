@@ -95,7 +95,7 @@ const Header: Component<HeaderProps> = (props) => {
     }
   };
   return (
-    <header class="dark:bg-neutral-900 border-b z-12 sticky top-0 flex items-center bg-white gap-x-4 border-slate-200 p-1 px-2 text-sm dark:border-neutral-800 mb-1">
+    <header class="dark:bg-neutral-900 border-b z-12 sticky top-0 flex items-center bg-white gap-x-4 border-slate-200 p-0 px-2 text-sm dark:border-neutral-800 mb-0">
       {props.children || (
         <>
           <button

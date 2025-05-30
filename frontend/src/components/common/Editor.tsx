@@ -40,30 +40,32 @@ export default function Editor(props: CodeEditorWithAPIProps) {
   };
 
   const initEditor = (code: string) => {
-    if (editorView) {
-      editorView.destroy();
-      editorView = null;
-    }
+  if (editorView) {
+    editorView.destroy();
+    editorView = null;
+  }
 
-    const state = EditorState.create({
-      doc: code,
-      extensions: [
-        basicSetup,
-        detectLanguage(props.filePath),
-        getThemeExtension(props.theme || "dark"),
-        EditorView.updateListener.of((v) => {
-          if (v.docChanged) {
-            setContent(v.state.doc.toString());
-          }
-        }),
-      ],
-    });
+  const theme = props.theme === "light" ? "light" : "dark"; // default to dark
 
-    editorView = new EditorView({
-      state,
-      parent: editorContainer!,
-    });
-  };
+  const state = EditorState.create({
+    doc: code,
+    extensions: [
+      basicSetup,
+      detectLanguage(props.filePath),
+      ...getThemeExtension(theme),
+      EditorView.updateListener.of((v) => {
+        if (v.docChanged) {
+          setContent(v.state.doc.toString());
+        }
+      }),
+    ],
+  });
+
+  editorView = new EditorView({
+    state,
+    parent: editorContainer!,
+  });
+};
 
   const saveFile = async () => {
     setSaving(true);
