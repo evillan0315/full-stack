@@ -21,7 +21,6 @@ const App = (): JSX.Element => {
     <Router
       root={(props) => (
         <AppContextProvider>
-          
           <Suspense>{props.children}</Suspense>
         </AppContextProvider>
       )}

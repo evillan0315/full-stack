@@ -1,4 +1,3 @@
-// File: src/components/FileManager.tsx
 import { createResource, createSignal, For, Show } from 'solid-js';
 import api from '../services/api';
 
@@ -7,7 +6,7 @@ type FileItem = {
   path: string;
   isDirectory: boolean;
   type: 'file' | 'folder';
-  children: FileItem[]; // Always an array
+  children: FileItem[];
 };
 
 const fetchFileList = async (): Promise<FileItem[]> => {
@@ -40,41 +39,32 @@ function buildTree(files: FileItem[]): FileItem[] {
 const FileNode = (props: { file: FileItem; onSelect: (path: string) => void }) => {
   const [open, setOpen] = createSignal(false);
 
+  const isDir = props.file.isDirectory && props.file.children.length > 0;
+
   const toggle = () => {
-    if (props.file.isDirectory) {
-      setOpen(!open());
-    }
+    if (isDir) setOpen(!open());
   };
 
   return (
-    <div class="ml-4">
-      <Show
-        when={props.file.isDirectory && props.file.children.length > 0}
-        fallback={
-          <div class="cursor-pointer hover:underline" onClick={() => props.onSelect(props.file.path)}>
-            📄 {props.file.name}
-          </div>
-        }
+    <div class="ml-2">
+      <div
+        class="cursor-pointer font-semibold text-yellow-500"
+        onClick={() => (isDir ? toggle() : props.onSelect(props.file.path))}
       >
-        <div class="cursor-pointer text-yellow-500 font-bold" onClick={toggle}>
-          {open() ? '📂' : '📁'} {props.file.name}
-        </div>
+        {isDir ? (open() ? '📂' : '📁') : '📄'} {props.file.name}
+      </div>
 
-        <div
-          class={`transition-all duration-300 ease-in-out overflow-hidden pl-2 border-l border-neutral-300`}
-          classList={{
-            'max-h-0 opacity-0 scale-y-[0.95]': !open(),
-            'max-h-[1000px] opacity-100 scale-y-100': open(), // large enough max-height
-          }}
-          style={{
-            transformOrigin: 'top',
-          }}
-        >
-          <For each={props.file.children} fallback={null}>
-            {(child) => <FileNode file={child} onSelect={props.onSelect} />}
-          </For>
-        </div>
-      </Show>
+      {/* Always render children container, just toggle visibility */}
+      <div
+        class="pl-3 border-l border-gray-300 transition-all duration-200 origin-top"
+        style={{
+          display: open() ? 'block' : 'none',
+        }}
+      >
+        <For each={props.file.children}>
+          {(child) => <FileNode file={child} onSelect={props.onSelect} />}
+        </For>
+      </div>
     </div>
   );
 };
@@ -84,7 +74,7 @@ export default function FileManager(props: { onFileSelect: (path: string) => voi
 
   return (
     <Show when={files()} fallback={<div>Loading...</div>}>
-      <For each={buildTree(files())}>
+      <For each={buildTree(files())} fallback={<div>No files found.</div>}>
         {(file) => <FileNode file={file} onSelect={props.onFileSelect} />}
       </For>
     </Show>
