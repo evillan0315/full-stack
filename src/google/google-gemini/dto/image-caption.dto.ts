@@ -20,7 +20,9 @@ export class CaptionFromFileDto {
   @ApiProperty({ example: './assets/sample.jpg' })
   filePath: string;
 
-  @ApiProperty({ example: 'Provide a short caption for this file.', required: false })
+  @ApiProperty({
+    example: 'Provide a short caption for this file.',
+    required: false,
+  })
   prompt?: string;
 }
-

@@ -21,7 +21,7 @@ import {
   rocketLaunch,
   cog,
   codeBracket,
-  speakerWave
+  speakerWave,
 } from 'solid-heroicons/outline';
 
 import { API, useAppContext } from '../context';

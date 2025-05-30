@@ -10,12 +10,23 @@ export class GoogleGeminiController {
 
   @Post('generate-doc')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Generate documentation from code snippet using Google Gemini' })
+  @ApiOperation({
+    summary: 'Generate documentation from code snippet using Google Gemini',
+  })
   @ApiBody({ type: GenerateDocDto })
-  @ApiResponse({ status: 200, description: 'Generated documentation', schema: { example: 'Adds two numbers and returns the result.' } })
-  @ApiResponse({ status: 502, description: 'Bad gateway or error from Gemini API' })
+  @ApiResponse({
+    status: 200,
+    description: 'Generated documentation',
+    schema: { example: 'Adds two numbers and returns the result.' },
+  })
+  @ApiResponse({
+    status: 502,
+    description: 'Bad gateway or error from Gemini API',
+  })
   async generateDocumentation(@Body() body: GenerateDocDto): Promise<string> {
-    return this.geminiService.generateDocumentation(body.codeSnippet, body.language);
+    return this.geminiService.generateDocumentation(
+      body.codeSnippet,
+      body.language,
+    );
   }
 }
-

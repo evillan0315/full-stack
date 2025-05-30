@@ -1,10 +1,11 @@
-import { Controller, Post, Body,
-  HttpCode,
-  HttpStatus, } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody  } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { GoogleGeminiImageService } from './google-gemini-image.service';
-import { ImageCaptionDto, CaptionFromUrlDto, CaptionFromFileDto } from './dto/image-caption.dto';
-
+import {
+  ImageCaptionDto,
+  CaptionFromUrlDto,
+  CaptionFromFileDto,
+} from './dto/image-caption.dto';
 
 @ApiTags('Google Gemini')
 @Controller('api/google-gemini-image')
@@ -23,7 +24,10 @@ export class GoogleGeminiImageController {
   @ApiBody({ type: CaptionFromUrlDto })
   @ApiResponse({ status: 200, description: 'Caption generated successfully' })
   @ApiResponse({ status: 400, description: 'Invalid image URL or request' })
-  @ApiResponse({ status: 502, description: 'Failed to process image with Gemini' })
+  @ApiResponse({
+    status: 502,
+    description: 'Failed to process image with Gemini',
+  })
   async captionFromUrl(@Body() body: CaptionFromUrlDto): Promise<string> {
     return this.geminiService.captionImageFromUrl(body.imageUrl, body.prompt);
   }
@@ -34,9 +38,11 @@ export class GoogleGeminiImageController {
   @ApiBody({ type: CaptionFromFileDto })
   @ApiResponse({ status: 200, description: 'Caption generated successfully' })
   @ApiResponse({ status: 400, description: 'Invalid file path or request' })
-  @ApiResponse({ status: 502, description: 'Failed to process image with Gemini' })
+  @ApiResponse({
+    status: 502,
+    description: 'Failed to process image with Gemini',
+  })
   async captionFromFile(@Body() body: CaptionFromFileDto): Promise<string> {
     return this.geminiService.captionImageFromFile(body.filePath, body.prompt);
   }
 }
-

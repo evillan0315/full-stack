@@ -74,14 +74,7 @@ const App = (): JSX.Element => {
           </Layout>
         )}
       />
-      <Route
-        path="/editor"
-        component={() => (
-         
-            <CodeEditor />
-         
-        )}
-      />
+      <Route path="/editor" component={() => <CodeEditor />} />
       <Route path="/logout" component={() => <Logout />} />
       <Route path="/login" component={() => <Login />} />
     </Router>

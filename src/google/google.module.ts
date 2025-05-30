@@ -10,8 +10,17 @@ import { GoogleGeminiTtsController } from './google-gemini/google-gemini-tts.con
 
 @Module({
   imports: [HttpModule],
-  controllers: [GoogleGeminiController, GoogleGeminiImageController, GoogleGeminiTtsController],
-  providers: [GoogleOAuthService, GoogleGeminiService, GoogleGeminiImageService, GoogleGeminiTtsService],
+  controllers: [
+    GoogleGeminiController,
+    GoogleGeminiImageController,
+    GoogleGeminiTtsController,
+  ],
+  providers: [
+    GoogleOAuthService,
+    GoogleGeminiService,
+    GoogleGeminiImageService,
+    GoogleGeminiTtsService,
+  ],
   exports: [GoogleGeminiService],
 })
 export class GoogleModule {}

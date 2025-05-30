@@ -16,8 +16,11 @@ export class GoogleGeminiService {
       process.env.GOOGLE_GEMINI_API_ENDPOINT ||
       'https://generativelanguage.googleapis.com/v1beta/models'; // https://generativelanguage.googleapis.com/v1beta/models/${process.env.GOOGLE_GEMINI_MODEL}:generateContent?key=${process.env.GOOGLE_GEMINI_API_KEY}`;
   }
-  
-  async generateDocumentation(codeSnippet: string, language?: string): Promise<string> {
+
+  async generateDocumentation(
+    codeSnippet: string,
+    language?: string,
+  ): Promise<string> {
     const prompt = this.buildPrompt(codeSnippet, language);
     const accessToken = await this.googleOAuthService.getAccessToken();
 
@@ -65,4 +68,3 @@ export class GoogleGeminiService {
     return `Generate detailed and clear documentation comments for the following source code ${langText}:\n\n${codeSnippet}\n\nDocumentation:`;
   }
 }
-

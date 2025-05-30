@@ -14,7 +14,6 @@ const api = axios.create({
 // Add request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-
     return config;
   },
   (error) => Promise.reject(error),

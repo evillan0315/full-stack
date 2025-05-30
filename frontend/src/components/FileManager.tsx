@@ -1,6 +1,6 @@
 // File: src/components/FileManager.tsx
 import { createResource, createSignal, For, Show } from 'solid-js';
-import api from "../services/api";
+import api from '../services/api';
 type FileItem = {
   name: string;
   path: string;
@@ -10,7 +10,7 @@ type FileItem = {
 };
 
 const fetchFileList = async (): Promise<FileItem[]> => {
-  const res = await api.get("/file/list?directory=./&recursive=true");
+  const res = await api.get('/file/list?directory=./&recursive=true');
   console.log(res.data, 'res');
   if (!res.data) throw new Error('Failed to load files');
   return res.data;
@@ -51,35 +51,25 @@ const FileNode = (props: { file: FileItem; onSelect: (path: string) => void }) =
       <Show
         when={props.file.isDirectory}
         fallback={
-          <div
-            class="cursor-pointer hover:underline"
-            onClick={() => props.onSelect(props.file.path)}
-          >
+          <div class="cursor-pointer hover:underline" onClick={() => props.onSelect(props.file.path)}>
             📄 {props.file.name}
           </div>
         }
       >
-        <div
-          class="cursor-pointer text-blue-600"
-          onClick={toggle}
-        >
+        <div class="cursor-pointer text-blue-600" onClick={toggle}>
           {open() ? '📂' : '📁'} {props.file.name}
         </div>
 
         <div
           class={`transition-all duration-300 ease-in-out overflow-hidden`}
           style={{
-            height: open() ? "auto" : "0",
+            height: open() ? 'auto' : '0',
             opacity: open() ? 1 : 0,
-            transform: open() ? "scaleY(1)" : "scaleY(0.95)",
+            transform: open() ? 'scaleY(1)' : 'scaleY(0.95)',
           }}
         >
           <div class="pl-2 border-l border-gray-300">
-            <For each={props.file.children}>
-              {(child) => (
-                <FileNode file={child} onSelect={props.onSelect} />
-              )}
-            </For>
+            <For each={props.file.children}>{(child) => <FileNode file={child} onSelect={props.onSelect} />}</For>
           </div>
         </div>
       </Show>
@@ -91,10 +81,7 @@ export default function FileManager(props: { onFileSelect: (path: string) => voi
   const [files] = createResource(fetchFileList);
   return (
     <Show when={files()} fallback={<div>Loading...</div>}>
-      <For each={buildTree(files())}>
-        {(file) => <FileNode file={file} onSelect={props.onFileSelect} />}
-      </For>
+      <For each={buildTree(files())}>{(file) => <FileNode file={file} onSelect={props.onFileSelect} />}</For>
     </Show>
   );
 }
-

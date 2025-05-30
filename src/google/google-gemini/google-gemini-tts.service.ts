@@ -1,8 +1,13 @@
-// google-tts.service.ts
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { GoogleGenAI } from '@google/genai';
 import * as wav from 'wav';
 import * as fs from 'fs';
+import * as path from 'path';
+
+interface SpeakerVoiceInput {
+  speaker: string;
+  voiceName: string;
+}
 
 @Injectable()
 export class GoogleGeminiTtsService {
@@ -11,7 +16,10 @@ export class GoogleGeminiTtsService {
   constructor() {
     const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
     if (!apiKey) {
-      throw new HttpException('GOOGLE_GEMINI_API_KEY not set', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'GOOGLE_GEMINI_API_KEY not set',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
     this.ai = new GoogleGenAI({ apiKey });
   }
@@ -23,14 +31,21 @@ export class GoogleGeminiTtsService {
     rate = 24000,
     sampleWidth = 2,
   ): Promise<void> {
+    const dir = path.join(__dirname, '..', '..', 'tts', 'voice');
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    const fullPath = path.join(dir, filename);
+
     return new Promise((resolve, reject) => {
-      const writer = new wav.FileWriter(filename, {
+      const writer = new wav.FileWriter(fullPath, {
         channels,
         sampleRate: rate,
         bitDepth: sampleWidth * 8,
       });
 
-      writer.on('finish', resolve);
+      writer.on('finish', () => resolve());
       writer.on('error', reject);
 
       writer.write(pcmData);
@@ -38,44 +53,66 @@ export class GoogleGeminiTtsService {
     });
   }
 
-  async generateSpeech(prompt: string): Promise<string> {
+  async generateSpeech(
+    prompt: string,
+    speakers: SpeakerVoiceInput[],
+    languageCode: string = 'en-US',
+  ): Promise<string> {
     try {
+      const isMultiSpeaker = speakers.length > 1;
+
+      const config: any = {
+        responseModalities: ['AUDIO'],
+        speechConfig: isMultiSpeaker
+          ? {
+              multiSpeakerVoiceConfig: {
+                speakerVoiceConfigs: speakers.map((s) => ({
+                  speaker: s.speaker,
+                  voiceConfig: {
+                    languageCode,
+                    prebuiltVoiceConfig: { voiceName: s.voiceName },
+                  },
+                })),
+              },
+            }
+          : {
+              voiceConfig: {
+                languageCode,
+                prebuiltVoiceConfig: { voiceName: speakers[0].voiceName },
+              },
+            },
+      };
+
       const response = await this.ai.models.generateContent({
         model: 'gemini-2.5-flash-preview-tts',
         contents: [{ parts: [{ text: prompt }] }],
-        config: {
-          responseModalities: ['AUDIO'],
-          speechConfig: {
-            multiSpeakerVoiceConfig: {
-              speakerVoiceConfigs: [
-                {
-                  speaker: 'Joe',
-                  voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName: 'Kore' },
-                  },
-                },
-                {
-                  speaker: 'Jane',
-                  voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName: 'Puck' },
-                  },
-                },
-              ],
-            },
-          },
-        },
+        config,
       });
 
-      const data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      const data =
+        response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
       if (!data) {
-        throw new HttpException('No audio data returned', HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          'No audio data returned',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const audioBuffer = Buffer.from(data, 'base64');
-      const fileName = 'out.wav';
-      await this.saveWaveFile(fileName, audioBuffer);
 
-      return fileName;
+      // Construct filename and path
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0];
+      const voices = speakers.map((s) => s.voiceName).join('_');
+      const filename = `${dateStr}_${voices}_${languageCode}.wav`;
+
+      const dir = path.join(__dirname, '..', '..', 'tts', 'voice');
+      const fullPath = path.join(dir, filename);
+
+      // Save WAV file
+      await this.saveWaveFile(filename, audioBuffer);
+
+      return fullPath;
     } catch (error) {
       throw new HttpException(
         `Failed to generate TTS audio: ${error.message || error}`,

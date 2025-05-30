@@ -119,4 +119,3 @@ export class EncodingController {
     return { code: this.encodingService.decodeFromURIComponent(body.encoded) };
   }
 }
-
