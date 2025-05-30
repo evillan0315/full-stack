@@ -228,7 +228,7 @@ export default function Home() {
       {/* Footer */}
       <footer class="bg-gray-100 dark:bg-neutral-900 py-6 mt-auto">
         <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-gray-600 dark:text-gray-400 text-sm">
-          <p>© 2025 YourAppName. All rights reserved.</p>
+          <p>© 2025 Project Board. All rights reserved.</p>
           <div class="flex space-x-6 mt-4 md:mt-0">
             <A href="/privacy" class="hover:text-blue-600 dark:hover:text-blue-400">
               Privacy Policy
