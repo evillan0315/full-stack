@@ -7,8 +7,6 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
 import { UtilsModule } from './utils/utils.module';
-
-//import { MigrationService } from './migration/migration.service';
 import { DatabaseModule } from './database/database.module';
 import { TerminalModule } from './terminal/terminal.module';
 import { FolderModule } from './folder/folder.module';
