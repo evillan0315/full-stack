@@ -26,7 +26,7 @@ const App = (): JSX.Element => {
       )}
     >
       {/* Wrap each page in Layout manually */}
-      
+
       <Route
         path="/"
         component={() => (
@@ -75,12 +75,14 @@ const App = (): JSX.Element => {
           </Layout>
         )}
       />
-      <Route path="/editor" component={() => (
-      <>
-      <Toaster /> 
-      <CodeEditor />
-      </>
-      )} 
+      <Route
+        path="/editor"
+        component={() => (
+          <>
+            <Toaster />
+            <CodeEditor />
+          </>
+        )}
       />
       <Route path="/logout" component={() => <Logout />} />
       <Route path="/login" component={() => <Login />} />

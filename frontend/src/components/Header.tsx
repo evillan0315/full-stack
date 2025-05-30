@@ -141,7 +141,6 @@ const Header: Component<HeaderProps> = (props) => {
           >
             <Icon path={sun} class="h-6" />
           </button>
-          
         </Show>
       </div>
       <button

@@ -55,14 +55,7 @@ export default function CodeEditor() {
         </div>
 
         <div class="flex-1 h-full overflow-hidden">
-          {!isLoading() && (
-            <Editor
-              theme="dark"
-              filePath={filePath()}
-              content={fileContent()}
-              language="typescript"
-            />
-          )}
+          {!isLoading() && <Editor theme="dark" filePath={filePath()} content={fileContent()} language="typescript" />}
         </div>
       </div>
 
@@ -82,4 +75,3 @@ export default function CodeEditor() {
     </div>
   );
 }
-

@@ -61,9 +61,7 @@ const FileNode = (props: { file: FileItem; onSelect: (path: string) => void }) =
           display: open() ? 'block' : 'none',
         }}
       >
-        <For each={props.file.children}>
-          {(child) => <FileNode file={child} onSelect={props.onSelect} />}
-        </For>
+        <For each={props.file.children}>{(child) => <FileNode file={child} onSelect={props.onSelect} />}</For>
       </div>
     </div>
   );
@@ -80,4 +78,3 @@ export default function FileManager(props: { onFileSelect: (path: string) => voi
     </Show>
   );
 }
-

@@ -15,7 +15,6 @@ interface CodeEditorWithAPIProps {
 }
 
 const Editor: Component<CodeEditorWithAPIProps> = (props) => {
-
   let editorContainer: HTMLDivElement | undefined;
   let editorView: EditorView | null = null;
 
@@ -71,7 +70,6 @@ const Editor: Component<CodeEditorWithAPIProps> = (props) => {
   };
 
   const saveFile = async () => {
-
     setSaving(true);
     try {
       const formData = new FormData();
@@ -83,10 +81,9 @@ const Editor: Component<CodeEditorWithAPIProps> = (props) => {
 
       showToast('File saved successfully.', 'success');
     } catch (err) {
-     showToast('Error saving file: ' + (err as Error).message, 'error');
+      showToast('Error saving file: ' + (err as Error).message, 'error');
     } finally {
       setSaving(false);
-
     }
   };
 
@@ -106,34 +103,35 @@ const Editor: Component<CodeEditorWithAPIProps> = (props) => {
   return (
     <div class="h-full relative">
       <div class="absolute top-0 right-0 z-10 w-full">
-       <div class="flex justify-between align-center">
-       <div class="mb-1">
-        <button
-          title={props.filePath}
-          class="flex cursor-alias items-center gap-4 px-4 pb-2 pt-1 mt-1 bg-neutral-900 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 rounded-t-lg border-l border-t  border-neutral-700"
-        >
-           {() => props.filePath?.split('/').pop()} <Icon icon="mdi:close" width="18" height="18" />
-        </button>
-       </div>
-       <div class="flex align-center">
-        <button onClick={saveFile}
-          disabled={saving()} class="flex cursor-alias gap-2 px-2 py-1 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500  ">
+        <div class="flex justify-between align-center">
+          <div class="mb-1">
+            <button
+              title={props.filePath}
+              class="flex cursor-alias items-center gap-4 px-4 pb-2 pt-1 mt-1 bg-neutral-900 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 rounded-t-lg border-l border-t  border-neutral-700"
+            >
+              {() => props.filePath?.split('/').pop()} <Icon icon="mdi:close" width="18" height="18" />
+            </button>
+          </div>
+          <div class="flex align-center">
+            <button
+              onClick={saveFile}
+              disabled={saving()}
+              class="flex cursor-alias gap-2 px-2 py-1 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500  "
+            >
               <Icon icon="mdi:content-save" width="20" height="20" /> {saving() ? 'Saving...' : 'Save'}
             </button>
-        <button class="flex cursor-alias px-2 py-1 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 ">
-              <Icon icon="mdi:menu" width="20" height="20" /> 
+            <button class="flex cursor-alias px-2 py-1 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 ">
+              <Icon icon="mdi:menu" width="20" height="20" />
             </button>
-       </div>
+          </div>
+        </div>
       </div>
-     </div>
 
       {loading() && <Loading />}
       {error() && <p class="text-red-600 p-4">{error()}</p>}
 
-  <div ref={editorContainer} class="h-full w-full pt-10" />
-
-     
+      <div ref={editorContainer} class="h-full w-full pt-10" />
     </div>
   );
-}
+};
 export default Editor;
