@@ -1,52 +1,51 @@
-import { createSignal, Show, onMount, createEffect } from 'solid-js';
+import { createSignal, onMount } from 'solid-js';
 import Editor from '../components/common/Editor';
 import Header from '../components/Header';
-import api from '../services/api';
+import FileManager from '../components/FileManager';
+import api from "../services/api";
 export default function CodeEditor() {
+  const [dividerX, setDividerX] = createSignal(0);
+  const [filePath, setFilePath] = createSignal('./frontend/index.html');
+  const [fileContent, setFileContent] = createSignal<string>('');
+
+  onMount(async () => {
+    setDividerX(window.innerWidth / 4);
+    await loadFile(filePath());
+  });
   
-  const [previewContent, setPreviewContent] = createSignal('');
-  const [dividerX, setDividerX] = createSignal(0); // Will be initialized on mount
-  const [showResizer, setShowResizer] = createSignal(false);
+  const loadFile = async (path: string) => {
+    console.log(path, 'path');
+    try {
+      const formData = new FormData();
+      formData.append("filePath", path);
+      const response = await api.post("/file/read", formData);
+      if (!response.data) throw new Error("Failed to load file");
 
-  onMount(() => {
-    // Default to 50% of the window width on mount
-    setDividerX(window.innerWidth / 2);
-  });
 
-  const handleEditorSave = () => {
-    //setDividerX(clientX);
+      const content = response.data;
+      setFilePath(path);
+      setFileContent(content.data);
+    } catch (err) {
+      console.error(`Error loading file "${path}":`, err);
+    } 
+
   };
 
-  const toggleResize = (res: boolean) => {
-    if (res && dividerX() === 0) {
-      setDividerX(window.innerWidth / 2);
-    }
-    setShowResizer(res);
-  };
-  const getPreviewContent = (res: string, mimeType: string) => {
-    setPreviewContent(res);
-  };
-  createEffect(() => {
-    (async () => {
-      try {
-        
-      } catch (err) {
-        console.error('Error loading file into Monaco:', err);
-      }
-    })();
-  });
   return (
-    <div class="flex h-screen  flex-col bg-white dark:bg-neutral-900 dark:text-white">
+    <div class="flex h-screen flex-col bg-white dark:bg-neutral-900 dark:text-white">
       <Header />
- 
-            <Editor filePath="./frontend/index.html" language="typescript"
-             
-            />
-          
-     
-
-
-      
+      <div class="flex flex-1 overflow-hidden">
+        <div
+          class="h-full overflow-y-auto border-r border-gray-300 dark:border-neutral-700 p-2"
+          style={{ width: `${dividerX()}px`, minWidth: '200px' }}
+        >
+          <FileManager onFileSelect={loadFile} />
+        </div>
+        <div class="flex-1 h-full overflow-hidden">
+          <Editor filePath={filePath()} content={fileContent()} language="typescript" />
+        </div>
+      </div>
     </div>
   );
 }
+
