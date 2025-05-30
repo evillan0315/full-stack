@@ -1,17 +1,17 @@
 // File: src/components/FileManager.tsx
 import { createResource, createSignal, For, Show } from 'solid-js';
 import api from '../services/api';
+
 type FileItem = {
   name: string;
   path: string;
   isDirectory: boolean;
   type: 'file' | 'folder';
-  children: FileItem[]; // <- ensure it's always an array
+  children: FileItem[]; // Always an array
 };
 
 const fetchFileList = async (): Promise<FileItem[]> => {
   const res = await api.get('/file/list?directory=./&recursive=true');
-  console.log(res.data, 'res');
   if (!res.data) throw new Error('Failed to load files');
   return res.data;
 };
@@ -19,8 +19,7 @@ const fetchFileList = async (): Promise<FileItem[]> => {
 function buildTree(files: FileItem[]): FileItem[] {
   const map = new Map<string, FileItem & { children: FileItem[] }>();
   for (const file of files) {
-    console.log(file, 'file');
-    map.set(file.path, { ...file, children: file.children });
+    map.set(file.path, { ...file, children: file.children || [] });
   }
 
   const tree: FileItem[] = [];
@@ -40,8 +39,9 @@ function buildTree(files: FileItem[]): FileItem[] {
 
 const FileNode = (props: { file: FileItem; onSelect: (path: string) => void }) => {
   const [open, setOpen] = createSignal(false);
+
   const toggle = () => {
-    if (props.file.isDirectory && props.file.children.length > 0) {
+    if (props.file.isDirectory) {
       setOpen(!open());
     }
   };
@@ -49,28 +49,30 @@ const FileNode = (props: { file: FileItem; onSelect: (path: string) => void }) =
   return (
     <div class="ml-4">
       <Show
-        when={props.file.isDirectory}
+        when={props.file.isDirectory && props.file.children.length > 0}
         fallback={
           <div class="cursor-pointer hover:underline" onClick={() => props.onSelect(props.file.path)}>
             📄 {props.file.name}
           </div>
         }
       >
-        <div class="cursor-pointer text-yellow-500 bold" onClick={toggle}>
+        <div class="cursor-pointer text-yellow-500 font-bold" onClick={toggle}>
           {open() ? '📂' : '📁'} {props.file.name}
         </div>
 
         <div
-          class={`transition-all duration-300 ease-in-out overflow-hidden`}
+          class={`transition-all duration-300 ease-in-out overflow-hidden pl-2 border-l border-neutral-300`}
+          classList={{
+            'max-h-0 opacity-0 scale-y-[0.95]': !open(),
+            'max-h-[1000px] opacity-100 scale-y-100': open(), // large enough max-height
+          }}
           style={{
-            height: open() ? 'auto' : '0',
-            opacity: open() ? 1 : 0,
-            transform: open() ? 'scaleY(1)' : 'scaleY(0.95)',
+            transformOrigin: 'top',
           }}
         >
-          <div class="pl-2 border-l border-neutral-300">
-            <For each={props.file.children}>{(child) => <FileNode file={child} onSelect={props.onSelect} />}</For>
-          </div>
+          <For each={props.file.children} fallback={null}>
+            {(child) => <FileNode file={child} onSelect={props.onSelect} />}
+          </For>
         </div>
       </Show>
     </div>
@@ -79,9 +81,13 @@ const FileNode = (props: { file: FileItem; onSelect: (path: string) => void }) =
 
 export default function FileManager(props: { onFileSelect: (path: string) => void }) {
   const [files] = createResource(fetchFileList);
+
   return (
     <Show when={files()} fallback={<div>Loading...</div>}>
-      <For each={buildTree(files())}>{(file) => <FileNode file={file} onSelect={props.onFileSelect} />}</For>
+      <For each={buildTree(files())}>
+        {(file) => <FileNode file={file} onSelect={props.onFileSelect} />}
+      </For>
     </Show>
   );
 }
+
