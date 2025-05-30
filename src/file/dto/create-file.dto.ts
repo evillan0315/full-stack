@@ -15,19 +15,18 @@ import { Type } from 'class-transformer';
 
 export class CreateFileDto {
   @ApiProperty({ description: 'name field' })
-    @IsString()
-    name: string;
+  @IsString()
+  name: string;
   @ApiProperty({ description: 'content field' })
-    @IsString()
-    content: string;
+  @IsString()
+  content: string;
   @ApiProperty({ description: 'path field' })
-    @IsString()
-    path: string;
+  @IsString()
+  path: string;
   @ApiProperty({ description: 'folderId field' })
-    @IsOptional()
-    @IsString()
-    folderId: string;
-
+  @IsOptional()
+  @IsString()
+  folderId: string;
 }
 
 export class PaginationFileResultDto {
@@ -60,4 +59,3 @@ export class PaginationFileQueryDto {
   @ApiPropertyOptional({ default: 10 })
   pageSize?: number = 10;
 }
-

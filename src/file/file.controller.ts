@@ -14,7 +14,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
-  InternalServerErrorException
+  InternalServerErrorException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -29,7 +29,7 @@ import {
   ApiQuery,
   ApiResponse,
   ApiConsumes,
-  ApiBody
+  ApiBody,
 } from '@nestjs/swagger';
 import axios from 'axios';
 
@@ -54,24 +54,15 @@ import { ReadFileDto } from './dto/read-file.dto';
 import { ReadFileResponseDto } from './dto/read-file-response.dto';
 import { Response } from 'express';
 
-
-
-
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-
-
-@ApiTags(
-  'File & Folder'
-)
+@ApiTags('File & Folder')
 @Controller('api/file')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
-  
+
   @Get('list')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'List files in a directory' })
   @ApiQuery({
     name: 'directory',
@@ -91,9 +82,8 @@ export class FileController {
   ) {
     return this.fileService.getFilesByDirectory(directory, recursive);
   }
-  
+
   @Roles(UserRole.ADMIN)
-  
   @Post('read')
   @ApiOperation({
     summary: 'Read file content from upload, local path, or URL',
@@ -173,47 +163,51 @@ export class FileController {
     );
   }
   @Post('write')
-@ApiOperation({ summary: 'Write content to a file at a specified path' })
-@ApiResponse({ status: 200, description: 'File written successfully.' })
-@ApiBody({
-  schema: {
-    type: 'object',
-    properties: {
-      filePath: {
-        type: 'string',
-        description: 'Absolute or relative file path',
+  @ApiOperation({ summary: 'Write content to a file at a specified path' })
+  @ApiResponse({ status: 200, description: 'File written successfully.' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        filePath: {
+          type: 'string',
+          description: 'Absolute or relative file path',
+        },
+        content: {
+          type: 'string',
+          description: 'Text content to write into the file',
+        },
       },
-      content: {
-        type: 'string',
-        description: 'Text content to write into the file',
-      },
+      required: ['filePath', 'content'],
     },
-    required: ['filePath', 'content'],
-  },
-})
-async writeFileContent(
-  @Body() body: { filePath: string; content: string },
-): Promise<{ success: boolean; message: string }> {
-  const { filePath, content } = body;
+  })
+  async writeFileContent(
+    @Body() body: { filePath: string; content: string },
+  ): Promise<{ success: boolean; message: string }> {
+    const { filePath, content } = body;
 
-  if (!filePath || typeof content !== 'string') {
-    throw new BadRequestException('Both filePath and content must be provided.');
+    if (!filePath || typeof content !== 'string') {
+      throw new BadRequestException(
+        'Both filePath and content must be provided.',
+      );
+    }
+
+    try {
+      const directory = path.dirname(filePath);
+      await fs.mkdir(directory, { recursive: true });
+      await fs.writeFile(filePath, content, 'utf-8');
+
+      return { success: true, message: 'File written successfully.' };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to write file: ${error.message}`,
+      );
+    }
   }
-
-  try {
-    const directory = path.dirname(filePath);
-    await fs.mkdir(directory, { recursive: true });
-    await fs.writeFile(filePath, content, 'utf-8');
-
-    return { success: true, message: 'File written successfully.' };
-  } catch (error) {
-    throw new InternalServerErrorException(
-      `Failed to write file: ${error.message}`,
-    );
-  }
-}
   @Get('proxy')
-  @ApiOperation({ summary: 'Proxies an image URL and returns the image content' })
+  @ApiOperation({
+    summary: 'Proxies an image URL and returns the image content',
+  })
   @ApiQuery({
     name: 'url',
     required: true,
@@ -222,23 +216,25 @@ async writeFileContent(
   })
   @ApiResponse({ status: 200, description: 'Image successfully proxied' })
   @ApiResponse({ status: 400, description: 'Missing or invalid image URL' })
-  @ApiResponse({ status: 500, description: 'Error fetching or streaming image' })
+  @ApiResponse({
+    status: 500,
+    description: 'Error fetching or streaming image',
+  })
   async proxy(@Query('url') url: string, @Res() res: Response): Promise<void> {
     await this.fileService.proxyImage(url, res);
   }
-  
-  
-  
+
   // ───────────────────────────────────────────────────────────
   // CREATE
   // ───────────────────────────────────────────────────────────
 
   @Post()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Create a new File' })
-  @ApiCreatedResponse({ description: 'Successfully created.', type: CreateFileDto })
+  @ApiCreatedResponse({
+    description: 'Successfully created.',
+    type: CreateFileDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
@@ -251,11 +247,12 @@ async writeFileContent(
   // ───────────────────────────────────────────────────────────
 
   @Get()
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Retrieve all File records' })
-  @ApiOkResponse({ description: 'List of File records.', type: [CreateFileDto] })
+  @ApiOkResponse({
+    description: 'List of File records.',
+    type: [CreateFileDto],
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
   findAll() {
@@ -267,9 +264,7 @@ async writeFileContent(
   // ───────────────────────────────────────────────────────────
 
   @Get('paginated')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Paginated File records' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -288,9 +283,7 @@ async writeFileContent(
   // ───────────────────────────────────────────────────────────
 
   @Get(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Find File by ID' })
   @ApiOkResponse({ description: 'Record found.', type: CreateFileDto })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -305,9 +298,7 @@ async writeFileContent(
   // ───────────────────────────────────────────────────────────
 
   @Patch(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Update File by ID' })
   @ApiOkResponse({ description: 'Successfully updated.', type: UpdateFileDto })
   @ApiBadRequestResponse({ description: 'Invalid data.' })
@@ -323,9 +314,7 @@ async writeFileContent(
   // ───────────────────────────────────────────────────────────
 
   @Delete(':id')
-  
   @Roles(UserRole.ADMIN)
-  
   @ApiOperation({ summary: 'Delete File by ID' })
   @ApiOkResponse({ description: 'Successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Record not found.' })
@@ -335,4 +324,3 @@ async writeFileContent(
     return this.fileService.remove(id);
   }
 }
-

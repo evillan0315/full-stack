@@ -15,6 +15,8 @@ export function detectLanguage(filePath: string): Extension {
   switch (ext) {
     case "js":
     case "ts":
+    case "tsx":
+    case "jsx":
       return javascript();
     case "json":
       return json();
