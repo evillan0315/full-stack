@@ -3,13 +3,15 @@ import Editor from '../components/common/Editor';
 import Header from '../components/Header';
 import FileManager from '../components/FileManager';
 import api from '../services/api';
+import { Icon } from '@iconify-icon/solid';
+
 export default function CodeEditor() {
   const [dividerX, setDividerX] = createSignal(0);
   const [filePath, setFilePath] = createSignal('./README.md');
   const [fileContent, setFileContent] = createSignal<string>('');
 
   onMount(async () => {
-    setDividerX(window.innerWidth / 4);
+    setDividerX(window.innerWidth / 4.4);
     await loadFile(filePath());
   });
 
@@ -31,16 +33,24 @@ export default function CodeEditor() {
   return (
     <div class="flex h-screen flex-col bg-white dark:bg-neutral-900 dark:text-white">
       <Header />
-      <div class="flex flex-1 overflow-hidden">
+      <div class="flex flex-1 overflow-hidden relative pb-10">
         <div
-          class="h-full overflow-y-auto border-r border-gray-300 dark:border-neutral-700 p-2"
-          style={{ width: `${dividerX()}px`, minWidth: '200px' }}
+          class="h-full overflow-y-auto border-r dark:border-neutral-700 px-2 pt-10 pb-4 shadow-sm"
+          style={{ width: `${dividerX()}px`, minWidth: '180px' }}
         >
+          <div class="absolute top-0 left-0 right-0 z-10 w-full dark:bg-neutral-800 border-b dark:border-neutral-700">
+            <button class="flex cursor-alias items-center gap-2 px-2 py-1 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 leading-0 text-sm uppercase tracking-widest">
+              <Icon icon="mdi:edit" width="22" height="22" />
+            </button>
+          </div>
           <FileManager onFileSelect={loadFile} />
         </div>
         <div class="flex-1 h-full overflow-hidden">
           <Editor theme="dark" filePath={filePath()} content={fileContent()} language="typescript" />
         </div>
+        
+      </div>
+      <div class="fixed h-10 dark:bg-neutral-800 w-screen bottom-0 z-10 border-t dark:border-neutral-700 shadow-md">
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ import { detectLanguage } from '../../utils/editorLanguage';
 import { getThemeExtension } from '../../utils/editorTheme';
 import api from '../../services/api';
 import Loading from './Loading';
-
+import { Icon } from '@iconify-icon/solid';
 interface CodeEditorWithAPIProps {
   filePath: string;
   theme?: 'light' | 'dark';
@@ -101,16 +101,29 @@ export default function Editor(props: CodeEditorWithAPIProps) {
 
   return (
     <div class="h-full relative">
-      <div class="absolute top-2 right-4 z-10">
-        <button onClick={saveFile} disabled={saving()} class="px-4 py-2 bg-blue-600 text-white rounded shadow">
-          {saving() ? 'Saving...' : 'Save File'}
+      <div class="absolute top-0 right-0 z-10 w-full">
+       <div class="flex justify-between align-center">
+       <div class="mb-1">
+        <button
+          title={props.filePath}
+          class="flex cursor-alias items-center gap-4 px-4 pb-2 pt-1 mt-1 bg-neutral-900 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 rounded-t-lg border-l border-t  border-neutral-700"
+        >
+           {() => props.filePath?.split('/').pop()} <Icon icon="mdi:close" width="18" height="18" />
         </button>
+       </div>
+       <div>
+        <button onClick={saveFile}
+          disabled={saving()} class="flex cursor-alias items-center gap-2 px-2 py-1 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 leading-0 text-sm uppercase tracking-widest">
+              <Icon icon="mdi:content-save" width="22" height="22" /> {saving() ? 'Saving...' : 'Save'}
+            </button>
+       </div>
       </div>
+     </div>
 
       {loading() && <Loading />}
       {error() && <p class="text-red-600 p-4">{error()}</p>}
 
-      <div ref={editorContainer} class="dark:bg-neutral-900 bg-neutral-100 h-full w-full" />
+      <div ref={editorContainer} class="h-full w-full pt-10" />
     </div>
   );
 }

@@ -68,7 +68,7 @@ const FileNode = (props: { file: FileItem; onSelect: (path: string) => void }) =
             transform: open() ? 'scaleY(1)' : 'scaleY(0.95)',
           }}
         >
-          <div class="pl-2 border-l border-gray-300">
+          <div class="pl-2 border-l border-neutral-300">
             <For each={props.file.children}>{(child) => <FileNode file={child} onSelect={props.onSelect} />}</For>
           </div>
         </div>

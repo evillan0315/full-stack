@@ -135,7 +135,7 @@ export default function Terminal() {
 
   createEffect(scrollToBottom);
   return (
-    <div class="flex h-screen  flex-col bg-white dark:bg-neutral-900/5 dark:text-white rounded-md">
+    <div class="flex h-screen  flex-col bg-white dark:bg-neutral-900 dark:text-white">
       <Header />
       <div
         class="flex-1 overflow-auto scroll-smooth px-4 py-2 text-sm "

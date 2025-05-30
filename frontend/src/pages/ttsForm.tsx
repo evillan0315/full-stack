@@ -109,7 +109,7 @@ export default function TTSForm() {
           speakers: speakers(), // if applicable
         }),
       });
-      
+
       if (!response.ok) throw new Error('Failed to generate audio');
 
       const blob = await response.blob();
