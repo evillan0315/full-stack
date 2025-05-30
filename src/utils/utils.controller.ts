@@ -30,12 +30,22 @@ import { JsonBodyDto } from './dto/json-body.dto';
 import { diskStorage } from 'multer';
 import { UtilsService } from './utils.service';
 import { UploadImageDto } from './dto/upload-image.dto';
+import { FormatCodeDto } from './dto/format-code.dto';
 
 @ApiTags('Utilities')
 @Controller('api/utils')
 export class UtilsController {
   constructor(private readonly utilsService: UtilsService) {}
-
+  @Post('format')
+  @ApiOperation({ summary: 'Format source code using Prettier' })
+  @ApiResponse({
+    status: 200,
+    description: 'Formatted code returned as string',
+    schema: { type: 'string', example: 'function test() {\n  return 42;\n}' },
+  })
+  async formatCode(@Body() body: FormatCodeDto) {
+    return this.utilsService.formatCode(body.code, body.language);
+  }
   @Post('convert-to-svg')
   @ApiOperation({ summary: 'Convert an image to SVG' })
   @ApiConsumes('multipart/form-data')

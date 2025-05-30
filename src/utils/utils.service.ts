@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import * as sharp from 'sharp';
 import * as potrace from 'potrace';
@@ -17,6 +18,8 @@ import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
 import remarkStringify from 'remark-stringify';
 import { Root } from 'mdast';
+import * as prettier from 'prettier';
+
 const style = `
   <style>
      body {
@@ -106,6 +109,7 @@ const style = `
 
 @Injectable()
 export class UtilsService {
+  private readonly logger = new Logger(UtilsService.name);
   private outputDir = path.join(__dirname, '../../svg-outputs');
   private getTempPngPath(originalPath: string): string {
     const fileName = path.basename(originalPath, path.extname(originalPath));
@@ -117,6 +121,53 @@ export class UtilsService {
       fs.mkdirSync(this.outputDir);
     }
   }
+  private readonly parserMap: Record<string, string> = {
+    javascript: 'babel',
+    typescript: 'typescript',
+    json: 'json',
+    html: 'html',
+    css: 'css',
+    markdown: 'markdown',
+    yaml: 'yaml',
+    xml: 'xml',
+    ejs: 'html',
+    hbs: 'html',
+  };
+
+  async formatCode(code: string, language: string): Promise<string> {
+    const parser = this.parserMap[language];
+    if (!parser) {
+      this.logger.warn(`No formatter available for language: ${language}`);
+      return code;
+    }
+
+    try {
+      return await prettier.format(code, {
+        parser,
+        plugins: await this.loadPlugins(parser),
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to format code for language ${language}: ${error.message}`,
+        error.stack,
+      );
+      return code;
+    }
+  }
+
+  private async loadPlugins(parser: string) {
+    // Dynamically import external plugins only if needed
+    const externalPlugins = {
+      yaml: ['prettier-plugin-yaml'],
+      xml: ['prettier-plugin-xml'],
+    };
+
+    const requiredPlugins = externalPlugins[parser];
+    if (!requiredPlugins) return [];
+
+    return Promise.all(requiredPlugins.map((p) => import(p)));
+  }
+
   async convertToSvg(
     filePath: string,
     color = '#000000',

@@ -8,7 +8,7 @@ import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import { Extension } from "@codemirror/state";
-
+//import { handlebarsLanguage } from "@xiechao/codemirror-lang-handlebars";
 
 export function detectLanguage(filePath: string): Extension {
   const ext = filePath.split('.').pop()?.toLowerCase();
@@ -17,10 +17,15 @@ export function detectLanguage(filePath: string): Extension {
     case "ts":
     case "tsx":
     case "jsx":
+    case "cjs":
+    case "mjs":
+    case "ejs":
+    case "prisma":
       return javascript();
     case "json":
       return json();
     case "html":
+    case "hbs":
       return html();
     case "css":
       return css();
@@ -35,6 +40,8 @@ export function detectLanguage(filePath: string): Extension {
       return yaml();
     case "sql":
       return sql();
+    //case "hbs":
+      //return handlebarsLanguage();
     default:
       return [];
   }

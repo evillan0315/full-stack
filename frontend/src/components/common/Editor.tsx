@@ -5,6 +5,7 @@ import { basicSetup } from "codemirror";
 import { detectLanguage } from "../../utils/editorLanguage";
 import { getThemeExtension } from "../../utils/editorTheme";
 import api from "../../services/api";
+import Loading from "./Loading";
 
 interface CodeEditorWithAPIProps {
   filePath: string;
@@ -110,7 +111,7 @@ export default function Editor(props: CodeEditorWithAPIProps) {
         </button>
       </div>
 
-      {loading() && <p class="p-4 text-sm text-gray-500">Loading file...</p>}
+      {loading() && <Loading />}
       {error() && <p class="text-red-600 p-4">{error()}</p>}
 
       <div

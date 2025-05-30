@@ -36,6 +36,8 @@ const language = (filename: string, mimeType?: string): string | undefined => {
     tsx: 'typescript',
     json: 'json',
     html: 'html',
+    ejs: 'ejs',
+    hbs: 'hbs',
     css: 'css',
     md: 'markdown',
     py: 'python',
@@ -51,7 +53,6 @@ const language = (filename: string, mimeType?: string): string | undefined => {
     go: 'go',
     php: 'php',
   };
-
   if (ext && extMap[ext]) {
     return extMap[ext];
   }

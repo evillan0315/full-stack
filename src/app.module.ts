@@ -12,6 +12,8 @@ import { UtilsModule } from './utils/utils.module';
 import { DatabaseModule } from './database/database.module';
 import { TerminalModule } from './terminal/terminal.module';
 import { FolderModule } from './folder/folder.module';
+import { GoogleModule } from './google/google.module';
+import { GoogleOAuthService } from './google/google-oauth/google-oauth.service';
 
 @Module({
   imports: [
@@ -24,8 +26,9 @@ import { FolderModule } from './folder/folder.module';
     DatabaseModule,
     TerminalModule,
     FolderModule,
+    GoogleModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GoogleOAuthService],
 })
 export class AppModule {}

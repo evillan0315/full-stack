@@ -90,24 +90,31 @@ export class <%= className %>Service {
   ) {}
   <% if (className === 'File') { %>
   private getFileTree(dir: string, recursive: boolean = false): any[] {
-    if (!fs.existsSync(dir)) return [];
+  if (!fs.existsSync(dir)) return [];
 
-    const files = fs.readdirSync(dir);
-    return files
-      .filter((file) => !this.EXCLUDED_FOLDERS.includes(file))
-      .map((file) => {
-        const filePath = path.join(dir, file);
-        const isDirectory = fs.statSync(filePath).isDirectory();
-        return {
-          name: file,
-          isDirectory,
-          path: filePath,
-          type: isDirectory ? 'folder' : 'file',
-          children:
-            isDirectory && recursive ? this.getFileTree(filePath, true) : null,
-        };
-      });
-  }
+  const files = fs.readdirSync(dir);
+  return files
+    .filter((file) => !this.EXCLUDED_FOLDERS.includes(file))
+    .map((file) => {
+      const filePath = path.join(dir, file);
+      const isDirectory = fs.statSync(filePath).isDirectory();
+
+      const mimeType = !isDirectory ? mimeLookup(filePath) || undefined : undefined;
+      const lang = !isDirectory ? language(file, mimeType) : undefined;
+
+      return {
+        name: file,
+        isDirectory,
+        path: filePath,
+        type: isDirectory ? 'folder' : 'file',
+        mimeType,
+        language: lang,
+        children:
+          isDirectory && recursive ? this.getFileTree(filePath, true) : null,
+      };
+    });
+}
+  
   <% } %>
   <% if (hasCreatedBy || isProtected) { %>
   private get userId(): string | undefined {
