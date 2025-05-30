@@ -5,6 +5,9 @@ import FileManager from '../components/FileManager';
 import api from '../services/api';
 import { Icon } from '@iconify-icon/solid';
 
+
+
+
 export default function CodeEditor() {
   const [dividerX, setDividerX] = createSignal(0);
   const [filePath, setFilePath] = createSignal('./README.md');
@@ -32,6 +35,7 @@ export default function CodeEditor() {
 
   return (
     <div class="flex h-screen flex-col bg-white dark:bg-neutral-900 dark:text-white">
+
       <Header />
       <div class="flex flex-1 overflow-hidden relative pb-8">
         <div
@@ -39,9 +43,14 @@ export default function CodeEditor() {
           style={{ width: `${dividerX()}px`, minWidth: '180px' }}
         >
           <div class="absolute top-0 left-0 right-0 z-10 w-full dark:bg-neutral-800 border-b dark:border-neutral-700">
+<div class="flex justify-between align-center">
+<div>
             <button class="flex cursor-alias items-center gap-2 px-2 py-1 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 leading-0 text-sm uppercase tracking-widest">
-              <Icon icon="mdi:edit" width="22" height="22" />
+              <Icon icon="mdi:file" width="22" height="22" /> File Explorer
             </button>
+</div>
+
+</div>
           </div>
           <FileManager onFileSelect={loadFile} />
         </div>
@@ -64,6 +73,7 @@ export default function CodeEditor() {
 		</div>
 	</div>
       </div>
+
     </div>
   );
 }

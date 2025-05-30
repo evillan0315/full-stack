@@ -10,7 +10,7 @@ import Login from './pages/login';
 import Logout from './pages/logout';
 import CodeEditor from './pages/codeEditor';
 import TTSForm from './pages/ttsForm';
-
+import Toaster from './components/Toaster';
 import { AppContextProvider } from './context';
 
 const App = (): JSX.Element => {
@@ -21,11 +21,13 @@ const App = (): JSX.Element => {
     <Router
       root={(props) => (
         <AppContextProvider>
+          
           <Suspense>{props.children}</Suspense>
         </AppContextProvider>
       )}
     >
       {/* Wrap each page in Layout manually */}
+      
       <Route
         path="/"
         component={() => (
@@ -74,7 +76,13 @@ const App = (): JSX.Element => {
           </Layout>
         )}
       />
-      <Route path="/editor" component={() => <CodeEditor />} />
+      <Route path="/editor" component={() => (
+      <>
+      <Toaster /> 
+      <CodeEditor />
+      </>
+      )} 
+      />
       <Route path="/logout" component={() => <Logout />} />
       <Route path="/login" component={() => <Login />} />
     </Router>

@@ -2,7 +2,6 @@
 
 A robust and secure authentication module for **NestJS**, using **Prisma ORM**, **JWT authentication** via **HTTP-only cookies**, and full **Swagger API documentation**. Includes **email verification**, a **Nest CLI scaffolding tool**, and OAuth placeholders for future use.
 ---
-
 * ✅ JWT-based auth via HTTP-only cookies and optional Bearer header
 * ✅ User registration and login
 * ✅ Email verification with JWT token links
@@ -10,9 +9,7 @@ A robust and secure authentication module for **NestJS**, using **Prisma ORM**, 
 * ✅ Swagger support with cookie + bearer authentication
 * ✅ CLI tool to scaffold modules with service/controller/dto
 * 🚧 Future support for Google and GitHub OAuth
-
 ---
-
 ## 🔐 Features
 
 * ✅ User registration and login
@@ -37,8 +34,6 @@ A robust and secure authentication module for **NestJS**, using **Prisma ORM**, 
 * ✅ CLI scaffolding for modules (controller, service, DTOs)
 
 ---
-
-
 
 ## 🛠 Tech Stack
 

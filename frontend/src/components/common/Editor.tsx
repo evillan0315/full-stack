@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup, createEffect } from 'solid-js';
+import { createSignal, onMount, onCleanup, createEffect, Component } from 'solid-js';
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
@@ -7,13 +7,15 @@ import { getThemeExtension } from '../../utils/editorTheme';
 import api from '../../services/api';
 import Loading from './Loading';
 import { Icon } from '@iconify-icon/solid';
+import { showToast } from '../../stores/toastStore';
 interface CodeEditorWithAPIProps {
   filePath: string;
   theme?: 'light' | 'dark';
   content?: string;
 }
 
-export default function Editor(props: CodeEditorWithAPIProps) {
+const Editor: Component<CodeEditorWithAPIProps> = (props) => {
+
   let editorContainer: HTMLDivElement | undefined;
   let editorView: EditorView | null = null;
 
@@ -69,6 +71,7 @@ export default function Editor(props: CodeEditorWithAPIProps) {
   };
 
   const saveFile = async () => {
+
     setSaving(true);
     try {
       const formData = new FormData();
@@ -78,11 +81,12 @@ export default function Editor(props: CodeEditorWithAPIProps) {
       const response = await api.post('/file/write', formData);
       if (!response.data.success) throw new Error('Failed to save file');
 
-      alert('File saved successfully.');
+      showToast('File saved successfully.', 'success');
     } catch (err) {
-      alert('Error saving file: ' + (err as Error).message);
+     showToast('Error saving file: ' + (err as Error).message, 'error');
     } finally {
       setSaving(false);
+
     }
   };
 
@@ -111,10 +115,13 @@ export default function Editor(props: CodeEditorWithAPIProps) {
            {() => props.filePath?.split('/').pop()} <Icon icon="mdi:close" width="18" height="18" />
         </button>
        </div>
-       <div>
+       <div class="flex align-center">
         <button onClick={saveFile}
-          disabled={saving()} class="flex cursor-alias items-center gap-2 px-2 py-1 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 leading-0 text-sm uppercase tracking-widest">
-              <Icon icon="mdi:content-save" width="22" height="22" /> {saving() ? 'Saving...' : 'Save'}
+          disabled={saving()} class="flex cursor-alias gap-2 px-2 py-1 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500  ">
+              <Icon icon="mdi:content-save" width="20" height="20" /> {saving() ? 'Saving...' : 'Save'}
+            </button>
+        <button class="flex cursor-alias px-2 py-1 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 ">
+              <Icon icon="mdi:menu" width="20" height="20" /> 
             </button>
        </div>
       </div>
@@ -123,7 +130,10 @@ export default function Editor(props: CodeEditorWithAPIProps) {
       {loading() && <Loading />}
       {error() && <p class="text-red-600 p-4">{error()}</p>}
 
-      <div ref={editorContainer} class="h-full w-full pt-10" />
+  <div ref={editorContainer} class="h-full w-full pt-10" />
+
+     
     </div>
   );
 }
+export default Editor;
