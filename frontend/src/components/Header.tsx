@@ -21,6 +21,7 @@ import {
   rocketLaunch,
   cog,
   codeBracket,
+  speakerWave
 } from 'solid-heroicons/outline';
 
 import { API, useAppContext } from '../context';
@@ -108,7 +109,7 @@ const Header: Component<HeaderProps> = (props) => {
           </button>
           <button
             class="flex cursor-alias items-center gap-2 px-2 py-2 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 leading-0 uppercase tracking-widest"
-            onClick={() => openInternalLink('/apps')}
+            onClick={() => openInternalLink('/dashboard')}
           >
             <Icon path={computerDesktop} class="h-6" /> Dashboard
           </button>
@@ -117,6 +118,12 @@ const Header: Component<HeaderProps> = (props) => {
             onClick={() => openInternalLink('/editor')}
           >
             <Icon path={codeBracket} class="h-6" /> Editor
+          </button>
+          <button
+            class="flex cursor-alias items-center gap-2 px-2 py-2 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500 leading-0 uppercase tracking-widest"
+            onClick={() => openInternalLink('/tts')}
+          >
+            <Icon path={speakerWave} class="h-6" /> TTS
           </button>
         </>
       )}

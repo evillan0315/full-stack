@@ -108,6 +108,21 @@ export class AppController {
       isAuthenticated: Boolean(req.cookies?.accessToken),
     };
   }
+  @Get('tts')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.MANAGER)
+  @Render('pages/index')
+  @ApiOperation({ summary: 'Render protected TTS page' })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'TTS rendered' })
+  @ApiResponse({ status: 403, description: 'Forbidden - insufficient role' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getTTS(@Req() req: Request) {
+    return {
+      message: `Manage TTS`,
+      isAuthenticated: Boolean(req.cookies?.accessToken),
+    };
+  }
   @Get('login')
   @Render('pages/index')
   @ApiOperation({ summary: 'Render login page' })

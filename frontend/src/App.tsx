@@ -9,6 +9,7 @@ import Home from './pages/home';
 import Login from './pages/login';
 import Logout from './pages/logout';
 import CodeEditor from './pages/codeEditor';
+import TTSForm from './pages/ttsForm';
 
 import { AppContextProvider } from './context';
 
@@ -62,6 +63,14 @@ const App = (): JSX.Element => {
         component={() => (
           <Layout isAuthenticated={isAuthenticated}>
             <Profile />
+          </Layout>
+        )}
+      />
+      <Route
+        path="/tts"
+        component={() => (
+          <Layout isAuthenticated={isAuthenticated}>
+            <TTSForm />
           </Layout>
         )}
       />
