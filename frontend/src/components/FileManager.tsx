@@ -20,7 +20,7 @@ function buildTree(files: FileItem[]): FileItem[] {
   const map = new Map<string, FileItem & { children: FileItem[] }>();
   for (const file of files) {
     console.log(file, 'file');
-    map.set(file.path, { ...file, children: file.children || [] });
+    map.set(file.path, { ...file, children: file.children });
   }
 
   const tree: FileItem[] = [];
