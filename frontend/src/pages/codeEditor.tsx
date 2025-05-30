@@ -33,7 +33,7 @@ export default function CodeEditor() {
   return (
     <div class="flex h-screen flex-col bg-white dark:bg-neutral-900 dark:text-white">
       <Header />
-      <div class="flex flex-1 overflow-hidden relative pb-10">
+      <div class="flex flex-1 overflow-hidden relative pb-8">
         <div
           class="h-full overflow-y-auto border-r dark:border-neutral-700 px-2 pt-10 pb-4 shadow-sm"
           style={{ width: `${dividerX()}px`, minWidth: '180px' }}
@@ -50,7 +50,19 @@ export default function CodeEditor() {
         </div>
         
       </div>
-      <div class="fixed h-10 dark:bg-neutral-800 w-screen bottom-0 z-10 border-t dark:border-neutral-700 shadow-md">
+      <div class="fixed h-8 dark:bg-neutral-900 w-screen bottom-0 z-10 border-t dark:border-neutral-700 shadow-md">
+
+        <div class="flex justify-between align-center">
+		<div class="">
+			<button
+  onClick={() => (window.location.href = '/terminal')}
+  class="flex cursor-alias items-center gap-2 px-2 py-1 text-left text-neutral-800 dark:text-neutral-100 dark:hover:text-yellow-500"
+  aria-label="Open Terminal"
+>
+  <Icon icon="mdi:terminal" width="22" height="22" />
+</button>
+		</div>
+	</div>
       </div>
     </div>
   );

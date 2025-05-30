@@ -141,12 +141,7 @@ const Header: Component<HeaderProps> = (props) => {
           >
             <Icon path={sun} class="h-6" />
           </button>
-          <button
-            class="flex cursor-alias items-center gap-2 px-2 py-2 text-left text-neutral-800 dark:text-neutral-200 dark:hover:text-yellow-500  leading-0 uppercase tracking-widest"
-            onClick={() => openInternalLink('/terminal')}
-          >
-            <Icon path={commandLine} class="h-6" />
-          </button>
+          
         </Show>
       </div>
       <button

@@ -56,7 +56,7 @@ const FileNode = (props: { file: FileItem; onSelect: (path: string) => void }) =
           </div>
         }
       >
-        <div class="cursor-pointer text-blue-600" onClick={toggle}>
+        <div class="cursor-pointer text-yellow-500 bold" onClick={toggle}>
           {open() ? '📂' : '📁'} {props.file.name}
         </div>
 
