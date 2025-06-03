@@ -2,14 +2,12 @@ module.exports = {
   apps: [
     {
       name: "api-server",
-      script: "pnpm",
-      args: "run start:prod",
-      interpreter: "none",
+      script: "dist/src/main.js", // run compiled output directly
       instances: 1,
-      exec_mode: "fork",
+      exec_mode: "fork",          // or "cluster" for load-balanced multi-core
       watch: false,
-      autorestart: true,
-      max_memory_restart: "1G",
+      autorestart: true,          // ensure restart on crash
+      max_memory_restart: "1G",   // restart on memory overflow
       env: {
         NODE_ENV: "development",
         PORT: 5000
@@ -18,9 +16,10 @@ module.exports = {
         NODE_ENV: "production",
         PORT: 5000
       },
-      out_file: './logs/combined.log',
-      error_file: './logs/error.log',
-      log_date_format: 'YYYY-MM-DD HH:mm Z'
+      out_file: "./logs/combined.log",
+      error_file: "./logs/error.log",
+      log_date_format: "YYYY-MM-DD HH:mm Z"
     }
   ]
 };
+

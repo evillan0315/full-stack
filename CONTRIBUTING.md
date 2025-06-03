@@ -13,7 +13,6 @@ This guide will help you understand how to contribute and the standards we follo
 - [License](#license)
 
 ---
-
 ## Getting Started
 
 1. **Fork the Repository**  

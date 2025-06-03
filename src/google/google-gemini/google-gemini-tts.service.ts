@@ -37,7 +37,7 @@ export class GoogleGeminiTtsService {
     }
 
     const fullPath = path.join(dir, filename);
-
+    console.log(fullPath, 'fullPath saveWaveFile');
     return new Promise((resolve, reject) => {
       const writer = new wav.FileWriter(fullPath, {
         channels,
@@ -88,7 +88,7 @@ export class GoogleGeminiTtsService {
         contents: [{ parts: [{ text: prompt }] }],
         config,
       });
-
+      console.log(response, 'response this.ai.models.generateContent');
       const data =
         response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
       if (!data) {
@@ -108,7 +108,7 @@ export class GoogleGeminiTtsService {
 
       const dir = path.join(__dirname, '..', '..', 'tts', 'voice');
       const fullPath = path.join(dir, filename);
-
+      console.log(fullPath, 'fullPath generateSpeech');
       // Save WAV file
       await this.saveWaveFile(filename, audioBuffer);
 

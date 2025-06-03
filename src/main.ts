@@ -19,7 +19,7 @@ async function bootstrap() {
     'http://localhost:5000',
     'http://localhost:5173',
   ];
-
+  const downloadDir = path.resolve(process.cwd(), 'downloads');
   const configService = app.get(ConfigService);
   const NODE_ENV = configService.get<string>('NODE_ENV') || 'development';
   const port = configService.get<number>('PORT', 5000);
@@ -36,6 +36,9 @@ async function bootstrap() {
     'Registering partials from:',
     join(__dirname, '..', 'views/partials'),
   );
+  app.useStaticAssets(join(__dirname, '..', '..', 'downloads'), {
+    prefix: '/api/media/',
+  });
   hbs.registerPartials(join(__dirname, '..', 'views/partials'));
   app.useStaticAssets(join(__dirname, '..', '..', 'public'), {
     prefix: '/public/', // Optional: accessed via http://localhost:3000/public/

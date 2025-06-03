@@ -22,6 +22,7 @@ import { GitHubProfileDto, GitHubTokenDto } from './dto/github-profile.dto';
 
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { OAuthService } from './oauth.service';
+import { CreateJwtUserDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -46,7 +47,7 @@ export class AuthService {
       expiresIn: '1d',
     });
   }*/
-  async login(dto: LoginDto): Promise<{ accessToken: string }> {
+  async login(dto: LoginDto): Promise<{ accessToken: string; user: any }> {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
       include: { password: true },
@@ -63,14 +64,18 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const payload: JwtPayload = {
+    const payload: CreateJwtUserDto = {
+      id: user.id,
       sub: user.id,
       email: user.email,
       role: user.role ?? Role.USER,
+      image: user.image ?? undefined,
+      name: user.name ?? '',
+      phone_number: user.phone_number ?? '',
     };
 
     const accessToken = await this.generateToken(payload);
-    return { accessToken };
+    return { accessToken, user: payload };
   }
   async register(dto: RegisterDto) {
     const hash = await bcrypt.hash(dto.password, 10);
@@ -164,7 +169,7 @@ export class AuthService {
     return await this.oauthService.validate(provider, profile, tokens);
   }
 
-  async generateToken(payload: JwtPayload): Promise<string> {
+  async generateToken(payload: CreateJwtUserDto): Promise<string> {
     return this.jwtService.signAsync(payload);
   }
 }

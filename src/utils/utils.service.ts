@@ -24,9 +24,7 @@ const style = `
   <style>
      body {
        margin: 0;
-       padding: 0;
-       color: #999;
-       background-color: black; font-family: Arial, sans-serif; 
+       padding: 0;  
      }
     .markdown-body { padding: 10px; max-width: 90%; margin: 0 auto; }
     .markdown-body h1 {  }
@@ -42,11 +40,13 @@ const style = `
 	h1 {
 	  margin-bottom: 20px;
 	  font-size: 1.8em;
+	  font-weight: lighter;
 	}
 	h2 {
 	  margin-bottom: 16px;
 	  margin-top: 16px;
 	  font-size: 1.6em;
+	   font-weight: lighter;
 	}
 	h3 {
 	  margin-top: 12px;

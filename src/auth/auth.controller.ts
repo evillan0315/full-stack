@@ -79,13 +79,13 @@ export class AuthController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { accessToken } = await this.authService.login(dto);
-    res.cookie('accessToken', accessToken, {
+    const user = await this.authService.login(dto);
+    res.cookie('accessToken', user.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
-    return { accessToken };
+    return user;
   }
   @Post('logout')
   @ApiOperation({ summary: 'Log out user (clear cookie)' })

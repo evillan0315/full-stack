@@ -12,6 +12,9 @@ import { TerminalModule } from './terminal/terminal.module';
 import { FolderModule } from './folder/folder.module';
 import { GoogleModule } from './google/google.module';
 import { GoogleOAuthService } from './google/google-oauth/google-oauth.service';
+import { SchemaModule } from './schema/schema.module';
+import { LogModule } from './log/log.module';
+import { AudioModule } from './audio/audio.module';
 
 @Module({
   imports: [
@@ -25,6 +28,9 @@ import { GoogleOAuthService } from './google/google-oauth/google-oauth.service';
     TerminalModule,
     FolderModule,
     GoogleModule,
+    SchemaModule,
+    LogModule,
+    AudioModule,
   ],
   controllers: [AppController],
   providers: [AppService, GoogleOAuthService],

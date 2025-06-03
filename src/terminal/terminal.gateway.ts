@@ -1,4 +1,3 @@
-import { UseGuards, Logger } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -8,14 +7,13 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
+import { UseGuards, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { spawn } from 'child_process';
 import * as os from 'os';
 import * as process from 'process';
 import { resolve } from 'path';
 import { existsSync, statSync } from 'fs';
 import { exec } from 'child_process';
-import * as cookie from 'cookie';
 import { TerminalService } from './terminal.service';
 import { AuthService } from '../auth/auth.service';
 import { JwtAuthGuard } from '../auth/auth.guard';
@@ -37,6 +35,8 @@ export class TerminalGateway
   private readonly logger = new Logger(TerminalGateway.name);
   @WebSocketServer()
   server: Server;
+  private systemIntervalMap = new Map<string, NodeJS.Timeout>();
+  private cwdMap = new Map<string, string>();
 
   constructor(
     private readonly authService: AuthService,
@@ -44,21 +44,18 @@ export class TerminalGateway
   ) {}
 
   async handleConnection(client: Socket) {
-    let token;
-    console.log(client.data.user);
-    const cookies = client.handshake?.headers?.cookie;
-    if (cookies) {
-      const parsedCookies = cookie.parse(cookies);
-      token = parsedCookies['accessToken'];
-    }
-    // Ensure the client is authenticated before proceeding
-    if (!cookies) {
-      client.emit('error', 'Authentication required');
+    console.log(client.handshake.auth?.token, 'Bearer Token');
+    const token = client.handshake.auth?.token?.replace('Bearer ', '').trim();
+    console.log(token, 'Trimmed Token');
+    if (!token) {
+      client.emit('error', 'Unauthorized: Missing or malformed token');
       client.disconnect();
       return;
     }
 
-    // 🍑 System + Directory Info
+    const clientId = client.id;
+    this.cwdMap.set(clientId, process.cwd());
+
     const info = {
       platform: os.platform(),
       type: os.type(),
@@ -70,115 +67,77 @@ export class TerminalGateway
       homedir: os.homedir(),
     };
 
-    // Convert uptime from seconds to a human-readable format (e.g., 1 day, 2 hours, 3 minutes)
     const convertUptimeToTime = (seconds: number) => {
       const days = Math.floor(seconds / (24 * 3600));
       const hours = Math.floor((seconds % (24 * 3600)) / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
       const secs = Math.floor(seconds % 60);
-      let uptimeString = '';
-      if (days > 0) uptimeString += `${days} day${days > 1 ? 's' : ''}, `;
-      if (hours > 0) uptimeString += `${hours} hour${hours > 1 ? 's' : ''}, `;
-      if (minutes > 0)
-        uptimeString += `${minutes} minute${minutes > 1 ? 's' : ''}, `;
-      if (secs > 0) uptimeString += `${secs} second${secs > 1 ? 's' : ''}`;
-      return uptimeString;
+      let str = '';
+      if (days) str += `${days}d `;
+      if (hours) str += `${hours}h `;
+      if (minutes) str += `${minutes}m `;
+      if (secs) str += `${secs}s`;
+      return str;
     };
 
-    // Function to get system load, memory, and swap usage dynamically
     const sendSystemInfo = () => {
-      exec('uptime', (err, stdout, stderr) => {
-        if (err) {
-          console.error('Error getting uptime:', stderr);
-        } else {
-          const systemLoad = stdout.split('load average: ')[1]?.split(',')[0]; // Parse system load
+      exec('uptime', (_, stdout) => {
+        const systemLoad =
+          stdout.split('load average: ')[1]?.split(',')[0] || 'n/a';
+        exec('free -h', (_, memOut) => {
+          const memory = memOut.split('\n')[1].split(/\s+/);
+          const swap = memOut.split('\n')[2].split(/\s+/);
+          const uptimeString = convertUptimeToTime(info.uptime);
 
-          exec('free -h', (err, stdout, stderr) => {
-            if (err) {
-              console.error('Error getting memory usage:', stderr);
-            } else {
-              const memoryUsage = stdout.split('\n')[1].split(/\s+/); // Memory usage
-              const swapUsage = stdout.split('\n')[2].split(/\s+/); // Swap usage
-              const uptimeString = convertUptimeToTime(info.uptime);
-
-              const initMessage = `
+          const message = `
 Project Name: Smart Terminal AI
 
-Smart Terminal AI is an intelligent, web-based terminal interface powered by NestJS and SolidJS, integrated with state-of-the-art AI models like Amazon Q, ChatGPT and Google Gemini. This smart terminal allows users to interact with system commands, code snippets, and AI assistance in real-time—blending traditional shell-like functionality with natural language processing capabilities.
+Smart Terminal AI is an intelligent, web-based terminal interface powered by NestJS and SolidJS, integrated with AI models like Amazon Q, ChatGPT, and Gemini.
 
-* Documentation:  https://github.com/evillan0315/bash-ai/docs
-* Repo:     	  https://github.com/evillan0315/bash-ai
+* Docs:  https://github.com/evillan0315/bash-ai/docs
+* Repo:  https://github.com/evillan0315/bash-ai
 
-System information as of ${new Date().toUTCString()}
+System info as of ${new Date().toUTCString()}:
 
-System load:  ${systemLoad}							Uptime:    ${uptimeString}		      
-Memory usage: ${memoryUsage[2]} of ${memoryUsage[1]} (${memoryUsage[2]} used)	Hostname:  ${info.hostname}
-Swap usage:   ${swapUsage[2]} of ${swapUsage[1]} (${swapUsage[2]} used)	Homedir:   ${info.homedir}                 		 
-	
+System load: ${systemLoad}		Uptime: ${uptimeString}
+Memory: ${memory[2]} / ${memory[1]}	Hostname: ${info.hostname}
+Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
 `;
-
-              // Emit system info along with dynamic load and memory
-              client.emit('outputMessage', initMessage);
-            }
-          });
-        }
+          client.emit('outputMessage', message);
+        });
       });
     };
 
-    // Send system info initially and then every 5 seconds
     sendSystemInfo();
-    const intervalId = setInterval(sendSystemInfo, 5000); // Refresh system info every 5 seconds
+    const interval = setInterval(sendSystemInfo, 5000);
+    this.systemIntervalMap.set(clientId, interval);
 
-    // Handle disconnection
-    client.on('disconnect', () => {
-      console.log(`Client disconnected: ${client.id}`);
-      clearInterval(intervalId); // Stop sending updates when the client disconnects
-      //this.clientDirectories.delete(client.id);
-    });
+    client.on('disconnect', () => this.handleDisconnect(client));
   }
 
   @SubscribeMessage('exec')
-  async handleCommand(
+  handleCommand(
     @MessageBody() command: string,
     @ConnectedSocket() client: Socket,
   ) {
-    let token;
-    const cookies = client.handshake?.headers?.cookie;
-    if (cookies) {
-      const parsedCookies = cookie.parse(cookies);
-      token = parsedCookies['accessToken'];
-    }
-    if (!cookies) {
-      client.emit('error', 'Authentication required');
-      client.disconnect();
-      return;
-    }
-
     const clientId = client.id;
-    let cwd = process.cwd();
+    let cwd = this.cwdMap.get(clientId) || process.cwd();
 
-    const user = client.data.user;
-
-    // Handle 'cd' separately
-    if (command.startsWith('cd')) {
-      const targetPath = command.slice(3).trim() || process.env.HOME || cwd;
-      const newPath = resolve(cwd, targetPath);
-
-      if (existsSync(newPath) && statSync(newPath).isDirectory()) {
-        cwd = newPath;
-        client.emit('prompt', { cwd, command });
-        client.emit('output', `Changed directory to ${newPath}\n`);
+    const trimmed = command.trim();
+    if (trimmed.startsWith('cd')) {
+      const target = trimmed.slice(3).trim() || os.homedir();
+      const newCwd = resolve(cwd, target);
+      if (existsSync(newCwd) && statSync(newCwd).isDirectory()) {
+        this.cwdMap.set(clientId, newCwd);
+        client.emit('output', `Changed directory to ${newCwd}\n`);
       } else {
-        client.emit('prompt', { cwd, command });
-        client.emit('error', `No such directory: ${newPath}\n`);
+        client.emit('error', `No such directory: ${newCwd}\n`);
       }
+      client.emit('prompt', { cwd: newCwd, command });
       return;
     }
 
-    const trimmedCmd = command.trim();
-    client.emit('prompt', { cwd, command });
-
-    if (trimmedCmd === 'osinfo') {
+    if (trimmed === 'osinfo') {
       const info = {
         platform: os.platform(),
         type: os.type(),
@@ -186,23 +145,52 @@ Swap usage:   ${swapUsage[2]} of ${swapUsage[1]} (${swapUsage[2]} used)	Homedir:
         arch: os.arch(),
         uptime: os.uptime(),
         hostname: os.hostname(),
-        cwd: process.cwd(),
+        cwd,
       };
-
-      const output = Object.entries(info)
-        .map(([key, val]) => `${key}: ${val}`)
-        .join('\n');
-
-      client.emit('output', output);
+      client.emit(
+        'output',
+        Object.entries(info)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join('\n'),
+      );
       return;
     }
-    console.log(trimmedCmd, 'trimmedCmd');
-    // ✅ Delegate command execution to TerminalService
-    this.terminalService.runCommand(trimmedCmd, cwd, client);
+
+    client.emit('prompt', { cwd, command });
+    this.terminalService.runCommand(clientId, command, cwd, client);
   }
+
+  @SubscribeMessage('input')
+  handleInput(
+    @MessageBody() data: { input: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.terminalService.write(client.id, data.input);
+  }
+
+  @SubscribeMessage('resize')
+  handleResize(
+    @MessageBody() data: { cols: number; rows: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.terminalService.resize(client.id, data.cols, data.rows);
+  }
+
+  @SubscribeMessage('close')
+  handleSessionClose(@ConnectedSocket() client: Socket) {
+    this.terminalService.dispose(client.id);
+  }
+
   handleDisconnect(client: Socket) {
-    // Clean up conversation history when client disconnects
-    //this.clientConversations.delete(client.id);
-    //this.clientDirectories.delete(client.id);
+    const clientId = client.id;
+    this.terminalService.dispose(clientId);
+    this.cwdMap.delete(clientId);
+    const interval = this.systemIntervalMap.get(clientId);
+    if (interval) {
+      clearInterval(interval);
+    }
+    //clearInterval(this.systemIntervalMap.get(clientId));
+    this.systemIntervalMap.delete(clientId);
+    this.logger.log(`Client disconnected: ${clientId}`);
   }
 }

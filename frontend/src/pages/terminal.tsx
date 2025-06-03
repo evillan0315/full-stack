@@ -81,9 +81,12 @@ export default function Terminal() {
 
   onMount(() => {
     //scrollToBottom();
-
+    const token = localStorage.getItem('token');
     const s = io(`${import.meta.env.BASE_URL}/terminal`, {
-      transports: ['websocket'],
+      //transports: ['websocket'],
+      auth: {
+        token: `Bearer ${token}`,
+      },
       withCredentials: true,
     });
 

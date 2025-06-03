@@ -34,6 +34,13 @@ export class RegisterDto {
   role?: Role;
 }
 export class CreateJwtUserDto {
+  @ApiProperty({
+    description: 'JQT User identifier',
+    example: '21jdh-jsdhd-jasjasd',
+  })
+  @IsString()
+  id?: string;
+
   @ApiProperty({ example: '21jdh-jsdhd-jasjasd' })
   @IsString()
   sub: string;
@@ -44,7 +51,7 @@ export class CreateJwtUserDto {
 
   @ApiProperty({ example: 'John Doe', required: false })
   @IsOptional()
-  name: string;
+  name?: string;
 
   @ApiProperty({ example: '+1234567890', required: false })
   @IsOptional()
@@ -54,6 +61,10 @@ export class CreateJwtUserDto {
   @IsOptional()
   @IsEnum(Role)
   role: Role;
+
+  @ApiProperty({ example: 'john.jpg', required: false })
+  @IsOptional()
+  image?: string;
 }
 export class LoginDto {
   @ApiProperty({ example: 'user@example.com' })
