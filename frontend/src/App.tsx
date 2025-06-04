@@ -13,6 +13,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import Toaster from './components/Toaster';
 
+import Package from './pages/tools/package';
 import Login from './pages/login';
 import Editor from './pages/editor';
 import TTSForm from './pages/tts';
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/" component={Home} />
           <Route path="/login" component={Login} />
 
+          <Route path="/tools/package" component={Package} />
           {/* Protected Routes */}
           <Route
             path="/dashboard"

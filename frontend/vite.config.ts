@@ -6,7 +6,7 @@ import solidPlugin from 'vite-plugin-solid';
 import tailwindcss from '@tailwindcss/vite';
 
 // Load environment variables
-dotenv.config({ path: './.env.local' }); // or '../.env'
+dotenv.config({ path: '../.env' }); // or '../.env'
 export default defineConfig(() => {
   return {
     plugins: [tailwindcss(), solidPlugin()],
@@ -18,7 +18,7 @@ export default defineConfig(() => {
         formats: ['es'],
         fileName: () => 'index.js',
       },
-      outDir: 'public/assets',
+      //outDir: 'public/assets',
       target: 'esnext',
       assetsInlineLimit: 0,
       emptyOutDir: true,

@@ -29,7 +29,6 @@ import { Type } from 'class-transformer';
   folderId: string;
 }*/
 
-
 export class CreateFileDto {
   @ApiProperty({ description: 'Path to file or directory' })
   filePath: string;

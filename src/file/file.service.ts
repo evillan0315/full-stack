@@ -238,12 +238,14 @@ export class FileService {
       throw new InternalServerErrorException('Unexpected proxy error');
     }
   }
-  
-   // ───────────────────────────────────────────────────────────
+
+  // ───────────────────────────────────────────────────────────
   // CREATE FILE OR FOLDER
   // ───────────────────────────────────────────────────────────
 
-  async createLocalFileOrFolder(dto: CreateFileDto): Promise<{ success: boolean; message: string }> {
+  async createLocalFileOrFolder(
+    dto: CreateFileDto,
+  ): Promise<{ success: boolean; message: string }> {
     const { filePath, isDirectory, content = '' } = dto;
     const resolvedPath = path.resolve(filePath);
 
@@ -258,7 +260,9 @@ export class FileService {
         return { success: true, message: `File created at ${resolvedPath}` };
       }
     } catch (error) {
-      throw new InternalServerErrorException(`Failed to create: ${error.message}`);
+      throw new InternalServerErrorException(
+        `Failed to create: ${error.message}`,
+      );
     }
   }
 }

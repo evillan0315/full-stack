@@ -7,9 +7,10 @@ import { Icon } from '@iconify-icon/solid';
 import { useAuth } from '../contexts/AuthContext';
 import EditorComponent from '../components/EditorComponent';
 import FileManager from '../components/FileManager';
+import FileManagerContainer from '../components/FileManagerContainer';
 import GridResizer from '../components/GridResizer';
 import TerminalDrawer from '../components/TerminalDrawer';
-
+import FileTabs from '../components/FileTabs';
 import api from '../services/api';
 
 /**
@@ -28,6 +29,9 @@ export default function Editor() {
 
   const [fileManagerWidth, setFileManagerWidth] = createSignal(400);
   const [containerWidth, setContainerWidth] = createSignal(0);
+
+  const [openTabs, setOpenTabs] = createSignal<string[]>([]);
+  const [activeTab, setActiveTab] = createSignal<string>('');
 
   const [left, setLeft] = createSignal(0.225);
   const isHorizontal = () => false;
@@ -75,7 +79,7 @@ export default function Editor() {
    * Loads file content from the backend for a given path.
    * @param path - Path to the file being loaded
    */
-  const loadFile = async (path: string) => {
+  /*const loadFile = async (path: string) => {
     try {
       setIsLoading(true);
       const formData = new FormData();
@@ -93,10 +97,34 @@ export default function Editor() {
     } finally {
       setIsLoading(false);
     }
+  };*/
+  const loadFile = async (path: string) => {
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append('filePath', path);
+
+      const response = await api.post('/file/read', formData);
+      if (!response.data) throw new Error('Failed to load file');
+
+      const { data } = response.data;
+
+      setFilePath(path);
+      setFileContent(data.data);
+
+      // Add to tabs if not already open
+      setOpenTabs((tabs) => (tabs.includes(path) ? tabs : [...tabs, path]));
+      setActiveTab(path);
+    } catch (err) {
+      console.error(`Error loading file "${path}":`, err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   onMount(() => {
-    loadFile(filePath());
+    //loadFile(filePath());
     updateWidths();
     if (!isAuthenticated()) {
       navigate('/login', { replace: true });
@@ -116,28 +144,36 @@ export default function Editor() {
         'dark': true,
       }}
     >
-      {/* File Manager Panel */}
-      <div class="flex min-h-0 min-w-0 flex-col overflow-auto relative mt-10" style={`flex: ${left()}`}>
-        <div class="fixed top-12 left-0 right-0 z-60 w-full border-b border-gray-800/50 dark:bg-gray-800/10">
-          <div class="flex justify-between align-center">
-            <div>
-              <button class="flex cursor-alias items-center gap-2 px-2 py-1 text-left  dark:hover:text-yellow-500 text-sm uppercase tracking-widest">
-                <Icon icon="mdi:file" width="22" height="22" /> File Explorer
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="pb-4 ">
-          <FileManager onFileSelect={loadFile} />
-        </div>
-      </div>
+      <FileManagerContainer left={left} FileManager={FileManager} loadFile={loadFile} />
 
       {/* Grid Resizer */}
       <GridResizer ref={resizer} isHorizontal={isHorizontal()} onResize={changeLeft} />
 
       {/* Code Editor Panel */}
-      <div class="flex min-h-0 min-w-0 flex-col overflow-auto pt-9" style={`flex: ${1 - left()}`}>
-        <EditorComponent param="filePath" filePath={filePath()}  />
+
+      <div class="flex min-h-0 min-w-0 flex-col overflow-auto" style={`flex: ${1 - left()}`}>
+        <FileTabs
+          openTabs={openTabs()}
+          activeTab={activeTab()}
+          onTabClick={(path) => {
+            setActiveTab(path);
+            loadFile(path);
+          }}
+          onTabClose={(closedPath) => {
+            setOpenTabs((tabs) => tabs.filter((t) => t !== closedPath));
+            if (closedPath === activeTab()) {
+              const remaining = openTabs().filter((t) => t !== closedPath);
+              if (remaining.length > 0) {
+                loadFile(remaining[remaining.length - 1]);
+              } else {
+                setActiveTab('');
+                setFilePath('');
+                setFileContent('');
+              }
+            }
+          }}
+        />
+        <EditorComponent param="filePath" filePath={activeTab()} />
       </div>
 
       {/* Integrated Terminal Drawer */}

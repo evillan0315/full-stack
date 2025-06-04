@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { spawn } from 'child_process';
 import * as pty from 'node-pty';
 import * as os from 'os';
+import { Client, ConnectConfig } from 'ssh2';
+import { readFileSync } from 'fs';
 
 interface TerminalSession {
   ptyProcess: pty.IPty;
@@ -91,6 +93,66 @@ export class TerminalService {
       shell.on('error', (err) => {
         reject(err);
       });
+    });
+  }
+
+  async runSshCommandOnce(options: {
+    host: string;
+    port?: number;
+    username: string;
+    password?: string;
+    privateKeyPath?: string;
+    command: string;
+  }): Promise<string> {
+    const {
+      host,
+      port = 22,
+      username,
+      password,
+      privateKeyPath,
+      command,
+    } = options;
+
+    const config: ConnectConfig = {
+      host,
+      port,
+      username,
+    };
+
+    if (privateKeyPath) {
+      config.privateKey = readFileSync(privateKeyPath);
+    } else if (password) {
+      config.password = password;
+    } else {
+      throw new Error('SSH requires either a password or private key path');
+    }
+
+    return new Promise((resolve, reject) => {
+      const conn = new Client();
+      let result = '';
+
+      conn
+        .on('ready', () => {
+          conn.exec(command, (err, stream) => {
+            if (err) return reject(err);
+
+            stream
+              .on('close', () => {
+                conn.end();
+                resolve(result.trim());
+              })
+              .on('data', (data: Buffer) => {
+                result += data.toString();
+              })
+              .stderr.on('data', (data: Buffer) => {
+                result += data.toString(); // You can separate stderr if needed
+              });
+          });
+        })
+        .on('error', (err) => {
+          reject(err);
+        })
+        .connect(config);
     });
   }
 }

@@ -153,7 +153,6 @@ const EditorComponent = (props: EditorComponentProps) => {
 
   return (
     <div class="bg-gray-950 h-screen flex flex-col overflow-auto relative">
-      {error() && <p class="text-red-600 p-4">{error()}</p>}
       {/* Optionally re-enable this */}
       {/* loading() && (
         <div class="h-[calc(100vh-8rem)]">

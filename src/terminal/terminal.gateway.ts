@@ -14,6 +14,8 @@ import * as process from 'process';
 import { resolve } from 'path';
 import { existsSync, statSync } from 'fs';
 import { exec } from 'child_process';
+import { Client as SSHClient, ConnectConfig } from 'ssh2';
+
 import { TerminalService } from './terminal.service';
 import { AuthService } from '../auth/auth.service';
 import { JwtAuthGuard } from '../auth/auth.guard';
@@ -37,7 +39,16 @@ export class TerminalGateway
   server: Server;
   private systemIntervalMap = new Map<string, NodeJS.Timeout>();
   private cwdMap = new Map<string, string>();
-
+  private sshClientMap = new Map<string, SSHClient>();
+  private sshStreamMap = new Map<string, any>();
+  private disposeSsh(clientId: string) {
+    const sshClient = this.sshClientMap.get(clientId);
+    if (sshClient) {
+      sshClient.end();
+      this.sshClientMap.delete(clientId);
+    }
+    this.sshStreamMap.delete(clientId);
+  }
   constructor(
     private readonly authService: AuthService,
     private readonly terminalService: TerminalService,
@@ -121,6 +132,15 @@ Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
     @ConnectedSocket() client: Socket,
   ) {
     const clientId = client.id;
+
+    if (this.sshStreamMap.has(clientId)) {
+      // SSH mode
+      const stream = this.sshStreamMap.get(clientId);
+      stream.write(`${command}\n`);
+      return;
+    }
+
+    // Local shell fallback
     let cwd = this.cwdMap.get(clientId) || process.cwd();
 
     const trimmed = command.trim();
@@ -159,13 +179,73 @@ Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
     client.emit('prompt', { cwd, command });
     this.terminalService.runCommand(clientId, command, cwd, client);
   }
+  @SubscribeMessage('ssh-connect')
+  async handleSshConnect(
+    @MessageBody()
+    payload: {
+      host: string;
+      port?: number;
+      username: string;
+      password?: string;
+      privateKey?: string;
+    },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const sshClient = new SSHClient();
+    const clientId = client.id;
 
+    const config: ConnectConfig = {
+      host: payload.host,
+      port: payload.port || 22,
+      username: payload.username,
+      ...(payload.password ? { password: payload.password } : {}),
+      ...(payload.privateKey ? { privateKey: payload.privateKey } : {}),
+    };
+
+    sshClient
+      .on('ready', () => {
+        this.logger.log(`SSH connected for client ${clientId}`);
+        client.emit('output', `Connected to ${payload.host}\n`);
+
+        sshClient.shell((err, stream) => {
+          if (err) {
+            client.emit('error', `Shell error: ${err.message}`);
+            return;
+          }
+
+          this.sshStreamMap.set(clientId, stream);
+
+          stream
+            .on('data', (data: Buffer) => {
+              client.emit('output', data.toString());
+            })
+            .on('close', () => {
+              client.emit('output', 'SSH session closed\n');
+              this.disposeSsh(clientId);
+            });
+        });
+      })
+      .on('error', (err) => {
+        client.emit('error', `SSH error: ${err.message}`);
+      })
+      .connect(config);
+
+    this.sshClientMap.set(clientId, sshClient);
+  }
   @SubscribeMessage('input')
   handleInput(
     @MessageBody() data: { input: string },
     @ConnectedSocket() client: Socket,
   ) {
-    this.terminalService.write(client.id, data.input);
+    const clientId = client.id;
+
+    if (this.sshStreamMap.has(clientId)) {
+      const stream = this.sshStreamMap.get(clientId);
+      stream.write(data.input);
+      return;
+    }
+
+    this.terminalService.write(clientId, data.input);
   }
 
   @SubscribeMessage('resize')
@@ -183,14 +263,17 @@ Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
 
   handleDisconnect(client: Socket) {
     const clientId = client.id;
+
     this.terminalService.dispose(clientId);
     this.cwdMap.delete(clientId);
+
     const interval = this.systemIntervalMap.get(clientId);
     if (interval) {
       clearInterval(interval);
+      this.systemIntervalMap.delete(clientId);
     }
-    //clearInterval(this.systemIntervalMap.get(clientId));
-    this.systemIntervalMap.delete(clientId);
+
+    this.disposeSsh(clientId);
     this.logger.log(`Client disconnected: ${clientId}`);
   }
 }

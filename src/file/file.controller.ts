@@ -224,13 +224,22 @@ export class FileController {
     await this.fileService.proxyImage(url, res);
   }
 
+@Post('delete')
+delete(@Body() body: { path: string }) {
+  return this.fileService.delete(body.path);
+}
+
+@Post('open')
+open(@Body() body: { path: string }) {
+  return this.fileService.read(body.path);
+}
   // ───────────────────────────────────────────────────────────
   // CREATE
   // ───────────────────────────────────────────────────────────
 
-  @Post()
+  @Post('create')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Create a new File' })
+  @ApiOperation({ summary: 'Create a new file or folder' })
   @ApiCreatedResponse({
     description: 'Successfully created.',
     type: CreateFileDto,
@@ -238,27 +247,13 @@ export class FileController {
   @ApiBadRequestResponse({ description: 'Validation failed.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
-   // ───────────────────────────────────────────────────────────
+  // ───────────────────────────────────────────────────────────
   // CREATE FILE OR FOLDER
   // ───────────────────────────────────────────────────────────
-
-  async create(dto: CreateFileDto): Promise<{ success: boolean; message: string }> {
-    const { filePath, isDirectory, content = '' } = dto;
-    const resolvedPath = path.resolve(filePath);
-
-    try {
-      if (isDirectory) {
-        await fs.mkdir(resolvedPath, { recursive: true });
-        return { success: true, message: `Folder created at ${resolvedPath}` };
-      } else {
-        const dir = path.dirname(resolvedPath);
-        await fs.mkdir(dir, { recursive: true });
-        await fs.writeFile(resolvedPath, content, 'utf-8');
-        return { success: true, message: `File created at ${resolvedPath}` };
-      }
-    } catch (error) {
-      throw new InternalServerErrorException(`Failed to create: ${error.message}`);
-    }
+  async create(
+    dto: CreateFileDto,
+  ): Promise<{ success: boolean; message: string }> {
+    return this.fileService.createLocalFileOrFolder(dto);
   }
 
   // ───────────────────────────────────────────────────────────

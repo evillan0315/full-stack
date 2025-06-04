@@ -2,7 +2,7 @@ import { createSignal, onCleanup, onMount } from 'solid-js';
 import { Terminal } from 'xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { io, Socket } from 'socket.io-client';
-//import 'xterm/css/xterm.css';
+import 'xterm/css/xterm.css';
 
 interface TerminalShellProps {
   fontSize?: number;

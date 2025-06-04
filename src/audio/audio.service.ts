@@ -52,7 +52,6 @@ export class AudioService {
           onProgress(percent);
         }
 
-
         const destMatch = text.match(/\[ExtractAudio\] Destination: (.+)/);
         if (destMatch) {
           filePath = destMatch[1].trim();
@@ -87,5 +86,3 @@ export class AudioService {
     });
   }
 }
-
-
