@@ -13,7 +13,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
-export class CreateFileDto {
+/*export class CreateFileDto {
   @ApiProperty({ description: 'name field' })
   @IsString()
   name: string;
@@ -27,8 +27,25 @@ export class CreateFileDto {
   @IsOptional()
   @IsString()
   folderId: string;
-}
+}*/
 
+
+export class CreateFileDto {
+  @ApiProperty({ description: 'Path to file or directory' })
+  filePath: string;
+
+  @ApiProperty({
+    description: 'Whether this is a directory',
+    default: false,
+  })
+  isDirectory: boolean;
+
+  @ApiProperty({
+    description: 'Optional content for the file (ignored if directory)',
+    required: false,
+  })
+  content?: string;
+}
 export class PaginationFileResultDto {
   @ApiProperty({ type: [CreateFileDto] })
   items: CreateFileDto[];

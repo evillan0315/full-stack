@@ -1,24 +1,47 @@
 import { defineConfig } from 'vite';
-import solid from 'vite-plugin-solid';
+
 import path from 'path';
 import dotenv from 'dotenv';
+import solidPlugin from 'vite-plugin-solid';
+import tailwindcss from '@tailwindcss/vite';
 
 // Load environment variables
-dotenv.config({ path: '../.env' }); // or '../.env'
+dotenv.config({ path: './.env.local' }); // or '../.env'
 export default defineConfig(() => {
   return {
-    plugins: [solid()],
+    plugins: [tailwindcss(), solidPlugin()],
+    publicDir: false,
     build: {
       lib: {
         entry: path.resolve(__dirname, 'src/index.tsx'),
-        name: 'Terminal',
+        name: 'VS Code Layout',
         formats: ['es'],
         fileName: () => 'index.js',
       },
-      outDir: '../public/assets',
+      outDir: 'public/assets',
       target: 'esnext',
       assetsInlineLimit: 0,
       emptyOutDir: true,
+      /*rollupOptions: {
+        output: {
+          // Change assets directory name to "styles" for CSS
+          assetFileNames: (chunkInfo) => {
+            return 'assets/[name][extname]';
+          },
+        },
+      },*/
+    },
+    worker: {
+      rollupOptions: {
+        output: {
+          entryFileNames: `assets/[name].js`,
+        },
+      },
+    },
+    resolve: {
+      alias: {
+        '~': path.resolve(__dirname, 'src'),
+      },
     },
     server: {
       proxy: {
@@ -34,6 +57,7 @@ export default defineConfig(() => {
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
       },
+      port: 3000
     },
     define: {
       'import.meta.env.BASE_URL': JSON.stringify(process.env.BASE_URL),

@@ -1,19 +1,28 @@
+// src/services/api.ts
 import axios from 'axios';
-import { API } from '../context';
 
+const API_URL = `${import.meta.env.BASE_URL}/api`;
+let getToken: () => string | null = () => localStorage.getItem('token');
+
+export function configureTokenGetter(fn: () => string | null) {
+  getToken = fn;
+}
 // Create axios instance
 const api = axios.create({
-  baseURL: API || 'http://localhost:5000/api',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  // Include credentials (cookies) with every request
-  withCredentials: true,
 });
 
-// Add request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    } else {
+      delete config.headers['Authorization'];
+    }
     return config;
   },
   (error) => Promise.reject(error),

@@ -17,6 +17,7 @@ async function bootstrap() {
   const allowedOrigins = [
     'https://board-api.duckdns.org',
     'http://localhost:5000',
+    'http://localhost:3000',
     'http://localhost:5173',
   ];
   const downloadDir = path.resolve(process.cwd(), 'downloads');

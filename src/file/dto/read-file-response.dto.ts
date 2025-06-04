@@ -17,4 +17,9 @@ export class ReadFileResponseDto {
 
   @ApiProperty({ description: 'File content or data URL (base64-encoded)' })
   data: string;
+  
+  @ApiProperty({
+    description: 'Raw text content or base64 blob URL (based on request)',
+  })
+  content?: string;
 }

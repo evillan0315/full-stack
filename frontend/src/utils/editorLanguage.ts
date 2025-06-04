@@ -7,7 +7,7 @@ import { xml } from '@codemirror/lang-xml';
 import { json } from '@codemirror/lang-json';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
-import { Extension } from '@codemirror/state';
+import { type Extension } from '@codemirror/state';
 //import { handlebarsLanguage } from "@xiechao/codemirror-lang-handlebars";
 
 export function detectLanguage(filePath: string): Extension {

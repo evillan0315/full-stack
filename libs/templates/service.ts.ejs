@@ -267,6 +267,50 @@ export class <%= className %>Service {
       throw new InternalServerErrorException('Unexpected proxy error');
     }
   }
+   // ───────────────────────────────────────────────────────────
+  // CREATE FILE OR FOLDER
+  // ───────────────────────────────────────────────────────────
+
+  async create(dto: CreateLocalFileDto): Promise<{ success: boolean; message: string }> {
+    const { filePath, isDirectory, content = '' } = dto;
+    const resolvedPath = path.resolve(filePath);
+
+    try {
+      if (isDirectory) {
+        await fs.mkdir(resolvedPath, { recursive: true });
+        return { success: true, message: `Folder created at ${resolvedPath}` };
+      } else {
+        const dir = path.dirname(resolvedPath);
+        await fs.mkdir(dir, { recursive: true });
+        await fs.writeFile(resolvedPath, content, 'utf-8');
+        return { success: true, message: `File created at ${resolvedPath}` };
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(`Failed to create: ${error.message}`);
+    }
+  }
+  // ───────────────────────────────────────────────────────────
+  // UPDATE A FILE
+  // ───────────────────────────────────────────────────────────
+  async update(id: string, dto: UpdateLocalFileDto): Promise<{ success: boolean; message: string }> {
+    try {
+      await fs.writeFile(id, dto.content, 'utf-8');
+      return { success: true, message: 'File updated successfully' };
+    } catch (error) {
+      throw new NotFoundException(`Failed to update file: ${error.message}`);
+    }
+  }
+  // ───────────────────────────────────────────────────────────
+  // DELETE A FILE
+  // ───────────────────────────────────────────────────────────
+  async remove(path: string): Promise<{ success: boolean; message: string }> {
+    try {
+      await fs.rm(path, { recursive: true, force: true });
+      return { success: true, message: 'File or folder deleted' };
+    } catch (error) {
+      throw new NotFoundException(`Failed to delete file or folder: ${error.message}`);
+    }
+  }
 <% } %>
 <% if (className === 'User') { %>
   async createUser(email: string, name: string, phone?: string, hash?: string) {

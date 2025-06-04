@@ -1,148 +1,292 @@
-## 📁 Project Name: Bash AI
+# Project Board
 
-### 🧠 Description
-
-**Smart Terminal AI** is an intelligent, web-based terminal interface powered by NestJS and SolidJS, integrated with state-of-the-art AI models like **ChatGPT** and **Google Gemini**. This smart terminal allows users to interact with system commands, code snippets, and AI assistance in real-time—blending traditional shell-like functionality with natural language processing capabilities.
-
-Ideal for developers, tech educators, and productivity enthusiasts, this platform streamlines command execution, automates troubleshooting, and acts as your AI-powered development assistant.
+A developer-focused layout system interface, implemented using TypeScript, Vite, and modern frontend technologies (React and SolidJS). The structure is highly modular and theme-aware, suitable for building extensible applications with sidebar navigation, a collapsible layout, and content-based routing.
 
 ---
 
-## 🚀 Features
+## 📸 Screenshots
 
-### 💻 Terminal Interface
-
-- Interactive smart terminal in the browser (built with **SolidJS**)
-- Supports basic shell commands (via backend)
-- Context-aware command suggestions
-- Autocomplete and history tracking
-
-### 🤖 AI Assistant Integration
-
-- Use **ChatGPT** for natural language prompts, debugging help, and code generation
-- Tap into **Google Gemini** for advanced reasoning, document analysis, and multi-modal interactions
-- AI-powered command completion and shell explanation
-- Multi-language support for development and DevOps
-
-### 🔐 Authentication
-
-- OAuth2 with AWS Cognito (Google login support)
-- Role-based access control (RBAC)
-
-### 📡 Realtime Communication
-
-- WebSocket-powered live command streaming
-- Live terminal feedback and AI interactions
-
-### 🗃️ Backend Services
-
-- NestJS REST & WebSocket APIs
-- Secure command execution environment
-- Custom command & script management
-- AI prompt pipelines with retry and memory
-
-### 📄 Documentation
-
-- Swagger API documentation with full CRUD operations for commands and sessions
-- CLI tools for developer automation
+| Login Page | Homepage | Dashboard |
+|------------|----------|-----------|
+| ![Login](./project-board-login.png) | ![Homepage](./homepage-project-board.png) | ![Dashboard](./dashboard-screen.png) |
 
 ---
 
-## 📦 Tech Stack
+## 📁 Project Structure
 
-| Layer       | Technology                            |
-| ----------- | ------------------------------------- |
-| Frontend    | SolidJS, TailwindCSS, TypeScript      |
-| Backend     | NestJS, WebSocket, Prisma, TypeScript |
-| AI Services | OpenAI (ChatGPT), Google Gemini       |
-| Auth        | AWS Cognito + OAuth2 (Google)         |
-| Realtime    | WebSocket (NestJS Gateway)            |
-| Database    | PostgreSQL or DynamoDB (configurable) |
-| Deployment  | Docker, AWS EC2 / Lambda              |
+```
 
----
+project-board/
+│
+├── .gitignore
+├── README.md
+├── index.html
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── prettier.config.cjs
+│
+├── dist/                          # Compiled output files
+│   ├── *...slug*-Dt0TiDlw\.js
+│   ├── index-G72cJpw\_.js
+│   ├── index.js
+│   └── vscode-layout.css
+│
+├── libs/                          # Utility scripts
+│   ├── generateStructure.ts
+│   └── generateStructureRunner.ts
+│
+├── src/                           # Application source
+│   ├── App.tsx
+│   ├── app.css
+│   │
+│   ├── components/                # Reusable UI components
+│   │   ├── Editor.tsx
+│   │   ├── FeatureCard.tsx
+│   │   ├── Hero.tsx
+│   │   ├── Loading.tsx
+│   │   ├── LoginForm.tsx
+│   │   ├── Logo.tsx
+│   │   ├── MetricCard.tsx
+│   │   ├── SignInWithGithub.tsx
+│   │   ├── SignInWithGoogle.tsx
+│   │   ├── ThemeToggle.tsx
+│   │   ├── docs/
+│   │   │   └── DocPageList.tsx
+│   │   ├── layouts/               # Layout structure and navigation
+│   │   │   ├── Footer.tsx
+│   │   │   ├── Header.tsx
+│   │   │   ├── Layout.tsx
+│   │   │   ├── LeftSidebar.tsx
+│   │   │   ├── MobileNav.tsx
+│   │   │   ├── Nav.tsx
+│   │   │   ├── RightSidebar.tsx
+│   │   │   ├── types.ts
+│   │   │   └── content/
+│   │   │       ├── Content.tsx
+│   │   │       ├── ContentHeader.tsx
+│   │   │       └── ContentLayout.tsx
+│   │   ├── pages/                 # Application pages
+│   │   │   ├── DynamicPage.tsx
+│   │   │   ├── Page.tsx
+│   │   │   ├── PageHeader.tsx
+│   │   │   └── PageSection.tsx
+│   │   └── routes/
+│   │       └── ProtectedRoute.tsx
+│   │
+│   ├── configs/                   # Configuration files (empty)
+│   ├── contexts/                 # React context providers
+│   │   ├── AuthContext.tsx
+│   │   └── ThemeProvider.tsx
+│   └── data/                     # Static data files
+│       ├── app.ts
+│       └── menus.ts
 
-## 📁 Folder Structure
-
-```bash
-smart-terminal-ai/
-├── apps/
-│   ├── frontend/           # SolidJS terminal UI
-│   └── backend/            # NestJS API + WebSocket
-├── packages/
-│   ├── ai-sdk/             # Unified AI interface for OpenAI/Gemini
-│   └── shared/             # Shared types & utilities
-├── docker/
-│   └── nginx/              # Optional reverse proxy setup
-├── prisma/                 # Prisma schema
-├── .env                    # Environment variables
-└── README.md
 ```
 
 ---
 
-## ⚙️ Getting Started
+## 🔧 Key Features
+
+- **Visual Studio Code-like Layout**  
+  Modular and flexible UI with collapsible sidebars, header, footer, and a content area.
+
+- **Multi-framework Support**  
+  React and SolidJS layout components supported side-by-side.
+
+- **Context Management**  
+  Theme and authentication context built-in.
+
+- **Theme Toggle**  
+  Dark/light mode supported using context and store.
+
+- **Dynamic Pages**  
+  Content and route-driven UI, with support for `[slug]` and `[...slug]` pages.
+
+- **Authentication Docs**  
+  Detailed markdown documentation for integrating OAuth (Google, GitHub).
+
+- **File Structure Generator**  
+  CLI-based utility (`generateStructure.ts`) to traverse and serialize the directory tree as JSON.
+
+---
+
+## 🚀 Scripts
+
+Use `ts-node` to run the structure generator:
 
 ```bash
-# Clone the repo
-git clone https://github.com/yourusername/smart-terminal-ai.git
-cd smart-terminal-ai
+npx ts-node generateStructureRunner.ts .
+```
 
-# Install dependencies
-pnpm install
+This will create a `structure.json` file representing the current file layout.
 
-# Setup environment
-cp .env.example .env
+---
 
-# Run backend
-pnpm --filter backend dev
+## 📄 Authentication Documentation
 
-# Run frontend
-pnpm --filter frontend dev
+Located under `src/docs/authentication/`:
+
+* `google-auth-Integration.md`
+* `github-auth-integration.md`
+
+---
+
+## 📦 Tooling & Stack
+
+* **Language:** TypeScript
+* **Bundler:** Vite
+* **Frameworks:** React, SolidJS (experimental)
+* **Package Manager:** pnpm
+* **UI:** Tailwind CSS
+* **Context Store:** React Context API + custom stores
+
+---
+
+## 🧠 Developer Workspace – Editor & Text-to-Speech Suite
+
+Welcome to the **Developer Workspace**, a robust, web-based IDE and communication toolkit built with **SolidJS**, **Tailwind CSS**, and **Node/NestJS** backend services. This suite combines a powerful file editor and terminal interface with an interactive **Text-to-Speech (TTS)** engine to help you code, test, and communicate faster.
+
+---
+
+## 🚀 Features Overview
+
+### 🖥️ Editor Interface
+
+An intuitive, browser-based coding workspace that emulates the experience of Visual Studio Code:
+
+- 📁 **File Manager** – Browse and select project files in a collapsible sidebar
+- ✍️ **Monaco Editor Integration** – Syntax highlighting, autocomplete, and rich editing support
+- 📐 **Resizable Layouts** – Dynamically adjust editor and sidebar dimensions
+- 💻 **Terminal Drawer** – Embedded `xterm` terminal for running shell commands
+- 📦 **Server Integration** – File read/write operations via REST endpoints
+
+### 🔊 Text-to-Speech (TTS)
+
+An interactive TTS form that converts written prompts into downloadable audio:
+
+- 📝 **Prompt Input** – Enter any message to synthesize speech
+- 🌍 **Language Selector** – Choose from 20+ languages and dialects
+- 🧑‍🎤 **Speaker Configuration** – Assign voice profiles to multiple speakers
+- 🎧 **Playback & Download** – Preview audio in-browser or save locally
+- 🌐 **API-Driven** – Backed by a RESTful `/google-tts/generate` service
+
+---
+
+## 🧑‍💻 Tech Stack
+
+### Frontend
+
+- [SolidJS](https://solidjs.com/) – Reactive UI framework
+- [Tailwind CSS](https://tailwindcss.com/) – Utility-first CSS framework
+- [xterm.js](https://xtermjs.org/) – Terminal emulation
+- [Monaco Editor](https://microsoft.github.io/monaco-editor/) – Code editing
+
+### Backend
+
+- [NestJS](https://nestjs.com/) – Scalable Node.js server framework
+- [Google Cloud Text-to-Speech API](https://cloud.google.com/text-to-speech)
+- RESTful API for file and speech handling
+
+---
+
+
+## 📡 Backend Setup
+
+Ensure the following endpoints are functional:
+
+* `POST /file/read` – Reads file content for editor
+* `POST /google-tts/generate` – Processes TTS requests
+
+These endpoints are typically provided by a NestJS backend (setup instructions should be included in that repo).
+
+---
+
+## 🧪 Usage
+
+### Editor
+
+```tsx
+import Editor from './pages/editor';
+
+function App() {
+  return <Editor />;
+}
+```
+
+### Text-to-Speech
+
+```tsx
+import TTSForm from './components/TTSForm';
+
+function App() {
+  return <TTSForm />;
+}
 ```
 
 ---
 
-## 🔐 Authentication Setup
+## 📜 Example TTS Request
 
-Configure AWS Cognito:
+```json
+POST /google-tts/generate
 
-1. Create a Cognito User Pool + Google Identity Provider.
-2. Update `.env` with Cognito and Google client credentials.
-3. Use provided `/auth` endpoints to login via Google.
+{
+  "prompt": "Hello world!",
+  "languageCode": "en-US",
+  "speakers": [
+    { "speaker": "Eddie", "voiceName": "Kore" },
+    { "speaker": "Marionette", "voiceName": "Puck" }
+  ]
+}
+```
 
----
-
-## ✨ AI Integration Setup
-
-- **ChatGPT (OpenAI)**: Add your `OPENAI_API_KEY` to `.env`
-- **Google Gemini**: Add your `GOOGLE_API_KEY`
-
-You can switch between AI models using config or user preferences.
-
----
-
-## 🛠️ Future Roadmap
-
-- 🧩 Plugin system for custom commands/scripts
-- 📜 AI memory & session-based context
-- 🧠 Auto-correct and AI explanations for command errors
-- 🧪 Unit + E2E tests for all modules
-- 🔌 CLI companion for local terminal usage
+On success, it returns a `200 OK` with an `audio/wav` binary file.
 
 ---
 
-## 🧑‍💻 Author
+## 🛠️ Roadmap
 
-**Eddie Villanueva**  
-[GitHub](https://github.com/evillan0315) | [LinkedIn](https://www.linkedin.com/in/evillanueva0315) | [Email](mailto:evillan0315@gmail.com)
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License.
+* [ ] Toggleable terminal drawer
+* [ ] TTS streaming with WebSockets
+* [ ] Syntax-aware code analysis in editor
+* [ ] TTS voice tone previews
+* [ ] Theme and accessibility enhancements
 
 ---
 
-Would you like me to generate the repo structure and starter files as well, sugar?
+## 🤝 Contributing
+
+We welcome contributions! Please open an issue or submit a PR with improvements or new features.
+
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feat/new-feature`)
+3. Commit your changes (`git commit -am 'feat: add new feature'`)
+4. Push to the branch (`git push origin feat/new-feature`)
+5. Open a pull request
+
+---
+
+## 📄 License
+
+MIT License © \[Eddie Villanueva]
+
+---
+
+## 📫 Contact
+
+For questions, suggestions, or support, please open an issue or email [evillan0315@gmail.com](mailto:evillan0315@gmail.com)
+
+
+
+## 🛠️ Planned Enhancements
+
+* Populate `configs/` with environment and runtime configs
+* Expand `stores/` and `utils/` for shared logic
+* Support SSR or static builds for docs
+* Extend authentication system
+
+
+
+
+
