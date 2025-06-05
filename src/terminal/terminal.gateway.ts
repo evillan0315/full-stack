@@ -55,9 +55,8 @@ export class TerminalGateway
   ) {}
 
   async handleConnection(client: Socket) {
-    console.log(client.handshake.auth?.token, 'Bearer Token');
     const token = client.handshake.auth?.token?.replace('Bearer ', '').trim();
-    console.log(token, 'Trimmed Token');
+
     if (!token) {
       client.emit('error', 'Unauthorized: Missing or malformed token');
       client.disconnect();

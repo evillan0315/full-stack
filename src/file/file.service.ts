@@ -5,7 +5,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
   Logger,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -31,10 +31,6 @@ import { Request, Response } from 'express';
 // Import UtilsService
 import { UtilsService } from '../utils/utils.service'; // Adjust path as necessary
 
-// Removed redundant language maps and detectLanguage function
-// const EXTENSION_LANGUAGE_MAP: Record<string, string> = {...};
-// const MIME_LANGUAGE_MAP: Record<string, string> = {...};
-// function detectLanguage(...) {...}
 
 @Injectable()
 export class FileService {
@@ -267,7 +263,7 @@ export class FileService {
       );
     }
   }
-  
+
   async getFileContent(filePath: string): Promise<string> {
     const absolutePath = path.resolve(filePath); // Ensure absolute path for security and consistency
 
@@ -285,10 +281,12 @@ export class FileService {
       if (error.code === 'ENOENT') {
         throw new NotFoundException(`File not found at path: ${filePath}`);
       }
-      throw new Error(`Error reading file content for '${filePath}': ${error.message}`);
+      throw new Error(
+        `Error reading file content for '${filePath}': ${error.message}`,
+      );
     }
   }
-  
+
   /**
    * Returns a readable stream for the specified file path.
    * Throws an error if the path does not exist or is not a file.
@@ -300,7 +298,9 @@ export class FileService {
       // Use fs.stat from 'fs/promises' to check if the path exists and is a file
       const stats = await fs.stat(absolutePath);
       if (!stats.isFile()) {
-        throw new BadRequestException(`Path '${filePath}' is not a file or does not exist.`);
+        throw new BadRequestException(
+          `Path '${filePath}' is not a file or does not exist.`,
+        );
       }
 
       // Use fsExtra.createReadStream() as fs-extra re-exports Node.js's fs methods
@@ -311,7 +311,9 @@ export class FileService {
         throw new NotFoundException(`File not found at path: ${filePath}`);
       }
       // Re-throw other errors to be handled by the controller
-      throw new Error(`Error preparing file for download '${filePath}': ${error.message}`);
+      throw new Error(
+        `Error preparing file for download '${filePath}': ${error.message}`,
+      );
     }
   }
   /**

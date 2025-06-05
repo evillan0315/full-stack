@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ConfigModule } from '@nestjs/config';
-import { join } from 'path'; 
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -18,7 +18,6 @@ import { GoogleOAuthService } from './google/google-oauth/google-oauth.service';
 import { SchemaModule } from './schema/schema.module';
 import { LogModule } from './log/log.module';
 import { AudioModule } from './audio/audio.module';
-
 
 import fileConfig from './config/file.config';
 

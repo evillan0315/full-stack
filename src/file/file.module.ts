@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { FileService } from './file.service';
+import { FileLanguageService } from './file-language.service';
 import { FileController } from './file.controller';
 import { ViewsController } from './views/views.controller';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -12,6 +13,7 @@ import { FileValidationService } from '../common/services/file-validation.servic
   controllers: [FileController, ViewsController],
   providers: [
     FileService,
+    FileLanguageService,
     FileValidationService,
     {
       provide: 'EXCLUDED_FOLDERS',
@@ -20,3 +22,4 @@ import { FileValidationService } from '../common/services/file-validation.servic
   ],
 })
 export class FileModule {}
+

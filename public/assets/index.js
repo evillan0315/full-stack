@@ -3652,7 +3652,7 @@ const {
   formToJSON: i3,
   getAdapter: r3,
   mergeConfig: s3
-} = Ze, $x = "//api";
+} = Ze, $x = "http://localhost:5000/api";
 let P0 = () => localStorage.getItem("token");
 function Tx(i) {
   P0 = i;
@@ -5656,7 +5656,7 @@ const vC = (i, e, t) => {
   const [e, t] = ie(!1), [r, s] = ie(!1), [n, o] = ie(i.file.name), a = Qe(() => vC(i.file.name, i.file.isDirectory, e())), l = i.file.isDirectory, c = Qe(() => l && i.file.children && i.file.children.length > 0), h = () => {
     l && t(!e());
   }, f = () => {
-    l ? h() : i.onSelect(i.file.path);
+    l ? h() : (console.log(i.file, "file handleClick"), i.onSelect(i.file.path));
   }, u = async () => {
     const S = n().trim();
     if (!S || S === i.file.name)
@@ -5980,8 +5980,10 @@ function AC(i) {
   }), c = Qe(() => e()), h = async (O) => {
     o(!0);
     try {
-      const p = O !== void 0 ? O : "/", m = p && p !== "/" ? `?directory=${encodeURIComponent(p)}` : "", _ = await _i.get(`/file/list${m}`);
-      if (!_.data || !Array.isArray(_.data))
+      const p = O !== void 0 ? O : "/", m = p && p !== "/" ? `?directory=${encodeURIComponent(p)}&` : "?";
+      console.log(m, "query fetchFiles");
+      const _ = await _i.get(`/file/list${m}recursive=true`);
+      if (console.log(_, "response fetchFiles"), !_.data || !Array.isArray(_.data))
         throw new Error("Invalid data format received from API. Expected an array of FileItem.");
       t(_.data), s(p);
     } catch (p) {
@@ -30723,7 +30725,7 @@ const DB = (i) => {
     try {
       const w = new FormData();
       w.append(i.param ?? "filePath", i.filePath);
-      const y = (await _i.post("/file/read", w)).data?.data;
+      const y = (await _i.post("/file/read", w)).data?.content;
       if (!y) throw new Error("Failed to load file");
       n(y), v(y);
     } catch (w) {
@@ -30734,8 +30736,7 @@ const DB = (i) => {
   }, O = async () => {
     c(!0);
     try {
-      if (i.param !== "filePath")
-        throw new Error("Only internal files from the server can be saved");
+      i.param;
       const w = new FormData();
       if (w.append("filePath", i.filePath), w.append("content", s()), !(await _i.post("/file/write", w)).data.success) throw new Error("Failed to save file");
       hc("File saved successfully.", "success");
@@ -39198,7 +39199,7 @@ function I4(i) {
       const m = S.getSelection();
       m && (p.preventDefault(), p.clipboardData?.setData("text/plain", m));
     });
-    const d = localStorage.getItem("token"), O = pn("//terminal", {
+    const d = localStorage.getItem("token"), O = pn("http://localhost:5000/terminal", {
       auth: {
         token: `Bearer ${d}`
       }
@@ -39338,11 +39339,11 @@ function Y4() {
       s(!0);
       try {
         const m = new FormData();
-        m.append("filePath", p);
+        m.append("filePath", p), console.log(m, "formData loadFile"), console.log(p, "path loadFile");
         const _ = await _i.post("/file/read", m);
-        if (!_.data || typeof _.data.data != "string")
+        if (console.log(_.data, "loadFile response.data"), !_.data || typeof _.data.content != "string")
           throw new Error("Invalid file content format received from API");
-        o(_.data.data), g((b) => b.includes(p) ? b : [...b, p]), v(p);
+        o(_.data.content), g((b) => b.includes(p) ? b : [...b, p]), v(p);
       } catch (m) {
         console.error(`Error loading file "${p}":`, m), o(`Error loading file: ${m.response?.data?.message || m.message}`);
       } finally {
@@ -39351,7 +39352,7 @@ function Y4() {
     }
   };
   return Et(() => {
-    e() ? u().length === 0 && !S() && O("README.md") : t("/login", {
+    e() ? u().length === 0 && !S() && O("/media/eddie/Data/projects/nestJS/nest-modules/project-board/README.md") : t("/login", {
       replace: !0
     });
   }), ct(() => {

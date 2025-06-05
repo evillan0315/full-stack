@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "cd frontend && vite build &&  cd .. && tailwindcss -i styles/global.css -o public/assets/styles.css && nest build",
     "build:css": "tailwindcss -i styles/global.css -o public/assets/styles.css",
     "build:vite": "cd frontend && vite build && rm -rf ../dist/public && cp -rf ./public ../dist/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",

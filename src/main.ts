@@ -17,7 +17,8 @@ async function bootstrap() {
   // --- Configuration Variables ---
   const NODE_ENV = configService.get<string>('NODE_ENV') || 'development';
   const port = configService.get<number>('PORT', 5000);
-  const base_url = configService.get<string>('BASE_URL') || `http://localhost:${port}`;
+  const base_url =
+    configService.get<string>('BASE_URL') || `http://localhost:${port}`;
   const swaggerEnabled = configService.get<boolean>('SWAGGER_ENABLED') || false;
 
   // Define allowed CORS origins
@@ -39,8 +40,9 @@ async function bootstrap() {
   // Register Handlebars partials.
   // Assumes 'partials' is inside your 'views' directory (views/partials).
   hbs.registerPartials(join(__dirname, '..', 'views/partials'));
-  logger.log(`Registering partials from: ${join(__dirname, '..', 'views/partials')}`);
-
+  logger.log(
+    `Registering partials from: ${join(__dirname, '..', 'views/partials')}`,
+  );
 
   // Set default layout for all views.
   // This layout file should be located at views/layouts/main.hbs
@@ -62,8 +64,9 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'), {
     prefix: '/public/',
   });
-  logger.log(`Serving static assets from: ${join(__dirname, '..', 'public')} under prefix /public/`);
-
+  logger.log(
+    `Serving static assets from: ${join(__dirname, '..', 'public')} under prefix /public/`,
+  );
 
   // Serve 'downloads' directory (assuming it's at the project root) under '/api/media/' prefix.
   // This directory might contain user-uploaded or generated files you want to expose.
@@ -75,7 +78,6 @@ async function bootstrap() {
     prefix: '/api/media/',
   });
   logger.log(`Serving downloads from: ${downloadDir} under prefix /api/media/`);
-
 
   // --- Middleware Setup ---
   app.use(cookieParser());

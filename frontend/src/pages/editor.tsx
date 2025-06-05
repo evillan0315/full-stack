@@ -86,16 +86,17 @@ export default function Editor() {
     try {
       const formData = new FormData();
       formData.append('filePath', path);
-
+      console.log(formData, 'formData loadFile');
+      console.log(path, 'path loadFile');
       // Assuming `api.post` returns a structure like { data: { data: "file_content" } }
       const response = await api.post('/file/read', formData);
-
+      console.log(response.data, 'loadFile response.data');
       // Check if response.data or response.data.data exists and is a string
-      if (!response.data || typeof response.data.data !== 'string') {
+      if (!response.data || typeof response.data.content !== 'string') {
         throw new Error('Invalid file content format received from API');
       }
 
-      setFileContent(response.data.data);
+      setFileContent(response.data.content);
 
       // Add to tabs if not already open
       setOpenTabs((tabs) => {
@@ -127,7 +128,7 @@ export default function Editor() {
       // Optionally load a default file (e.g., README.md) on initial mount
       // Only if no tab is active or no files are open
       if (openTabs().length === 0 && !activeTab()) {
-        loadFile('README.md'); // Or any other default file
+        loadFile('/media/eddie/Data/projects/nestJS/nest-modules/project-board/README.md'); // Or any other default file
       }
     }
 

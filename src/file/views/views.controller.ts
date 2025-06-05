@@ -9,7 +9,7 @@ import {
   Query,
   Render,
   BadRequestException,
-  StreamableFile
+  StreamableFile,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -171,14 +171,15 @@ export class ViewsController {
       throw new BadRequestException(`Failed to create: ${error.message}`);
     }
   }
-  
+
   // Render File Content View
   @Get('view')
   @Roles(UserRole.ADMIN)
   @Render('pages/view') // This will be your new HBS template for viewing file content
   @ApiOperation({
     summary: 'Render file content view',
-    description: 'Displays the content of a specified file. Only for text-based files.',
+    description:
+      'Displays the content of a specified file. Only for text-based files.',
   })
   @ApiQuery({
     name: 'filePath',
@@ -189,7 +190,10 @@ export class ViewsController {
     status: 200,
     description: 'File content view rendered successfully.',
   })
-  @ApiResponse({ status: 400, description: 'File path not provided or file not found.' })
+  @ApiResponse({
+    status: 400,
+    description: 'File path not provided or file not found.',
+  })
   @ApiResponse({ status: 500, description: 'Failed to read file content.' })
   async viewFile(@Req() req: Request, @Query('filePath') filePath: string) {
     if (!filePath) {
@@ -208,16 +212,19 @@ export class ViewsController {
         isAuthenticated: Boolean(req['user']),
       };
     } catch (error) {
-      throw new BadRequestException(`Failed to view file '${filePath}': ${error.message}`);
+      throw new BadRequestException(
+        `Failed to view file '${filePath}': ${error.message}`,
+      );
     }
   }
-  
-   // Download File
+
+  // Download File
   @Get('download')
   @Roles(UserRole.ADMIN)
   @ApiOperation({
     summary: 'Download a file',
-    description: 'Allows an authenticated administrator to download a specified file.',
+    description:
+      'Allows an authenticated administrator to download a specified file.',
   })
   @ApiQuery({
     name: 'filePath',
@@ -236,8 +243,14 @@ export class ViewsController {
       },
     },
   })
-  @ApiResponse({ status: 400, description: 'File path not provided or file not found.' })
-  @ApiResponse({ status: 500, description: 'Failed to read file for download.' })
+  @ApiResponse({
+    status: 400,
+    description: 'File path not provided or file not found.',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Failed to read file for download.',
+  })
   async downloadFile(
     @Query('filePath') filePath: string,
     @Res({ passthrough: true }) res: Response, // Use passthrough: true for streaming
@@ -259,7 +272,9 @@ export class ViewsController {
 
       return new StreamableFile(fileStream); // Return as a StreamableFile
     } catch (error) {
-      throw new BadRequestException(`Failed to download file '${filePath}': ${error.message}`);
+      throw new BadRequestException(
+        `Failed to download file '${filePath}': ${error.message}`,
+      );
     }
   }
 }

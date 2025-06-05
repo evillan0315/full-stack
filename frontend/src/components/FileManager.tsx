@@ -99,10 +99,10 @@ export default function FileManager(props: FileManagerProps) {
     setLoading(true);
     try {
       const targetDirectory = directory !== undefined ? directory : '/';
-      const query = targetDirectory && targetDirectory !== '/' ? `?directory=${encodeURIComponent(targetDirectory)}` : '';
-
-      const response = await api.get(`/file/list${query}`);
-
+      const query = targetDirectory && targetDirectory !== '/' ? `?directory=${encodeURIComponent(targetDirectory)}&` : '?';
+      console.log(query, 'query fetchFiles');
+      const response = await api.get(`/file/list${query}recursive=true`);
+      console.log(response, 'response fetchFiles');
       if (!response.data || !Array.isArray(response.data)) {
         throw new Error('Invalid data format received from API. Expected an array of FileItem.');
       }

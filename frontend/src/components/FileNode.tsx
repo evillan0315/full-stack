@@ -99,6 +99,7 @@ const FileNode = (props: FileNodeProps) => {
     if (isDir) {
       toggle(); // Toggle folder open state
     } else {
+      console.log(props.file, 'file handleClick');
       props.onSelect(props.file.path); // Call onSelect for files
     }
   };

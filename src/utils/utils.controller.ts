@@ -11,6 +11,7 @@ import {
   Res,
   Query,
   BadRequestException,
+  Get
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -19,6 +20,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiQuery
 } from '@nestjs/swagger';
 import * as dotenv from 'dotenv'; // Keep if used for parsing env files
 import * as fs from 'fs'; // For file system operations like unlinkSync
@@ -38,7 +40,41 @@ import { FormatCodeDto } from './dto/format-code.dto';
 @Controller('api/utils')
 export class UtilsController {
   constructor(private readonly utilsService: UtilsService) {}
-
+  
+  /**
+   * Parses a semicolon-delimited key=value string from query param `mapString`
+   * and returns a parsed object.
+   * 
+   * Example:
+   * GET /utils/parse-env-map?mapString=ts=typescript;js=javascript
+   */
+  @Get('parse-env-map')
+  @ApiOperation({
+    summary: 'Parse ENV-style map string',
+    description: 'Parses a semicolon-delimited key=value string into an object.',
+  })
+  @ApiQuery({
+    name: 'mapString',
+    required: false,
+    type: String,
+    example: 'ts=typescript;js=javascript',
+    description: 'Semicolon-delimited key=value string to parse',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Parsed key-value map',
+    schema: {
+      type: 'object',
+      additionalProperties: { type: 'string' },
+      example: {
+        ts: 'typescript',
+        js: 'javascript',
+      },
+    },
+  })
+  parseEnvMap(@Query('mapString') mapString?: string): Record<string, string> {
+    return this.utilsService.parseEnvMap(mapString);
+  }
   @Post('format')
   @ApiOperation({ summary: 'Format source code using Prettier' })
   @ApiResponse({

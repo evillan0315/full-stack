@@ -21,12 +21,19 @@ import remarkStringify from 'remark-stringify';
 import { Root } from 'mdast';
 import * as prettier from 'prettier';
 
+import { ConfigService } from '@nestjs/config';
+
+type LanguageMap = Record<string, string>;
+
 @Injectable()
 export class UtilsService {
   private readonly logger = new Logger(UtilsService.name);
-  private outputDir = path.join(__dirname, '../../svg-outputs');
-  private globalCssContent: string | null = null; // To store the CSS content
-
+  private outputDir = path.resolve(process.cwd(), 'svg-outputs');
+  private cssDir = path.resolve(process.cwd(), 'styles');
+  private globalCssContent: string | null = null;
+  private downloadDir = path.resolve(process.cwd(), 'downloads');
+  
+  
   // --- Language Detection Maps ---
   private readonly EXTENSION_LANGUAGE_MAP: Record<string, string> = {
     js: 'javascript',
@@ -114,7 +121,7 @@ export class UtilsService {
   }
 
   private async loadGlobalCss(): Promise<void> {
-    const cssFilePath = path.join(__dirname, '../../styles/global.css');
+    const cssFilePath = path.resolve(process.cwd(), `${this.cssDir}/global.css`);
     try {
       this.globalCssContent = await fs.promises.readFile(cssFilePath, 'utf-8');
       this.logger.log('global.css loaded successfully.');
@@ -130,6 +137,23 @@ export class UtilsService {
   private getTempPngPath(originalPath: string): string {
     const fileName = path.basename(originalPath, path.extname(originalPath));
     return path.join(this.outputDir, `${fileName}-${Date.now()}-temp.png`);
+  }
+
+  /**
+   * Parses a semicolon-delimited key=value string from an env variable into a record.
+   */
+  parseEnvMap(mapString?: string): LanguageMap {
+    const map: LanguageMap = {};
+    if (!mapString) return map;
+
+    for (const entry of mapString.split(';')) {
+      const [key, value] = entry.split('=');
+      if (key && value) {
+        map[key.trim()] = value.trim();
+      }
+    }
+
+    return map;
   }
 
   // Language Detection

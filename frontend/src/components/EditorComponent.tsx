@@ -76,7 +76,7 @@ const EditorComponent = (props: EditorComponentProps) => {
       formData.append(props.param ?? 'filePath', props.filePath);
       const response = await api.post('/file/read', formData);
 
-      const code = response.data?.data;
+      const code = response.data?.content;
       if (!code) throw new Error('Failed to load file');
 
       setContent(code);
@@ -94,7 +94,7 @@ const EditorComponent = (props: EditorComponentProps) => {
     setSaving(true);
     try {
       if (props.param !== 'filePath') {
-        throw new Error('Only internal files from the server can be saved');
+        //throw new Error('Only internal files from the server can be saved');
       }
 
       const formData = new FormData();

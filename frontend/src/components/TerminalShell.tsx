@@ -114,7 +114,7 @@ export default function TerminalShell(props: TerminalShellProps) {
 
     const token = localStorage.getItem('token');
 
-    const socketInstance = io(`${import.meta.env.BASE_URL}/terminal`, {
+    const socketInstance = io(`${import.meta.env.BASE_URL_API}/terminal`, {
       auth: { token: `Bearer ${token}` },
       //withCredentials: true,
     });

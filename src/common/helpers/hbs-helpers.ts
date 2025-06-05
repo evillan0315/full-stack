@@ -93,7 +93,7 @@ export function registerHandlebarsHelpers() {
    * Safely encodes a URI component (for URL parameters).
    * Usage: {{encodeURIComponent "path with spaces"}}
    */
-  hbs.registerHelper('encodeURIComponent', function(str: string) {
+  hbs.registerHelper('encodeURIComponent', function (str: string) {
     return encodeURIComponent(str);
   });
 
@@ -101,20 +101,23 @@ export function registerHandlebarsHelpers() {
    * Formats a number of bytes into a human-readable string (e.g., "1.2 MB").
    * Usage: {{formatBytes size}} or {{formatBytes size 0}}
    */
-  hbs.registerHelper('formatBytes', function(bytes: number, decimals: number = 2) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-  });
+  hbs.registerHelper(
+    'formatBytes',
+    function (bytes: number, decimals: number = 2) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    },
+  );
 
   /**
    * Extracts the directory path from a full file path.
    * Usage: {{dirname "/path/to/file.txt"}} -> "/path/to"
    */
-  hbs.registerHelper('dirname', function(path: string) {
+  hbs.registerHelper('dirname', function (path: string) {
     const lastSlashIndex = path.lastIndexOf('/');
     if (lastSlashIndex <= 0) {
       return '/'; // For root directory or paths without slashes
