@@ -38,7 +38,9 @@ export default function FileTabs(props: FileTabsProps) {
           {(tabPath) => (
             <div
               class={`px-4 py-1 cursor-pointer flex items-center gap-2 border-r border-gray-900/50 whitespace-nowrap ${
-                tabPath === props.activeTab ? 'text-gray-200 bg-gray-800/50 font-semibold' : 'text-gray-200  bg-gray-900/50 hover:bg-gray-700'
+                tabPath === props.activeTab
+                  ? 'text-gray-200 bg-gray-800/50 font-semibold'
+                  : 'text-gray-200  bg-gray-900/50 hover:bg-gray-700'
               }`}
               onClick={() => props.onTabClick(tabPath)}
             >
@@ -67,4 +69,3 @@ export default function FileTabs(props: FileTabsProps) {
     </div>
   );
 }
-

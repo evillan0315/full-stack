@@ -3,79 +3,76 @@ import {
   Get,
   Post,
   Res,
-  Req,
   Body,
-  Param,
-  Patch,
-  Delete,
-  UseGuards,
-  HttpStatus,
   Query,
   UseInterceptors,
   UploadedFile,
   BadRequestException,
-  InternalServerErrorException,
+  UseGuards,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiBearerAuth,
-  ApiOkResponse,
-  ApiCreatedResponse,
-  ApiNotFoundResponse,
-  ApiBadRequestResponse,
-  ApiUnauthorizedResponse,
-  ApiForbiddenResponse,
-  ApiQuery,
   ApiResponse,
   ApiConsumes,
   ApiBody,
+  ApiQuery,
 } from '@nestjs/swagger';
-import axios from 'axios';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
+
+import { ReadFileDto } from './dto/read-file.dto';
+import { ReadFileResponseDto } from './dto/read-file-response.dto';
+import { ReadMultipleFilesDto } from './dto/read-multiple-files.dto';
+import { CreateFileDto } from './dto/create-file.dto';
+import { UpdateFileDto } from './dto/update-file.dto'; // Assuming UpdateFileDto is for writing content
+
+import { FileService } from './file.service';
+import { FileValidationService } from '../common/services/file-validation.service'; // Assuming this service is correctly implemented for general file validation
 
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../auth/enums/user-role.enum';
 
-import { FileService } from './file.service';
-import {
-  CreateFileDto,
-  PaginationFileResultDto,
-  PaginationFileQueryDto,
-} from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
-
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { diskStorage } from 'multer';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ReadFileDto } from './dto/read-file.dto';
-import { ReadFileResponseDto } from './dto/read-file-response.dto';
-import { Response } from 'express';
-
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('File & Folder')
 @Controller('api/file')
 export class FileController {
-  constructor(private readonly fileService: FileService) {}
+  constructor(
+    private readonly fileValidator: FileValidationService, // Keep if other validations are handled here
+    private readonly fileService: FileService,
+  ) {}
+
+  // Directory & File Listing
 
   @Get('list')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'List files in a directory' })
+  @ApiOperation({ summary: 'List files and folders in a directory' })
   @ApiQuery({
     name: 'directory',
     required: false,
-    description: 'Path to the directory',
+    description:
+      'Path to the directory (defaults to current working directory)',
   })
   @ApiQuery({
     name: 'recursive',
     required: false,
     type: Boolean,
-    description: 'List files recursively',
+    description: 'List files recursively (defaults to false)',
   })
-  @ApiResponse({ status: 200, description: 'List of files and directories' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of files and directories returned successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid directory path' })
+  @ApiResponse({
+    status: 500,
+    description: 'Failed to list directory contents',
+  })
   async getFiles(
     @Query('directory') directory?: string,
     @Query('recursive') recursive: boolean = false,
@@ -83,10 +80,14 @@ export class FileController {
     return this.fileService.getFilesByDirectory(directory, recursive);
   }
 
-  @Roles(UserRole.ADMIN)
+  // Read File Content (Single)
+
   @Post('read')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({
-    summary: 'Read file content from upload, local path, or URL',
+    summary: 'Read file content from an uploaded file, local path, or URL',
+    description:
+      'Provides file content based on the input source. You can upload a file, specify a local file path, or provide a URL to a remote file.',
   })
   @ApiResponse({ status: 200, type: ReadFileResponseDto })
   @ApiConsumes('multipart/form-data')
@@ -97,11 +98,13 @@ export class FileController {
         file: {
           type: 'string',
           format: 'binary',
-          description: 'Upload a file (optional if using filePath or url)',
+          description:
+            'Upload a file (optional if filePath or url is provided)',
         },
         filePath: {
           type: 'string',
-          description: 'Path to a file on the local file system',
+          description:
+            'Absolute or relative path to a file on the local file system',
         },
         url: {
           type: 'string',
@@ -109,52 +112,22 @@ export class FileController {
         },
         generateBlobUrl: {
           type: 'boolean',
-          description: 'Return as base64 blob-style data URL',
+          description:
+            'If true, returns content as a base64 blob-style data URL.',
         },
       },
-      required: [],
+      required: [], // None are strictly required as one of the three (file, filePath, url) must be provided
     },
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'File content returned successfully.',
   })
   @UseInterceptors(FileInterceptor('file'))
   async readFileContent(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: ReadFileDto,
   ): Promise<ReadFileResponseDto> {
-    let buffer: Buffer;
-    let filename = 'file';
-    let filePath = '';
-    if (file?.buffer) {
-      buffer = file.buffer;
-      filename = file.originalname || filename;
-    } else if (body.filePath) {
-      try {
-        buffer = await fs.readFile(body.filePath);
-        filePath = body.filePath;
-        filename = body.filePath.split('/').pop() || filename;
-      } catch {
-        throw new BadRequestException(
-          `Unable to read file from path: ${body.filePath}`,
-        );
-      }
-    } else if (body.url) {
-      try {
-        const res = await axios.get(body.url, { responseType: 'arraybuffer' });
-        buffer = Buffer.from(res.data);
-        filePath = body.url;
-        filename = body.url.split('/').pop() || filename;
-      } catch {
-        throw new BadRequestException(
-          `Unable to fetch file from URL: ${body.url}`,
-        );
-      }
-    } else {
-      throw new BadRequestException('Please provide a file, filePath, or url.');
-    }
-
+    const { buffer, filename, filePath } = await this.fileService.resolveFile(
+      file,
+      body,
+    );
     return this.fileService.readFile(
       buffer,
       filename,
@@ -162,51 +135,64 @@ export class FileController {
       filePath,
     );
   }
-  @Post('write')
-  @ApiOperation({ summary: 'Write content to a file at a specified path' })
-  @ApiResponse({ status: 200, description: 'File written successfully.' })
+
+  //Read Multiple Files
+
+  @Post('read-many')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Upload and read content from multiple files' })
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        filePath: {
-          type: 'string',
-          description: 'Absolute or relative file path',
+        files: {
+          type: 'array',
+          items: { type: 'string', format: 'binary' },
+          description: 'Multiple files to upload and read',
         },
-        content: {
-          type: 'string',
-          description: 'Text content to write into the file',
+        generateBlobUrl: {
+          type: 'boolean',
+          description:
+            'If true, returns content as base64 blob-style data URLs.',
         },
       },
-      required: ['filePath', 'content'],
+      required: ['files'],
     },
   })
-  async writeFileContent(
-    @Body() body: { filePath: string; content: string },
-  ): Promise<{ success: boolean; message: string }> {
-    const { filePath, content } = body;
-
-    if (!filePath || typeof content !== 'string') {
-      throw new BadRequestException(
-        'Both filePath and content must be provided.',
-      );
+  @ApiResponse({
+    status: 200,
+    description: 'Contents of multiple files returned successfully.',
+    type: [ReadFileResponseDto], // Indicate an array response
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'No files uploaded or validation failed.',
+  })
+  @UseInterceptors(FilesInterceptor('files'))
+  async readMultipleFiles(
+    @UploadedFile() files: Express.Multer.File[],
+    @Body() body: ReadMultipleFilesDto,
+  ): Promise<ReadFileResponseDto[]> {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('No files uploaded.');
     }
+    this.fileValidator.validateMultipleFiles(files); // Keep if this validation is needed
 
-    try {
-      const directory = path.dirname(filePath);
-      await fs.mkdir(directory, { recursive: true });
-      await fs.writeFile(filePath, content, 'utf-8');
-
-      return { success: true, message: 'File written successfully.' };
-    } catch (error) {
-      throw new InternalServerErrorException(
-        `Failed to write file: ${error.message}`,
-      );
-    }
+    return await this.fileService.readMultipleFiles(
+      files.map((file) => ({
+        buffer: file.buffer,
+        filename: file.originalname,
+      })),
+      body.generateBlobUrl,
+    );
   }
+
+  //Proxy Image
+
   @Get('proxy')
   @ApiOperation({
-    summary: 'Proxies an image URL and returns the image content',
+    summary: 'Proxies an image URL and streams the image content',
   })
   @ApiQuery({
     name: 'url',
@@ -224,117 +210,99 @@ export class FileController {
     await this.fileService.proxyImage(url, res);
   }
 
-@Post('delete')
-delete(@Body() body: { path: string }) {
-  return this.fileService.delete(body.path);
-}
-
-@Post('open')
-open(@Body() body: { path: string }) {
-  return this.fileService.read(body.path);
-}
-  // ───────────────────────────────────────────────────────────
-  // CREATE
-  // ───────────────────────────────────────────────────────────
+  // Create File or Folder
 
   @Post('create')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a new file or folder' })
-  @ApiCreatedResponse({
-    description: 'Successfully created.',
+  @ApiResponse({
+    status: 201,
+    description: 'File or folder successfully created.',
     type: CreateFileDto,
   })
-  @ApiBadRequestResponse({ description: 'Validation failed.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
-  // ───────────────────────────────────────────────────────────
-  // CREATE FILE OR FOLDER
-  // ───────────────────────────────────────────────────────────
+  @ApiResponse({ status: 400, description: 'Invalid input or path.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
   async create(
-    dto: CreateFileDto,
+    @Body() dto: CreateFileDto,
   ): Promise<{ success: boolean; message: string }> {
     return this.fileService.createLocalFileOrFolder(dto);
   }
 
-  // ───────────────────────────────────────────────────────────
-  // FIND ALL
-  // ───────────────────────────────────────────────────────────
+  // Write File Content
 
-  @Get()
+  @Post('write') // Changed from 'update' to 'write' for clarity, as it overwrites/creates
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Retrieve all File records' })
-  @ApiOkResponse({
-    description: 'List of File records.',
-    type: [CreateFileDto],
+  @ApiOperation({
+    summary: 'Write content to a file at a specified path',
+    description:
+      'Creates a new file or overwrites an existing one with the provided content. Parent directories will be created if they do not exist.',
   })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
-  findAll() {
-    return this.fileService.findAll();
-  }
-
-  // ───────────────────────────────────────────────────────────
-  // PAGINATED
-  // ───────────────────────────────────────────────────────────
-
-  @Get('paginated')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Paginated File records' })
-  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
-  @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Paginated results',
-    type: PaginationFileResultDto,
+    status: 200,
+    description: 'File written successfully.',
   })
-  findAllPaginated(@Query() query: PaginationFileQueryDto) {
-    const { page, pageSize } = query;
-    return this.fileService.findAllPaginated(undefined, page, pageSize);
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        filePath: {
+          type: 'string',
+          description: 'Absolute or relative file path',
+          example: '/path/to/your/file.txt',
+        },
+        content: {
+          type: 'string',
+          description: 'Text content to write into the file',
+          example: 'This is the content of the file.',
+        },
+      },
+      required: ['filePath', 'content'],
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Both filePath and content are required.',
+  })
+  @ApiResponse({ status: 500, description: 'Failed to write file.' })
+  async writeFileContent(
+    @Body() body: UpdateFileDto, // Assuming UpdateFileDto contains filePath and content
+  ): Promise<{ success: boolean; message: string }> {
+    const { filePath, content } = body;
+    if (!filePath || typeof content !== 'string') {
+      throw new BadRequestException(
+        'Both filePath and content must be provided.',
+      );
+    }
+    return this.fileService.writeLocalFileContent(filePath, content);
   }
 
-  // ───────────────────────────────────────────────────────────
-  // FIND ONE
-  // ───────────────────────────────────────────────────────────
+  // Delete File or Folder
 
-  @Get(':id')
+  @Delete('delete')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Find File by ID' })
-  @ApiOkResponse({ description: 'Record found.', type: CreateFileDto })
-  @ApiNotFoundResponse({ description: 'Record not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
-  findOne(@Param('id') id: string) {
-    return this.fileService.findOne(id);
-  }
-
-  // ───────────────────────────────────────────────────────────
-  // UPDATE
-  // ───────────────────────────────────────────────────────────
-
-  @Patch(':id')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Update File by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateFileDto })
-  @ApiBadRequestResponse({ description: 'Invalid data.' })
-  @ApiNotFoundResponse({ description: 'Record not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
-  update(@Param('id') id: string, @Body() dto: UpdateFileDto) {
-    return this.fileService.update(id, dto);
-  }
-
-  // ───────────────────────────────────────────────────────────
-  // DELETE
-  // ───────────────────────────────────────────────────────────
-
-  @Delete(':id')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Delete File by ID' })
-  @ApiOkResponse({ description: 'Successfully deleted.' })
-  @ApiNotFoundResponse({ description: 'Record not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
-  remove(@Param('id') id: string) {
-    return this.fileService.remove(id);
+  @ApiOperation({ summary: 'Delete a file or folder' })
+  @ApiQuery({
+    name: 'filePath',
+    required: true,
+    description: 'The path to the file or folder to delete.',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully deleted the file or folder.',
+  })
+  @ApiResponse({ status: 400, description: 'Path not found or invalid.' })
+  @ApiResponse({
+    status: 500,
+    description: 'Failed to delete the file or folder.',
+  })
+  async deleteFile(
+    @Query('filePath') filePath: string,
+  ): Promise<{ success: boolean; message: string }> {
+    if (!filePath) {
+      throw new BadRequestException('File path is required for deletion.');
+    }
+    return this.fileService.deleteLocalFile(filePath);
   }
 }

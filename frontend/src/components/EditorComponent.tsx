@@ -16,6 +16,8 @@ import Loading from './Loading';
 type EditorComponentProps = {
   param?: 'url' | 'filePath';
   filePath: string;
+  initialContent?: string; // <-- ADD THIS LINE
+  isLoading?: boolean;    // <-- ADD THIS LINE
 };
 
 const EditorComponent = (props: EditorComponentProps) => {

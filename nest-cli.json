@@ -5,19 +5,22 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "assets": [
+
       {
         "include": "../public/**/*",
-        "outDir": "dist/public"
+        "outDir": "dist" 
       },
+
       {
         "include": "views/**/*",
-        "outDir": "dist"
+        "outDir": "dist" 
       },
+
       {
-        "include": "src/mail/templates/**/*",
-        "outDir": "dist/templates"
+        "include": "mail/templates/**/*",
+        "outDir": "dist"
       }
-    ]
+    ],
+    "watchAssets": true
   }
 }
-

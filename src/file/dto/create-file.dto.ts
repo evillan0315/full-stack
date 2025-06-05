@@ -13,24 +13,9 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
-/*export class CreateFileDto {
-  @ApiProperty({ description: 'name field' })
-  @IsString()
-  name: string;
-  @ApiProperty({ description: 'content field' })
-  @IsString()
-  content: string;
-  @ApiProperty({ description: 'path field' })
-  @IsString()
-  path: string;
-  @ApiProperty({ description: 'folderId field' })
-  @IsOptional()
-  @IsString()
-  folderId: string;
-}*/
-
 export class CreateFileDto {
-  @ApiProperty({ description: 'Path to file or directory' })
+  @IsString()
+  @ApiProperty({ description: 'Path to file or directory', required: true })
   filePath: string;
 
   @ApiProperty({
@@ -39,11 +24,22 @@ export class CreateFileDto {
   })
   isDirectory: boolean;
 
+  @IsOptional()
+  @IsString()
   @ApiProperty({
     description: 'Optional content for the file (ignored if directory)',
     required: false,
   })
   content?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'Whether it is a folder or a file.',
+    default: 'file',
+    required: false,
+  })
+  type?: string;
 }
 export class PaginationFileResultDto {
   @ApiProperty({ type: [CreateFileDto] })

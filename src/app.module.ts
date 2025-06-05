@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { ConfigModule } from '@nestjs/config';
+import { join } from 'path'; 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -16,6 +19,9 @@ import { SchemaModule } from './schema/schema.module';
 import { LogModule } from './log/log.module';
 import { AudioModule } from './audio/audio.module';
 
+
+import fileConfig from './config/file.config';
+
 @Module({
   imports: [
     AuthModule,
@@ -31,6 +37,15 @@ import { AudioModule } from './audio/audio.module';
     SchemaModule,
     LogModule,
     AudioModule,
+    ConfigModule.forRoot({
+      isGlobal: true, // Make config available globally
+      load: [fileConfig],
+    }),
+    ServeStaticModule.forRoot({
+      // This line is crucial for serving static files
+      rootPath: join(__dirname, '..', 'assets'), // Points to the 'assets' folder
+      serveRoot: '/assets', // The URL prefix for static files (e.g., /assets/project-board.css)
+    }),
   ],
   controllers: [AppController],
   providers: [AppService, GoogleOAuthService],

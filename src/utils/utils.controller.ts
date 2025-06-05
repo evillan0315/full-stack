@@ -1,3 +1,5 @@
+// src/utils/utils.controller.ts
+
 import {
   Controller,
   Post,
@@ -18,14 +20,14 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import * as dotenv from 'dotenv';
-import * as fs from 'fs';
-import * as path from 'path';
-import { Root } from 'mdast';
-import { Response } from 'express';
+import * as dotenv from 'dotenv'; // Keep if used for parsing env files
+import * as fs from 'fs'; // For file system operations like unlinkSync
+import * as path from 'path'; // For path manipulation
+import { Root } from 'mdast'; // For Markdown AST
+import { Response } from 'express'; // For @Res()
 import { MarkdownDto } from './dto/markdown.dto';
 import { UploadEnvDto } from './dto/upload-env.dto';
-import { UploadJsonDto } from './dto/upload-json.dto';
+import { UploadJsonDto } from './dto/upload-json.dto'; // Consider if this is still needed, or use JsonBodyDto
 import { JsonBodyDto } from './dto/json-body.dto';
 import { diskStorage } from 'multer';
 import { UtilsService } from './utils.service';
@@ -36,6 +38,7 @@ import { FormatCodeDto } from './dto/format-code.dto';
 @Controller('api/utils')
 export class UtilsController {
   constructor(private readonly utilsService: UtilsService) {}
+
   @Post('format')
   @ApiOperation({ summary: 'Format source code using Prettier' })
   @ApiResponse({
@@ -46,6 +49,7 @@ export class UtilsController {
   async formatCode(@Body() body: FormatCodeDto) {
     return this.utilsService.formatCode(body.code, body.language);
   }
+
   @Post('convert-to-svg')
   @ApiOperation({ summary: 'Convert an image to SVG' })
   @ApiConsumes('multipart/form-data')
@@ -60,26 +64,28 @@ export class UtilsController {
           description: 'Fill color of the SVG output',
         },
         width: {
-          type: 'string',
-          example: '512',
-          description: 'Resize width',
+          type: 'number', // Changed to number for API spec clarity
+          example: 512,
+          description: 'Resize width (pixels)',
         },
         height: {
-          type: 'string',
-          example: '512',
-          description: 'Resize height',
+          type: 'number', // Changed to number for API spec clarity
+          example: 512,
+          description: 'Resize height (pixels)',
         },
       },
+      required: ['file'], // Mark file as required
     },
   })
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads',
+        destination: './uploads', // Ensure this directory exists and is writable
         filename: (_req, file, cb) => {
           const ext = path.extname(file.originalname);
           const name = path.basename(file.originalname, ext);
-          cb(null, `${name}${ext}`);
+          // Append timestamp to prevent filename collisions
+          cb(null, `${name}-${Date.now()}${ext}`);
         },
       }),
     }),
@@ -88,20 +94,59 @@ export class UtilsController {
     @UploadedFile() file: Express.Multer.File,
     @Body() body: UploadImageDto,
   ) {
-    let tempPath;
-    if (file) {
-      tempPath = `./uploads/${file.originalname}`;
+    if (!file) {
+      throw new BadRequestException(
+        'Image file is required for SVG conversion.',
+      );
     }
-    const { color = '#000000', width, height } = body;
 
-    const result = await this.utilsService.convertToSvg(
-      tempPath,
-      color,
-      width,
-      height,
-    );
+    const tempPath = file.path; // Multer's diskStorage provides `file.path`
 
-    fs.unlinkSync(tempPath);
+    const { color = '#000000' } = body;
+    // Parse width and height to numbers, or use undefined if not provided/invalid
+    const width = body.width ? parseInt(body.width.toString(), 10) : undefined;
+    const height = body.height
+      ? parseInt(body.height.toString(), 10)
+      : undefined;
+
+    // Check if parsing resulted in NaN (e.g., if input was "abc")
+    if (width !== undefined && isNaN(width)) {
+      throw new BadRequestException('Width must be a valid number.');
+    }
+    if (height !== undefined && isNaN(height)) {
+      throw new BadRequestException('Height must be a valid number.');
+    }
+
+    let result;
+    try {
+      // Corrected method name: `convertToSvg` (assuming you've renamed it in UtilsService)
+      // Pass numbers for width/height if your service expects them
+      result = await this.utilsService.convertToSvg(
+        tempPath,
+        color,
+        width,
+        height,
+      );
+    } catch (error) {
+      // More specific error handling for conversion
+      throw new HttpException(
+        `SVG conversion failed: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    } finally {
+      // Ensure the temporary file is deleted even if conversion fails
+      if (tempPath && fs.existsSync(tempPath)) {
+        try {
+          fs.unlinkSync(tempPath);
+        } catch (unlinkError) {
+          console.error(
+            `Failed to delete temporary file ${tempPath}:`,
+            unlinkError,
+          );
+          // Consider logging this or handling it gracefully without throwing to the client
+        }
+      }
+    }
 
     return {
       message: 'SVG conversion successful',
@@ -109,12 +154,15 @@ export class UtilsController {
       width,
       height,
       svg: result.svg,
-      savedPath: result.filePath,
+      savedPath: result.filePath, // `filePath` is the path where the SVG was saved
     };
   }
+
   @Post('json-to-env')
   @ApiOperation({
     summary: 'Upload JSON file or provide JSON body to convert to .env',
+    description:
+      'Converts a JSON object (from file upload or request body) into a .env string. Optionally allows direct download of the .env file.',
   })
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiBody({
@@ -124,6 +172,7 @@ export class UtilsController {
         file: {
           type: 'string',
           format: 'binary',
+          description: 'Optional: Upload a JSON file to convert.',
         },
         json: {
           type: 'object',
@@ -132,24 +181,45 @@ export class UtilsController {
             DB_HOST: 'localhost',
             DB_USER: 'admin',
           },
+          description:
+            'Optional: Provide a JSON object directly in the request body.',
         },
         download: {
           type: 'boolean',
           example: true,
           default: false,
+          description:
+            'If true, the .env file will be downloaded; otherwise, the content is returned as plain text.',
         },
       },
+      // At least one of file or json must be provided
+      oneOf: [{ required: ['file'] }, { required: ['json'] }],
     },
   })
   @ApiResponse({
     status: 200,
     description:
       'Returns .env as a file or raw string based on download option',
+    content: {
+      'text/plain': {
+        schema: {
+          type: 'string',
+          example: 'DB_HOST=localhost\nDB_USER=admin',
+        },
+      },
+      'application/octet-stream': {
+        schema: {
+          type: 'string',
+          format: 'binary',
+          description: 'The .env file content if download is true.',
+        },
+      },
+    },
   })
   @UseInterceptors(FileInterceptor('file'))
   async jsonToEnv(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: JsonBodyDto,
+    @Body() body: JsonBodyDto, // Use JsonBodyDto for parsing JSON in body
     @Res() res: Response,
   ) {
     let json: Record<string, string>;
@@ -157,18 +227,14 @@ export class UtilsController {
     if (file) {
       try {
         json = JSON.parse(file.buffer.toString('utf-8'));
-      } catch {
-        throw new HttpException(
-          'Invalid JSON file format',
-          HttpStatus.BAD_REQUEST,
-        );
+      } catch (error) {
+        throw new BadRequestException('Invalid JSON file format.');
       }
     } else if (body?.json) {
       json = body.json;
     } else {
-      throw new HttpException(
-        'Either file or JSON body must be provided',
-        HttpStatus.BAD_REQUEST,
+      throw new BadRequestException(
+        'Either a JSON file or a JSON body must be provided.',
       );
     }
 
@@ -187,6 +253,7 @@ export class UtilsController {
       res.send(envContent);
     }
   }
+
   @Post('env-to-json')
   @ApiOperation({
     summary: 'Convert uploaded .env file or a filepath to JSON',
@@ -195,31 +262,39 @@ export class UtilsController {
   })
   @ApiBody({
     description: 'Upload a .env file or provide a filepath (only one)',
-    type: UploadEnvDto,
+    type: UploadEnvDto, // This DTO should contain 'file' (for upload) and 'filepath' (for local path)
   })
   @ApiConsumes('multipart/form-data')
   @ApiResponse({
     status: 200,
     description: 'Successfully parsed .env file.',
     schema: {
-      example: {
-        filepath: '.env.local',
+      type: 'object',
+      properties: {
+        filepath: { type: 'string', example: '.env.local' },
         data: {
-          DB_HOST: 'localhost',
-          DB_USER: 'root',
+          type: 'object',
+          example: {
+            DB_HOST: 'localhost',
+            DB_USER: 'root',
+          },
         },
       },
     },
   })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file')) // FileInterceptor should process 'file' from multipart
   async envToJson(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: UploadEnvDto,
   ) {
+    // UtilsService.parseEnvFile should handle the logic of whether to use file.buffer or body.filepath
     return this.utilsService.parseEnvFile(file, body.filepath);
   }
+
   @Post('extract-title')
-  @ApiOperation({ summary: 'Extracts the title from Markdown content' })
+  @ApiOperation({
+    summary: 'Extracts the first H1 or H2 title from Markdown content',
+  })
   @ApiResponse({
     status: 200,
     description: 'Title successfully extracted',
@@ -231,9 +306,10 @@ export class UtilsController {
   })
   @ApiResponse({ status: 400, description: 'Invalid input' })
   extractTitle(@Body() body: MarkdownDto) {
+    // This logic can also be moved to UtilsService if you want to centralize Markdown utilities
     const match = body.content.match(/^#{1,2}\s+(.*)/m);
     const title = match ? match[1].trim() : null;
-    return title;
+    return { title }; // Return as an object for consistent API response
   }
 
   // Utili for handling SQL
@@ -258,7 +334,7 @@ export class UtilsController {
     try {
       return this.utilsService.parseSqlToJson(sql);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      throw new BadRequestException(e.message); // Use BadRequestException for client errors
     }
   }
 
@@ -283,7 +359,7 @@ export class UtilsController {
     try {
       return this.utilsService.parseInsertSqlToJson(sql);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      throw new BadRequestException(e.message);
     }
   }
 
@@ -308,34 +384,48 @@ export class UtilsController {
     try {
       return { sql: this.utilsService.jsonToInsertSql(body) };
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      throw new BadRequestException(e.message);
     }
   }
+
   @Post('to-json')
   @ApiOperation({ summary: 'Convert Markdown to JSON AST' })
   @ApiBody({
-    schema: { example: { markdown: '# Hello\n\nThis is **bold**.' } },
+    schema: {
+      type: 'object',
+      properties: {
+        markdown: { type: 'string', example: '# Hello\n\nThis is **bold**.' },
+      },
+      required: ['markdown'],
+    },
   })
   @ApiResponse({ status: 201, description: 'MDAST JSON returned.' })
   async convertToJson(@Body('markdown') markdown: string): Promise<Root> {
     return this.utilsService.markdownToJson(markdown);
   }
+
   @Post('to-markdown')
   @ApiOperation({ summary: 'Convert JSON AST to Markdown' })
   @ApiBody({
     schema: {
-      example: {
+      type: 'object',
+      properties: {
         ast: {
-          type: 'root',
-          children: [
-            {
-              type: 'heading',
-              depth: 1,
-              children: [{ type: 'text', value: 'Hello' }],
-            },
-          ],
+          // Ensure `Root` type is correctly represented in Swagger if possible
+          type: 'object',
+          example: {
+            type: 'root',
+            children: [
+              {
+                type: 'heading',
+                depth: 1,
+                children: [{ type: 'text', value: 'Hello' }],
+              },
+            ],
+          },
         },
       },
+      required: ['ast'],
     },
   })
   @ApiResponse({ status: 201, description: 'Markdown string returned.' })
@@ -345,7 +435,15 @@ export class UtilsController {
 
   @Post('to-html')
   @ApiOperation({ summary: 'Convert Markdown to HTML' })
-  @ApiBody({ schema: { example: { markdown: '# Hello\n\nParagraph here.' } } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        markdown: { type: 'string', example: '# Hello\n\nParagraph here.' },
+      },
+      required: ['markdown'],
+    },
+  })
   @ApiResponse({ status: 201, description: 'HTML string returned.' })
   async convertToHtml(@Body('markdown') markdown: string): Promise<string> {
     return this.utilsService.markdownToHtml(markdown);

@@ -7,7 +7,7 @@ import {
   Delete,
   Put,
   Query,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { RdsInstanceService } from './rds-instance.service';
 import {

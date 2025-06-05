@@ -2,7 +2,7 @@ import { createSignal, onCleanup, onMount } from 'solid-js';
 import io from 'socket.io-client';
 import { Icon } from '@iconify-icon/solid';
 import { Button } from './ui/Button';
-const socket = io('https://board-api.duckdns.org'); // Adjust if hosted elsewhere
+const socket = io(`${import.meta.env.BASE_URL}`); // Adjust if hosted elsewhere
 
 export default function AudioDownloader() {
   const [url, setUrl] = createSignal('');
