@@ -19277,7 +19277,7 @@ function zT(i, e, t) {
   let r = e.resolveStack(t), s = e.resolveInner(t, -1).resolve(t, 0).enterUnfinishedNodesBefore(t);
   if (s != r.node) {
     let n = [];
-    for (let o = s; o && !(o.from == r.node.from && o.type == r.node.type); o = o.parent)
+    for (let o = s; o && !(o.from < r.node.from || o.to > r.node.to || o.from == r.node.from && o.type == r.node.type); o = o.parent)
       n.push(o);
     for (let o = n.length - 1; o >= 0; o--)
       r = { node: n[o], next: r };
@@ -19645,7 +19645,7 @@ class Qc extends Ii {
   }
 }
 function cR(i = {}) {
-  let e = Object.assign(Object.assign({}, lR), i), t = new Qc(e, !0), r = new Qc(e, !1), s = Ue.fromClass(class {
+  let e = { ...lR, ...i }, t = new Qc(e, !0), r = new Qc(e, !1), s = Ue.fromClass(class {
     constructor(o) {
       this.from = o.viewport.from, this.markers = this.buildMarkers(o);
     }
@@ -19672,15 +19672,18 @@ function cR(i = {}) {
       initialSpacer() {
         return new Qc(e, !1);
       },
-      domEventHandlers: Object.assign(Object.assign({}, n), { click: (o, a, l) => {
-        if (n.click && n.click(o, a, l))
-          return !0;
-        let c = tl(o.state, a.from, a.to);
-        if (c)
-          return o.dispatch({ effects: go.of(c) }), !0;
-        let h = el(o.state, a.from, a.to);
-        return h ? (o.dispatch({ effects: ql.of(h) }), !0) : !1;
-      } })
+      domEventHandlers: {
+        ...n,
+        click: (o, a, l) => {
+          if (n.click && n.click(o, a, l))
+            return !0;
+          let c = tl(o.state, a.from, a.to);
+          if (c)
+            return o.dispatch({ effects: go.of(c) }), !0;
+          let h = el(o.state, a.from, a.to);
+          return h ? (o.dispatch({ effects: ql.of(h) }), !0) : !1;
+        }
+      }
     }),
     IS()
   ];
