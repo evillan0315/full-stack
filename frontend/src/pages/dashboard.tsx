@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { SolidApexCharts } from 'solid-apexcharts';
 import { Icon } from '@iconify-icon/solid';
 import MetricCard from '../components/MetricCard';
+import { PageHeader } from '../components/ui/PageHeader';
 
 export default function Dashboard() {
   const { isAuthenticated } = useAuth();
@@ -46,14 +47,12 @@ export default function Dashboard() {
   return (
     <Show when={isAuthenticated()}>
       <div class="flex flex-col max-w-7xl mx-auto">
-        {/* Entry Logs */}
-        <div class="flex-1 scroll-smooth px-4 py-4 space-y-4 mt-2 mb-6">
-          <h1 class="leading-0 uppercase tracking-widest text-2xl mt-6 mb-10 px-4">
+        <div class="flex-1 scroll-smooth px-4 py-4 space-y-4 mt-2">
+          <PageHeader icon="mdi:view-dashboard">
             <b>Dash</b>board
-          </h1>
-
+          </PageHeader>
           {/* Metrics Cards */}
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-4 mt-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4  mt-4">
             <For each={metrics()}>{(metric) => <MetricCard {...metric} />}</For>
           </div>
 

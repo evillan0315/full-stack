@@ -1,6 +1,6 @@
 import { type JSX } from 'solid-js';
 import { A } from '@solidjs/router';
-
+import { Button } from './ui/Button';
 type HeroButton = {
   label: string;
   href: string;
@@ -12,6 +12,7 @@ type HeroProps = {
   heading: JSX.Element;
   subheading: string;
   buttons?: HeroButton[];
+  showUser?: boolean;
 };
 
 const Hero = (props: HeroProps): JSX.Element => {
@@ -37,9 +38,9 @@ const Hero = (props: HeroProps): JSX.Element => {
     <section class="text-center py-16 px-4">
       <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight mb-4">{props.heading}</h1>
 
-      <p class="text-lg sm:text-xl text-gray-700 dark:text-gray-400 mb-6">{props.subheading}</p>
+      <p class="text-lg sm:text-xl mb-6">{props.subheading}</p>
 
-      {isAuthenticated() && (
+      {isAuthenticated() && props.showUser && (
         <div class="mb-8">
           <p class="text-sky-600 dark:text-sky-400 text-lg font-medium">
             <span>Welcome, {props.user?.name ?? 'Guest'}!</span>
@@ -50,8 +51,10 @@ const Hero = (props: HeroProps): JSX.Element => {
 
       <div class="flex justify-center gap-4 flex-wrap">
         {props.buttons?.filter(shouldRenderButton).map((btn) => (
-          <A href={btn.href} class={resolveButtonClasses(btn.variant || 'primary')}>
-            {btn.label}
+          <A href={btn.href}>
+            <Button variant={btn.variant} class={`px-6 py-3 font-semibold`}>
+              {btn.label}
+            </Button>
           </A>
         ))}
       </div>

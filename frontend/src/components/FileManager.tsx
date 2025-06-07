@@ -6,7 +6,7 @@ import FileNode from '../components/FileNode';
 import Loading from '../components/Loading';
 import { Icon } from '@iconify-icon/solid';
 import type { FileItem } from '../types';
-import * as path from 'path-browserify'; 
+import * as path from 'path-browserify';
 
 // --- Interfaces ---
 
@@ -48,7 +48,7 @@ function buildTree(files: FileItem[] = []): FileItem[] {
     }
   }
 
-  tree.forEach(node => {
+  tree.forEach((node) => {
     // FIX: Ensure node.children is an array before sorting
     // This is safer if FileItem interface *could* have undefined children sometimes
     if (node.children) {
@@ -94,14 +94,14 @@ export default function FileManager(props: FileManagerProps) {
     return files(); // if files() is already the flat list of current dir children
   });
 
-
   const fetchFiles = async (directory?: string) => {
     setLoading(true);
     try {
-      const targetDirectory = directory !== undefined ? directory : '/';
-      const query = targetDirectory && targetDirectory !== '/' ? `?directory=${encodeURIComponent(targetDirectory)}&` : '?';
-      console.log(query, 'query fetchFiles');
-      const response = await api.get(`/file/list${query}recursive=true`);
+      const targetDirectory = directory !== undefined ? directory : './';
+      const query =
+        targetDirectory && targetDirectory !== './' ? `?directory=${encodeURIComponent(targetDirectory)}&` : '?';
+      //console.log(query, 'query fetchFiles');
+      const response = await api.get(`/file/list?directory=.%2F`);
       console.log(response, 'response fetchFiles');
       if (!response.data || !Array.isArray(response.data)) {
         throw new Error('Invalid data format received from API. Expected an array of FileItem.');
@@ -112,7 +112,7 @@ export default function FileManager(props: FileManagerProps) {
       setFiles(response.data as FileItem[]);
       setCurrentPath(targetDirectory);
     } catch (error) {
-      console.error("Failed to fetch files:", error);
+      console.error('Failed to fetch files:', error);
       alert(`Failed to fetch files: ${(error as any).response?.data?.message || (error as Error).message}`);
     } finally {
       setLoading(false);
@@ -120,7 +120,6 @@ export default function FileManager(props: FileManagerProps) {
   };
 
   props.refreshList?.((dir?: string) => fetchFiles(dir || currentPath())); // Pass currentPath as default
-
 
   const handleFileNodeSelect = (filePath: string, isDirectory: boolean) => {
     if (isDirectory) {
@@ -297,8 +296,10 @@ export default function FileManager(props: FileManagerProps) {
           </div>
 
           <ul class="space-y-1">
-            <li class="text-sm text-yellow-500 hover:underline cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => handleFileAction('open')}>
+            <li
+              class="text-sm text-yellow-500 hover:underline cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+              onClick={() => handleFileAction('open')}
+            >
               Open
             </li>
 
@@ -317,8 +318,10 @@ export default function FileManager(props: FileManagerProps) {
               </li>
             </Show>
 
-            <li class="text-sm text-red-500 hover:underline cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => handleFileAction('delete')}>
+            <li
+              class="text-sm text-red-500 hover:underline cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+              onClick={() => handleFileAction('delete')}
+            >
               ❌ Delete
             </li>
           </ul>

@@ -10,6 +10,8 @@ import {
   BadRequestException,
   UseGuards,
   Delete,
+  HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,6 +23,8 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
+import * as path from 'path';
 import { Response } from 'express';
 
 import { ReadFileDto } from './dto/read-file.dto';
@@ -123,17 +127,41 @@ export class FileController {
   async readFileContent(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: ReadFileDto,
-  ): Promise<ReadFileResponseDto> {
+    @Res() res: Response,
+  ): Promise<void> {
     const { buffer, filename, filePath } = await this.fileService.resolveFile(
       file,
       body,
     );
-    return this.fileService.readFile(
+
+    const fileData = this.fileService.readFile(
       buffer,
       filename,
       body.generateBlobUrl,
       filePath,
     );
+
+    if (body.generateBlobUrl) {
+      if (!filePath || !fs.existsSync(filePath)) {
+        throw new HttpException(
+          'Requested file not found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      res.setHeader('Content-Type', fileData.mimeType);
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${filename}"`,
+      );
+
+      const stream = fs.createReadStream(filePath);
+      stream.pipe(res);
+      return;
+    }
+
+    // If not generating blob URL, return JSON response manually
+    res.json(fileData);
   }
 
   //Read Multiple Files

@@ -2,6 +2,7 @@ import { createSignal, For, Show } from 'solid-js';
 import { Icon } from '@iconify-icon/solid';
 import { Button } from '../components/ui/Button';
 import ToggleSwitch from '../components/ui/ToggleSwitch';
+import { PageHeader } from '../components/ui/PageHeader';
 import api from '../services/api';
 
 interface SpeakerConfig {
@@ -147,15 +148,20 @@ export default function TTSForm() {
   };
 
   return (
-    <div class="py-6">
-      <div class="flex justify-center">
-        <div class="flex flex-col md:flex-row gap-6 w-full max-w-6xl px-6 py-4">
-          <div class="w-full md:w-2/3 space-y-4 rounded-lg border border-gray-500/30 p-6 bg-gray-500/10">
-            <div class="flex items-center justify-between">
-              <h2 class="text-2xl font-bold">Generate TTS Audio</h2>
-              <Icon icon="mdi:tts" width="2.2em" height="2.2em" />
-            </div>
-
+    <div class="flex flex-col max-w-7xl mx-auto">
+      <div class="flex-1 scroll-smooth px-4 py-4 space-y-4 mt-2">
+        <PageHeader icon="mdi:tts">
+          <b>Generate</b> TTS Audio
+        </PageHeader>
+        <p class="">
+                This interactive TTS generator transforms written prompts into human-like speech using the Google Cloud
+                Text-to-Speech API. Customize the language, assign unique voices to multiple speakers, and preview or
+                download the resulting audio.
+              </p>
+        {/* Main Content */}
+        <div class="flex flex-col md:flex-row gap-6">
+          <div class="space-y-4 md:w-3/4 rounded-lg border p-6 bg-gray-800/10 border-gray-500/30">
+            <label class="block mb-1 text-lg font-medium">Prompt</label>
             <textarea
               rows={4}
               class="w-full p-3 min-h-[160px] border border-gray-500/30 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
@@ -201,8 +207,12 @@ export default function TTSForm() {
                           )}
                         </For>
                       </select>
-                      <Button onClick={() => removeSpeaker(index())} class="px-2 py-1 text-sm">
-                        ✕
+                      <Button
+                        variant="outline"
+                        onClick={() => removeSpeaker(index())}
+                        class="w-8 h-8 px-1 py-1 text-sm"
+                      >
+                        <Icon icon="mdi:close" width="18" height="18" class="text-red-500" />
                       </Button>
                     </div>
                     <Show when={speaker.voiceName === 'Custom'}>
@@ -217,7 +227,7 @@ export default function TTSForm() {
                 )}
               </For>
               <div class="flex item-center justify-between">
-                <Button onClick={addSpeaker} class="text-sm border border-gray-500/30 ">
+                <Button onClick={addSpeaker} variant="secondary" class="primary px-4 py-1">
                   + Add Speaker
                 </Button>
                 <ToggleSwitch label="Autoplay" checked={autoPlay()} onChange={setAutoPlay} />
@@ -225,8 +235,9 @@ export default function TTSForm() {
             </div>
 
             <Button
-              class="w-full flex items-center gap-2 px-2 py-2 uppercase tracking-widest border border-gray-500/30 "
+              class="px-4 py-3 w-full text-xl mt-2 mb-6 gap-4 disabled:bg-gray-200"
               onClick={handleSubmit}
+              variant="secondary"
               disabled={loading()}
             >
               <Icon icon="mdi:tts" width="2.2em" height="2.2em" />
@@ -254,31 +265,30 @@ export default function TTSForm() {
             </div>
           </div>
 
-          <div class="w-full md:w-1/3 space-y-4 p-4 border border-gray-500/30 p-6 bg-gray-500/10 rounded-lg">
-            <h3 class="text-xl font-semibold">🔊 About Text-to-Speech</h3>
-            <p class="">
-              This interactive TTS generator transforms written prompts into human-like speech using the Google Cloud
-              Text-to-Speech API. Customize the language, assign unique voices to multiple speakers, and preview or
-              download the resulting audio.
-            </p>
+          {/* Sidebar Info */}
+          <div class="w-full md:w-1/4 space-y-4 ">
+            <div class="p-4 border rounded-lg bg-gray-800/10 border-gray-500/30">
+              <h3 class="text-xl font-semibold">🔊 About Text-to-Speech</h3>
+              
 
-            <h4 class="font-medium mt-4">✨ Key Features</h4>
-            <ul class="list-disc pl-5  space-y-1">
-              <li>Supports over 20 languages and dialects</li>
-              <li>Custom speaker and voice assignment</li>
-              <li>Real-time playback of synthesized speech</li>
-              <li>Downloadable `.wav` audio files</li>
-              <li>Clean and responsive UI with SolidJS</li>
-            </ul>
+              <h4 class="font-medium mt-4">✨ Key Features</h4>
+              <ul class="list-disc pl-5  space-y-1">
+                <li>Supports over 20 languages and dialects</li>
+                <li>Custom speaker and voice assignment</li>
+                <li>Real-time playback of synthesized speech</li>
+                <li>Downloadable `.wav` audio files</li>
+                <li>Clean and responsive UI with SolidJS</li>
+              </ul>
 
-            <h4 class="font-medium mt-4">🌐 Language Support</h4>
-            <p class="">Includes locales such as English (US, IN), Japanese, Hindi, Arabic, French, and more.</p>
+              <h4 class="font-medium mt-4">🌐 Language Support</h4>
+              <p class="">Includes locales such as English (US, IN), Japanese, Hindi, Arabic, French, and more.</p>
 
-            <h4 class="font-medium mt-4">🎙 Voice Profiles</h4>
-            <p class="">
-              Choose from curated tones like <em>Bright</em>, <em>Smooth</em>, or enter custom voice names for more
-              control.
-            </p>
+              <h4 class="font-medium mt-4">🎙 Voice Profiles</h4>
+              <p class="">
+                Choose from curated tones like <em>Bright</em>, <em>Smooth</em>, or enter custom voice names for more
+                control.
+              </p>
+            </div>
           </div>
         </div>
       </div>

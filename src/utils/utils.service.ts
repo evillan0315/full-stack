@@ -32,10 +32,10 @@ export class UtilsService {
   private cssDir = path.resolve(process.cwd(), 'styles');
   private globalCssContent: string | null = null;
   private downloadDir = path.resolve(process.cwd(), 'downloads');
-  
-  
+
   // --- Language Detection Maps ---
   private readonly EXTENSION_LANGUAGE_MAP: Record<string, string> = {
+    // Programming / markup / config
     js: 'javascript',
     jsx: 'javascript',
     ts: 'typescript',
@@ -63,9 +63,31 @@ export class UtilsService {
     vue: 'vue',
     svelte: 'svelte',
     sql: 'sql',
+
+    // Audio extensions
+    mp3: 'audio',
+    wav: 'audio',
+    ogg: 'audio',
+    m4a: 'audio',
+    aac: 'audio',
+    flac: 'audio',
+    wma: 'audio',
+
+    // Video extensions
+    mp4: 'video',
+    webm: 'video',
+    ogv: 'video',
+    avi: 'video',
+    mov: 'video',
+    mkv: 'video',
+    flv: 'video',
+    '3gp': 'video',
+    '3g2': 'video',
+    wmv: 'video',
   };
 
   private readonly MIME_LANGUAGE_MAP: Record<string, string> = {
+    // Text-based formats
     'application/json': 'json',
     'text/html': 'html',
     'text/css': 'css',
@@ -79,7 +101,31 @@ export class UtilsService {
     'text/plain': 'plaintext',
     'application/x-sh': 'shell',
     'application/x-yaml': 'yaml',
-    'video/mp2t': 'typescript', // This mapping seems unusual, verify if intended.
+
+    // Audio MIME types
+    'audio/mpeg': 'audio', // .mp3
+    'audio/mp3': 'audio', // .mp3 (alternate)
+    'audio/wav': 'audio', // .wav
+    'audio/x-wav': 'audio', // .wav (alternate)
+    'audio/webm': 'audio', // .webm (audio-only)
+    'audio/ogg': 'audio', // .ogg
+    'audio/mp4': 'audio', // .m4a
+    'audio/x-m4a': 'audio', // .m4a (alternate)
+    'audio/aac': 'audio', // .aac
+    'audio/flac': 'audio', // .flac
+    'audio/x-ms-wma': 'audio', // .wma
+
+    // Video MIME types
+    'video/mp4': 'video', // .mp4
+    'video/webm': 'video', // .webm
+    'video/ogg': 'video', // .ogv
+    'video/x-msvideo': 'video', // .avi
+    'video/quicktime': 'video', // .mov
+    'video/x-matroska': 'video', // .mkv
+    'video/x-flv': 'video', // .flv
+    'video/3gpp': 'video', // .3gp
+    'video/3gpp2': 'video', // .3g2
+    'video/x-ms-wmv': 'video', // .wmv
   };
 
   // --- Prettier Parser Map ---
@@ -121,7 +167,10 @@ export class UtilsService {
   }
 
   private async loadGlobalCss(): Promise<void> {
-    const cssFilePath = path.resolve(process.cwd(), `${this.cssDir}/global.css`);
+    const cssFilePath = path.resolve(
+      process.cwd(),
+      `${this.cssDir}/global.css`,
+    );
     try {
       this.globalCssContent = await fs.promises.readFile(cssFilePath, 'utf-8');
       this.logger.log('global.css loaded successfully.');

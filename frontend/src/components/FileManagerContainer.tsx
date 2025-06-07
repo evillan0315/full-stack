@@ -1,7 +1,7 @@
 // src/components/FileManagerContainer.tsx
 
 import { createSignal, onMount } from 'solid-js';
-import type { Accessor } from 'solid-js'; 
+import type { Accessor } from 'solid-js';
 import { Icon } from '@iconify-icon/solid';
 import FileManager from './FileManager';
 import type { FileItem } from '../types'; // Keep FileItem if you use it for other purposes here
@@ -75,7 +75,7 @@ const FileManagerContainer = (props: FileManagerContainerProps) => {
       class="flex min-h-0 min-w-0 flex-col overflow-hidden relative"
       // Use a Solid.js memo or directly access the prop if it's a signal
       // If props.left is a signal (Accessor<T>), call it; otherwise, use it directly.
-      style={`flex: ${typeof props.left === 'function' ? props.left() : (props.left || 1)}`} // Default to 1 if not provided
+      style={`flex: ${typeof props.left === 'function' ? props.left() : props.left || 1}`} // Default to 1 if not provided
     >
       {/* Sticky Collapsible Header */}
       <div class="sticky top-0 z-20 border-b border-gray-950 bg-white dark:bg-gray-800">
@@ -93,7 +93,8 @@ const FileManagerContainer = (props: FileManagerContainerProps) => {
               class="cursor-pointer flex items-center gap-1 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
               onClick={() => {
                 const refresh = refreshFileList();
-                if (refresh) { // Check if refresh function exists
+                if (refresh) {
+                  // Check if refresh function exists
                   refresh(); // Call the refresh function
                 }
               }}
@@ -123,7 +124,9 @@ const FileManagerContainer = (props: FileManagerContainerProps) => {
         // Initial state for max-height based on isOpen
         style={isOpen() ? 'max-height: none;' : 'max-height: 0px;'}
       >
-        <div class="pb-4 pt-2"> {/* Added some padding inside */}
+        <div class="pb-4 pt-2">
+          {' '}
+          {/* Added some padding inside */}
           {/* onFileSelect now takes a filePath (string) */}
           <FileManager
             onFileSelect={props.loadFile} // Pass the loadFile prop directly

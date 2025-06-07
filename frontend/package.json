@@ -7,7 +7,7 @@
     "build": "tsc -b && vite build",
     "build:css": "tailwindcss -i src/styles/global.css -o dist/assets/styles.css",
     "build:vite": "vite build",
-    "format": "prettier --write \"src/**/*.tsx\" \"src/**/*.ts\" \"libs/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.tsx\" \"src/**/*.ts\"",
     "start": "vite"
   },
   "author": "Eddie Villanueva",
@@ -21,7 +21,8 @@
     "typescript": "5.8.3",
     "vite": "^6.3.5",
     "vite-plugin-react": "^4.0.1",
-    "vite-plugin-solid": "^2.11.6"
+    "vite-plugin-solid": "^2.11.6",
+    "vite-plugin-static-copy": "^3.0.0"
   },
   "dependencies": {
     "@codemirror/lang-css": "^6.3.1",

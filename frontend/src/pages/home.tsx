@@ -1,7 +1,109 @@
-import { createSignal, createEffect, onCleanup } from 'solid-js';
+import { createSignal, createEffect, onCleanup, For } from 'solid-js';
 import { useAuth } from '../contexts/AuthContext';
 import FeatureCard from '../components/FeatureCard';
 import Hero from '../components/Hero';
+
+const ttsFeatures = [
+  {
+    icon: 'mdi:text-to-speech',
+    title: 'Multilingual Input',
+    description: 'Supports over 20 languages and regional accents using standardized language codes.',
+  },
+  {
+    icon: 'mdi:account-voice',
+    title: 'Custom Voice Profiles',
+    description: 'Define multiple speakers with distinct voices and tones like Bright, Smooth, or Informative.',
+  },
+  {
+    icon: 'mdi:music-note',
+    title: 'Real-Time Playback',
+    description: 'Instantly listen to generated speech and download high-quality audio files.',
+  },
+  {
+    icon: 'mdi:form-textbox',
+    title: 'Interactive Form',
+    description: 'Dynamic speaker fields, inline validation, and easy-to-use controls built with SolidJS.',
+  },
+  {
+    icon: 'mdi:api',
+    title: 'API Powered',
+    description: 'Backed by a robust REST API for reliable, scalable TTS generation and playback.',
+  },
+  {
+    icon: 'mdi:progress-clock',
+    title: 'Future Enhancements',
+    description: 'Plans include WebSocket streaming, sample previews, and enhanced customization.',
+  },
+];
+const benefits = [
+  {
+    icon: 'mdi:hand-okay',
+    title: 'Easy to Use',
+    description: 'Intuitive UI that helps you get started quickly without any hassle.',
+  },
+  {
+    icon: 'mdi:secure',
+    title: 'Secure & Reliable',
+    description: 'Your data is protected with industry-leading security measures.',
+  },
+  {
+    icon: 'mdi:focus-field',
+    title: 'Customizable',
+    description: 'Tailor the platform to your specific needs with flexible options.',
+  },
+];
+const editor_features = [
+  {
+    id: '7d2f7e98-983c-4d6a-896a-43bb8a5d85c5',
+    title: 'Integrated Code Editor',
+    icon: 'mdi:file-code-outline',
+    description: 'Edit your files with a fast, Monaco-based editor tailored for developers.',
+    page: 'fa6bc7dc-23ad-4174-84c4-bdb65de0c230',
+  },
+  {
+    id: '5971b870-98f4-4a7e-b9e2-e8d7de7d1fa4',
+    title: 'Terminal Access',
+    icon: 'mdi:console',
+    description: 'Execute commands directly from a built-in terminal interface with real-time output.',
+    page: '3e8b3138-3f64-4a37-bd88-72c3fefb7d5c',
+  },
+  {
+    id: '0f194ee1-f318-4a9f-8f10-bf26e23fcd57',
+    title: 'Version Control',
+    icon: 'mdi:source-branch',
+    description: 'Seamlessly track changes and manage your codebase using Git integration.',
+    page: '7a0f74b1-94d8-4ad0-9c4d-1b6599a6d4f3',
+  },
+  {
+    id: 'e9786a13-3a3d-46a0-9b0f-b7f82dd13e42',
+    title: 'Environment Configuration',
+    icon: 'mdi:cog-outline',
+    description:
+      'Configure environment variables through a user-friendly setup form and automatic .env file generation.',
+    page: '10495a57-c50b-40b3-8dbe-d0879ee589c3',
+  },
+  {
+    id: 'c5775401-3be2-42d5-95ee-dc818c6e89ef',
+    title: 'Project Explorer',
+    icon: 'mdi:folder-outline',
+    description: 'Navigate, organize, and manage your project files with a structured tree view.',
+    page: 'c17beae3-9ef1-4bcb-9947-7f66d1a897b5',
+  },
+  {
+    id: 'fc2f7a5c-d6f4-4b6f-b7f1-7a4043c0b0e2',
+    title: 'Live Preview',
+    icon: 'mdi:eye-outline',
+    description: 'View changes in real time with an embedded browser preview of your web application.',
+    page: '9495a528-65b5-4f6d-a43d-65c9cd6a215e',
+  },
+  {
+    id: '0e149f6e-caa7-4a88-94c3-214dfc1f94e4',
+    title: 'Authentication & Role Management',
+    icon: 'mdi:shield-account-outline',
+    description: 'Secure your workspace with JWT-based authentication and customizable role-based access control.',
+    page: 'f1b13e8b-41cf-4d02-9d90-918b94ea88e7',
+  },
+];
 
 const testimonials = [
   {
@@ -59,10 +161,11 @@ export default function Home() {
         {/* Hero Section */}
         <Hero
           user={isAuthenticated() ? { name: user()?.name } : null}
+          showUser={true}
           heading={
             <>
-              Welcome to <span class="text-blue-600 dark:text-sky-400 italic text-7xl">Project</span>{' '}
-              <span class="text-light">Board</span>
+              Welcome to <span class="text-blue-600 dark:text-sky-400 italic text-6xl font-bold">Project</span>{' '}
+              <span class="font-light">Board</span>
             </>
           }
           subheading="The best solution to manage your projects efficiently and effortlessly."
@@ -70,143 +173,81 @@ export default function Home() {
             {
               label: 'Go to Dashboard',
               href: '/dashboard',
-              variant: 'primary',
+              variant: 'secondary',
               showWhen: 'authenticated',
             },
             {
               label: 'Get Started',
-              href: '/dashboard',
-              variant: 'secondary',
+              href: '/login',
+              variant: 'primary',
               showWhen: 'unauthenticated',
             },
             {
               label: 'Learn More',
-              href: '/editor',
+              href: '/page/editor',
               variant: 'outline',
               showWhen: 'always',
             },
           ]}
         />
 
-        {/* Features Section */}
         <section class="mt-16 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
-          <FeatureCard
-            icon={'mdi:hand-okay'}
-            title="Easy to Use"
-            description="Intuitive UI that helps you get started quickly without any hassle."
-          />
-          <FeatureCard
-            icon={'mdi:secure'}
-            title="Secure & Reliable"
-            description="Your data is protected with industry-leading security measures."
-          />
-          <FeatureCard
-            icon={'mdi:focus-field'}
-            title="Customizable"
-            description="Tailor the platform to your specific needs with flexible options."
-          />
+          <For each={benefits}>
+            {({ icon, title, description }) => <FeatureCard icon={icon} title={title} description={description} />}
+          </For>
         </section>
 
         {/* Editor Features Section */}
         <section class="mt-20 max-w-5xl mx-auto text-center">
           <h2 class="text-3xl font-bold mb-2">Powerful Editor Features</h2>
-          <p class="text-lg text-gray-600 dark:text-gray-400 mb-10">
+          <p class="mb-10">
             Designed to feel like a full IDE in the browser, our editor provides a seamless development experience —
             complete with file navigation, in-browser coding, and an integrated terminal.
           </p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
-            <FeatureCard
-              icon="mdi:file-code-outline"
-              title="Integrated Code Editor"
-              description="Edit your files with a fast, Monaco-based editor tailored for developers."
-            />
-            <FeatureCard
-              icon="mdi:file-tree"
-              title="File Manager"
-              description="Navigate your project structure easily with a dynamic file explorer."
-            />
-            <FeatureCard
-              icon="mdi:resize"
-              title="Resizable Panels"
-              description="Adjust the editor and sidebar layout with flexible drag-to-resize functionality."
-            />
-            <FeatureCard
-              icon="mdi:console"
-              title="Embedded Terminal"
-              description="Run commands and interact with your environment directly in the terminal drawer."
-            />
-            <FeatureCard
-              icon="mdi:theme-light-dark"
-              title="Theme & UX Enhancements"
-              description="Customizable themes, smooth transitions, and IDE-like experience."
-            />
-            <FeatureCard
-              icon="mdi:update"
-              title="Live Layout Updates"
-              description="Responsive design with real-time layout adjustment support."
-            />
+            <For each={editor_features}>
+              {({ icon, title, description }) => <FeatureCard icon={icon} title={title} description={description} />}
+            </For>
           </div>
         </section>
+
         {/* Developer Tools Hero Section */}
         <section class="mt-24 mb-20 px-6 md:px-12 lg:px-24 text-center">
-          <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">Build. Edit. Speak.</h2>
-          <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto">
-            From a powerful, resizable code editor to an intelligent text-to-speech engine, our platform gives you
-            everything you need to create, communicate, and deploy content faster than ever.
-          </p>
-          <div class="flex justify-center gap-4 flex-wrap">
-            <a
-              href="/editor"
-              class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-6 rounded-md transition"
-            >
-              Launch Editor
-            </a>
-            <a
-              href="/tts"
-              class="border border-sky-600 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 font-semibold py-2 px-6 rounded-md transition"
-            >
-              Try Text-to-Speech
-            </a>
-          </div>
+          <Hero
+            user={isAuthenticated() ? { name: user()?.name } : null}
+            heading={
+              <>
+                Build. <span class="text-blue-600 dark:text-sky-400 italic">Edit.</span> Speak.
+              </>
+            }
+            subheading="From a powerful, resizable code editor to an intelligent text-to-speech engine, our platform gives you
+            everything you need to create, communicate, and deploy content faster than ever."
+            buttons={[
+              {
+                label: ' Launch Editor',
+                href: '/editor',
+                variant: 'primary',
+                showWhen: 'authenticated',
+              },
+              {
+                label: 'Learn More',
+                href: '/page/editor',
+                variant: 'secondary',
+                showWhen: 'unauthenticated',
+              },
+            ]}
+          />
         </section>
-        {/* Text-to-Speech Section */}
         <section class="mt-20 max-w-5xl mx-auto text-center">
           <h2 class="text-3xl font-bold mb-2">Text-to-Speech Generator</h2>
-          <p class="text-lg text-gray-600 dark:text-gray-400 mb-10">
+          <p class="mb-10">
             Generate realistic speech from text with support for multiple languages and custom voice profiles. Perfect
             for narration, accessibility, and voice-driven applications.
           </p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
-            <FeatureCard
-              icon="mdi:text-to-speech"
-              title="Multilingual Input"
-              description="Supports over 20 languages and regional accents using standardized language codes."
-            />
-            <FeatureCard
-              icon="mdi:account-voice"
-              title="Custom Voice Profiles"
-              description="Define multiple speakers with distinct voices and tones like Bright, Smooth, or Informative."
-            />
-            <FeatureCard
-              icon="mdi:music-note"
-              title="Real-Time Playback"
-              description="Instantly listen to generated speech and download high-quality audio files."
-            />
-            <FeatureCard
-              icon="mdi:form-textbox"
-              title="Interactive Form"
-              description="Dynamic speaker fields, inline validation, and easy-to-use controls built with SolidJS."
-            />
-            <FeatureCard
-              icon="mdi:api"
-              title="API Powered"
-              description="Backed by a robust REST API for reliable, scalable TTS generation and playback."
-            />
-            <FeatureCard
-              icon="mdi:progress-clock"
-              title="Future Enhancements"
-              description="Plans include WebSocket streaming, sample previews, and enhanced customization."
-            />
+            <For each={ttsFeatures}>
+              {({ icon, title, description }) => <FeatureCard icon={icon} title={title} description={description} />}
+            </For>
           </div>
         </section>
 
@@ -231,33 +272,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-        {/* Pricing Section */}
-        {/**<section class="mt-20 max-w-5xl mx-auto text-center">
-          <h2 class="text-3xl font-bold mb-8">Choose Your Plan</h2>
-          <div class="flex flex-col md:flex-row justify-center gap-8">
-            {pricingPlans.map((plan) => (
-              <div
-                class={`flex-1 border rounded-lg p-6 cursor-pointer transition-shadow ${
-                  selectedPlan() === plan.name ? 'border-sky-600 shadow-lg dark:border-sky-400' : ''
-                }`}
-                onClick={() => setSelectedPlan(plan.name)}
-              >
-                <h3 class="text-2xl font-semibold mb-2 text-sky-400">{plan.name}</h3>
-                <p class="text-xl mb-4">{plan.price}</p>
-                <ul class="mb-6 text-left list-disc list-inside">
-                  {plan.features.map((feature) => (
-                    <li>{feature}</li>
-                  ))}
-                </ul>
-                {selectedPlan() === plan.name && (
-                  <button class="w-full bg-sky-500 dark:text-gray-100 hover:bg-sky-500 font-semibold py-2 rounded-md transition">
-                    Select {plan.name}
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>**/}
       </main>
     </div>
   );

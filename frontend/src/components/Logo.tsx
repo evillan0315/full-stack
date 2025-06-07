@@ -10,7 +10,7 @@ interface LogoProps {
 
 const Logo = (props: LogoProps): JSX.Element => {
   return (
-    <a href="/" class={`-m-1.5 p-1.5 ${props.className || ''}`}>
+    <a href="/" class={`cursor-pointer flex items-center justify-center gap-2 ${props.className || ''}`}>
       <div class="flex align-center justify-center gap-4">
         <span class="sr-only">{props.name || 'Your Company Name'}</span>
         {props.logo ? (
@@ -22,9 +22,9 @@ const Logo = (props: LogoProps): JSX.Element => {
             {props.name.charAt(0).toUpperCase()}
           </div>
         )}
-        <div class="mt-1 uppercase tracking-widest font-light text-shadow-2xs ">
-          <b class="font-bold text-shadow-black">Project</b> Board
-        </div>
+      </div>
+      <div class="mt-1 uppercase tracking-widest font-light text-shadow-2xs ">
+        <b class="font-bold text-shadow-black">Project</b> Board
       </div>
     </a>
   );

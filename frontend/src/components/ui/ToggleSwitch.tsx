@@ -17,8 +17,8 @@ export default function ToggleSwitch(props: ToggleSwitchProps): JSX.Element {
           checked={props.checked}
           onChange={(e) => props.onChange(e.currentTarget.checked)}
         />
-        <div class="w-11 h-6 border rounded-full peer-checked:bg-gray-200 transition-colors"></div>
-        <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-sky-600 rounded-full transition-transform peer-checked:translate-x-5"></div>
+        <div class="w-11 h-6 rounded-full border peer-checked:bg-sky-500 transition-colors"></div>
+        <div class="absolute top-0.5 left-0.5 w-5 h-5 border bg-gray-950 rounded-full transition-transform peer-checked:translate-x-5"></div>
       </div>
     </label>
   );

@@ -9,7 +9,7 @@ type MetricCardProps = {
 
 const MetricCard = (props: MetricCardProps): JSX.Element => {
   return (
-    <div class="rounded-2xl px-4 py-8 shadow-md flex items-center space-x-4 border">
+    <div class="border bg-gray-800/10 border-gray-500/30 rounded-2xl px-4 py-8 shadow-md flex items-center space-x-4 border">
       <Icon icon={props.icon} width="50" height="50" class="text-sky-500 shrink-0" />
       <div class="flex flex-col">
         <span class="text-lg">{props.label}</span>

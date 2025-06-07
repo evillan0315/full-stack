@@ -11,7 +11,7 @@ import tailwindcss from '@tailwindcss/vite';
 // `process.cwd()` is the current working directory
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), ''); // Load all env vars (empty prefix means all)
-
+  
   return {
     plugins: [tailwindcss(), solidPlugin()],
     // publicDir: false, // Reconsider this if you have static assets like favicon.ico
@@ -30,20 +30,14 @@ export default defineConfig(({ mode }) => {
       // If this is a standard SPA, outDir would typically be 'dist' or similar.
       // If you are bundling this as a library to be included in another project, this is fine.
       // Assuming this is a library for a larger project, keep this.
-      outDir: path.resolve(__dirname, '../public/assets'), // Ensure absolute path for outDir
+      //outDir: path.resolve(__dirname, 'public/assets'), // Ensure absolute path for outDir
       target: 'esnext',
       assetsInlineLimit: 0,
       emptyOutDir: true,
       // rollupOptions comments are fine, they are commented out
     },
 
-    worker: {
-      rollupOptions: {
-        output: {
-          entryFileNames: `assets/[name].js`,
-        },
-      },
-    },
+
 
     resolve: {
       alias: {
@@ -58,7 +52,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/api': {
           // Use the env variable loaded by `loadEnv`
-          target: env.BASE_URL,
+          target: env.BASE_URL_API,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },

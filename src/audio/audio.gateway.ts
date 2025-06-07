@@ -26,12 +26,29 @@ export class AudioGateway implements OnGatewayConnection {
 
   @SubscribeMessage('extract_audio')
   async handleExtractAudio(
-    @MessageBody() data: { url: string; format?: string },
+    @MessageBody()
+    data: {
+      url: string;
+      format?: string;
+      provider?: string;
+      cookieAccess?: boolean;
+    },
   ): Promise<void> {
-    const { url, format = 'webm' } = data;
-    console.log(url, format);
+    const { url, format = 'webm', provider, cookieAccess } = data;
+    console.log('Extracting from URL:', url);
+    console.log('Requested format:', format);
+    console.log('Provider:', provider);
+    console.log('Cookie access:', cookieAccess);
+
     try {
-      const allowedFormats = ['mp3', 'webm', 'm4a', 'wav'] as const;
+      const allowedFormats = [
+        'mp3',
+        'webm',
+        'm4a',
+        'wav',
+        'mp4',
+        'flv',
+      ] as const;
       type Format = (typeof allowedFormats)[number];
 
       const isValidFormat = (f: string): f is Format =>
@@ -39,12 +56,14 @@ export class AudioGateway implements OnGatewayConnection {
 
       const requestedFormat: Format = isValidFormat(format) ? format : 'webm';
 
-      const filePath = await this.audioService.extractAudioFromYoutube(
+      const filePath = await this.audioService.extractAudioVideoFromYoutube(
         url,
         requestedFormat,
         (progress: number) => {
           this.server.emit('download_progress', { progress });
         },
+        provider,
+        cookieAccess,
       );
 
       this.server.emit('download_complete', { filePath });

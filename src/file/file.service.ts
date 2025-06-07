@@ -31,7 +31,6 @@ import { Request, Response } from 'express';
 // Import UtilsService
 import { UtilsService } from '../utils/utils.service'; // Adjust path as necessary
 
-
 @Injectable()
 export class FileService {
   private readonly logger = new Logger(FileService.name); // Initialize logger
@@ -216,7 +215,8 @@ export class FileService {
     recursive = false,
   ): Promise<any[]> {
     // Explicitly define return type as any[]
-    const dir = directory || process.cwd();
+    //const dir = directory || process.cwd();
+    const dir = path.resolve(process.cwd(), directory); 
     if (!(await fsExtra.pathExists(dir))) {
       throw new BadRequestException(`Directory not found: ${dir}`);
     }
@@ -234,18 +234,22 @@ export class FileService {
             const stat = await fs.lstat(fullPath);
             const isDir = stat.isDirectory();
             const filename = entry; // For files, entry is the filename
-            const mimeType = isDir
-              ? undefined
-              : mimeLookup(fullPath) || 'application/octet-stream';
+            let mimeType = mimeLookup(filename) || 'application/octet-stream';
+
+            // Fix incorrect MIME type for .mp4 files
+            if (mimeType === 'application/mp4') {
+              mimeType = 'video/mp4';
+            }
+
+            const lang = this.utilsService.detectLanguage(filename, mimeType); // Use utilsService.detectLanguage
 
             return {
               name: entry,
               path: fullPath,
               isDirectory: isDir,
               type: isDir ? 'folder' : 'file',
-              language: isDir
-                ? undefined
-                : this.utilsService.detectLanguage(filename, mimeType), // Use utilsService.detectLanguage
+              lang: isDir ? undefined : lang,
+              mimeType: isDir ? undefined : mimeType,
               children:
                 isDir && recursive
                   ? await this.getFilesByDirectory(fullPath, true)
@@ -327,16 +331,15 @@ export class FileService {
   ): ReadFileResponseDto {
     const mimeType = mimeLookup(filename) || 'application/octet-stream';
     const lang = this.utilsService.detectLanguage(filename, mimeType); // Use utilsService.detectLanguage
-
+    //const fileBuffer = Buffer.from(buffer, 'base64');
     return {
       filePath,
       filename,
       mimeType,
       language: lang,
-      content: buffer.toString('utf-8'), // Assuming text-based content for 'content'
-      blob: generateBlobUrl
+      content: generateBlobUrl
         ? `data:${mimeType};base64,${buffer.toString('base64')}`
-        : undefined,
+        : buffer.toString('utf-8'),
     };
   }
 

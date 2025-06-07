@@ -158,27 +158,18 @@ const FileNode = (props: FileNodeProps) => {
         onClick={handleClick}
         onContextMenu={(e) => props.onContextMenu(e, props.file)}
         onDblClick={() => {
-          if (!isDir && !editing()) { // Only allow double-click to edit files
+          if (!isDir && !editing()) {
+            // Only allow double-click to edit files
             setEditing(true);
           }
         }}
       >
         {/* Indentation for nested items. Adjust ml-4 if already in a nested structure */}
         {/* For directories, add a small arrow/chevron for expand/collapse */}
-        {isDir && (
-          <Icon
-            icon={open() ? 'mdi:chevron-down' : 'mdi:chevron-right'}
-            class="w-4 h-4 text-gray-500"
-          />
-        )}
+        {isDir && <Icon icon={open() ? 'mdi:chevron-down' : 'mdi:chevron-right'} class="w-4 h-4 text-gray-500" />}
         <Icon width="20" height="20" icon={currentIcon()} />
 
-        <Show
-          when={editing()}
-          fallback={
-            <span class="truncate max-w-[220px]">{props.file.name}</span>
-          }
-        >
+        <Show when={editing()} fallback={<span class="truncate max-w-[220px]">{props.file.name}</span>}>
           <input
             class="border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-gray-900 text-black dark:text-white rounded px-1 text-sm flex-grow"
             value={newName()}
@@ -193,7 +184,9 @@ const FileNode = (props: FileNodeProps) => {
 
       {/* Render children recursively if directory is open and has children */}
       <Show when={open() && hasChildren()}>
-        <div class="pl-5 border-l border-gray-300 dark:border-gray-900 ml-1"> {/* Adjust margin/padding */}
+        <div class="pl-5 border-l border-gray-300 dark:border-gray-900 ml-1">
+          {' '}
+          {/* Adjust margin/padding */}
           <For each={props.file.children}>
             {(child) => (
               <FileNode

@@ -7,7 +7,7 @@
   "compilerOptions": {
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "paths": {
       "~/*": ["*"],      
     }

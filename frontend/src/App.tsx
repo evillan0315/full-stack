@@ -19,6 +19,8 @@ import Editor from './pages/editor';
 import TTSForm from './pages/tts';
 import Downloader from './pages/downloader';
 import Dashboard from './pages/dashboard';
+import FileGalleryPage from './pages/file-gallery';
+
 import Home from './pages/home';
 
 export default function App() {
@@ -46,6 +48,14 @@ export default function App() {
             component={() => (
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/file-gallery"
+            component={() => (
+              <ProtectedRoute>
+                <FileGalleryPage />
               </ProtectedRoute>
             )}
           />

@@ -44,7 +44,7 @@ export class AppController {
   home(@Req() req: Request) {
     return {
       message: 'Welcome to NestJS + HBS + SolidJS!',
-      isAuthenticated: Boolean(req.cookies?.accessToken),
+      layout: 'layouts/index',
     };
   }
 

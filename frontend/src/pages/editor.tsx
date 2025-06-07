@@ -151,7 +151,6 @@ export default function Editor() {
     }
   });
 
-
   return (
     <div
       ref={gridRef} // Assign ref to the main grid container

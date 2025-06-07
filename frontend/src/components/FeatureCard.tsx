@@ -9,7 +9,7 @@ type FeatureCardProps = {
 
 const FeatureCard = (props: FeatureCardProps): JSX.Element => {
   return (
-    <div class="p-6 border rounded-lg hover:shadow-lg transition cursor-default ">
+    <div class="p-6 border rounded-lg bg-gray-800/10 border-gray-500/30 hover:shadow-lg transition cursor-default ">
       <Icon icon={props.icon} width="50" height="50" class="text-sky-500 shrink-0" />
       <h3 class="text-xl font-semibold mb-2">{props.title}</h3>
       <p class="">{props.description}</p>

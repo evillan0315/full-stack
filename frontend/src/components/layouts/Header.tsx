@@ -8,12 +8,12 @@ import { AvatarMenu } from './ProfileNav';
 import { ThemeToggle } from '../ThemeToggle';
 export default function Header() {
   return (
-    <header class="sticky top-0 z-50 h-[3rem] flex items-center border-b border-gray-800/50 dark:bg-gray-950/10 justify-between px-4">
-      <div class="flex align-center justify-center ">
+    <header class="sticky top-0 z-50 h-[3rem] flex items-center border-b bg-gray-800/10 border-gray-500/30 justify-between px-4">
+      <div class="flex items-center justify-center ">
         <div class="flex-1 align-center">
           <Logo name={company.name} />
         </div>
-        <nav class="hidden md:flex p-2">
+        <nav class="hidden md:flex">
           <Nav />
         </nav>
       </div>
@@ -21,10 +21,9 @@ export default function Header() {
       <div class="md:hidden">
         <MobileNav />
       </div>
-      <div class="flex align-center justify-between gap-x-4">
-        <div class="mt-1">
-          <ThemeToggle />
-        </div>
+      <div class="flex items-center justify-between gap-x-4">
+        <ThemeToggle />
+
         <AvatarMenu />
       </div>
     </header>
