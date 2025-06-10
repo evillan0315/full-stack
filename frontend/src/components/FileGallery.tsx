@@ -2,7 +2,7 @@ import { createResource, Show, For, createSignal, onCleanup } from 'solid-js';
 import api from '../services/api';
 import Loading from './Loading';
 
-import type { ReadFileResponseDto } from '../types';
+import type { ReadFileDto } from '../types';
 
 const getFileType = (filename: string): 'video' | 'audio' | 'image' | 'unknown' => {
   const ext = filename.split('.').pop()?.toLowerCase();
@@ -30,7 +30,7 @@ export const FileGallery = () => {
   };
 
   const [files] = createResource(async () => {
-    const res = await api.get<ReadFileResponseDto[]>(directory());
+    const res = await api.get<ReadFileDto[]>(directory());
 
     const result = res.data.map((file) => ({
       name: file.name,

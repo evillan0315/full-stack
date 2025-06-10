@@ -5,6 +5,8 @@ export interface FileItem {
   name: string;
   path: string;
   isDirectory: boolean;
+  mimeType?: string;
+  lang?: string;
   type: 'file' | 'folder';
   children?: FileItem[]; // Optional: for nested file/folder structures
   size?: number; // Optional: file size in bytes

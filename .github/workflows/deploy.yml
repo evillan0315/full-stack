@@ -55,9 +55,8 @@ jobs:
             pnpm install
             
             echo "Generating database..."
-            npx prisma prisma generate
+            npx prisma generate
             
-
             echo "⚙️ Building project..."
             pnpm build
 
