@@ -53,11 +53,27 @@ jobs:
 
             echo "📦 Installing dependencies..."
             pnpm install
+            
+            echo "Generating database..."
+            npx prisma prisma generate
+            
 
             echo "⚙️ Building project..."
             pnpm build
 
-            echo "🚀 Starting or restarting PM2 process..."
-            pm2 restart api-server || pm2 start ecosystem.config.cjs
+            echo "🚀 Starting api server PM2 process..."
+            pm2 delete api-server
+            pm2 start ecosystem.config.cjs
+            
+            echo "Installing frontend dependencies..."
+            cd frontend
+            npm install
+            
+            echo "Building frontend..."
+            npm run build
+            
+            echo "🚀 Starting Frontend PM2 process..."
+            pm2 delete project-board
+            pm2 start ecosystem.config.cjs
             pm2 save
 
