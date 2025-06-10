@@ -10,7 +10,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
 import { UtilsModule } from './utils/utils.module';
-import { DatabaseModule } from './database/database.module';
+//import { DatabaseModule } from './database/database.module';
 import { TerminalModule } from './terminal/terminal.module';
 import { FolderModule } from './folder/folder.module';
 import { GoogleModule } from './google/google.module';
@@ -30,7 +30,7 @@ import fileConfig from './config/file.config';
     UserModule,
     FileModule,
     UtilsModule,
-    DatabaseModule,
+    //DatabaseModule,
     TerminalModule,
     FolderModule,
     GoogleModule,
