@@ -2,15 +2,31 @@
 import * as hbs from 'hbs';
 
 export function registerHandlebarsHelpers() {
+
+  
+  hbs.registerHelper(
+    'selectedAttr',
+    function (actual: string, expected: string) {
+      return actual === expected ? 'selected' : '';
+    },
+  );
+  hbs.registerHelper('requiredAttr', function (isOptional) {
+    return !isOptional ? 'required' : '';
+  });
+  hbs.registerHelper('checkedAttr', function (value) {
+    return value === 'true' ? 'checked' : '';
+  });
   /**
    * Compares two values for equality (a == b).
    * Usage: {{#if (ifEquals value1 value2)}} ... {{/if}}
    * Note: This is a simple helper, primarily used as a subexpression within other block helpers like `if`.
-   */
+   
   hbs.registerHelper('ifEquals', function (arg1: any, arg2: any) {
     return arg1 == arg2; // Simply return true or false
-  });
-
+  });*/
+  hbs.registerHelper('ifEquals', function (a, b) {
+  return a === b;
+});
   /**
    * Checks if the current model is 'user' AND the field is an image-related field.
    * Usage: {{#ifUserImageField modelName fieldName}} ... {{/ifUserImageField}}

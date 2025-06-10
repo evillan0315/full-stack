@@ -77,42 +77,25 @@ export default function Editor() {
    * @param path - Path to the file being loaded
    */
   const loadFile = async (path: string) => {
-    // If the path is already the active tab and content is loaded, do nothing
-    if (path === activeTab() && fileContent()) {
-      return;
-    }
+    if (path === activeTab() && fileContent()) return;
 
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('filePath', path);
-      console.log(formData, 'formData loadFile');
-      console.log(path, 'path loadFile');
-      // Assuming `api.post` returns a structure like { data: { data: "file_content" } }
-      const response = await api.post('/file/read', formData);
+      const response = await api.post('/file/read', { filePath: path });
       console.log(response.data, 'loadFile response.data');
-      // Check if response.data or response.data.data exists and is a string
+
       if (!response.data || typeof response.data.content !== 'string') {
         throw new Error('Invalid file content format received from API');
       }
 
       setFileContent(response.data.content);
 
-      // Add to tabs if not already open
-      setOpenTabs((tabs) => {
-        if (!tabs.includes(path)) {
-          return [...tabs, path];
-        }
-        return tabs;
-      });
-      setActiveTab(path); // Set the newly loaded file as the active tab
+      setOpenTabs((tabs) => (tabs.includes(path) ? tabs : [...tabs, path]));
+      setActiveTab(path);
     } catch (err) {
       console.error(`Error loading file "${path}":`, err);
-      // Display error message to user, clear content or show a placeholder
-      setFileContent(`Error loading file: ${(err as any).response?.data?.message || (err as Error).message}`);
-      // Optionally remove the tab if loading failed
-      // setOpenTabs((tabs) => tabs.filter((t) => t !== path));
-      // setActiveTab(openTabs().length > 0 ? openTabs()[0] : '');
+      const errorMessage = (err as any)?.response?.data?.message || (err as Error).message || 'Unknown error';
+      setFileContent(`Error loading file: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }

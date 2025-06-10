@@ -216,7 +216,7 @@ export class FileService {
   ): Promise<any[]> {
     // Explicitly define return type as any[]
     //const dir = directory || process.cwd();
-    const dir = path.resolve(process.cwd(), directory); 
+    const dir = path.resolve(process.cwd(), directory);
     if (!(await fsExtra.pathExists(dir))) {
       throw new BadRequestException(`Directory not found: ${dir}`);
     }

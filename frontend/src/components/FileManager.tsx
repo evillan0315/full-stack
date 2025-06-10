@@ -262,18 +262,16 @@ export default function FileManager(props: FileManagerProps) {
             </div>
           }
         >
-          {/* FIX: Use fallback prop on For, remove outer Show for file length */}
           <For
-            each={fileTree()} // fileTree() now directly returns the flat list of children
+            each={fileTree()}
             fallback={<p class="text-center text-gray-500">No files or folders in this directory.</p>}
           >
             {(file) => (
-              // This is the single child function for <For>
               <FileNode
                 file={file}
-                onSelect={(filePath) => handleFileNodeSelect(filePath, file.isDirectory)}
+                onSelect={handleFileNodeSelect} // fileNode handles path + isDirectory
                 onContextMenu={handleContextMenu}
-                onRefresh={(dir) => fetchFiles(dir || currentPath())} // Pass a more robust refresh
+                onRefresh={(dir) => fetchFiles(dir || currentPath())}
               />
             )}
           </For>

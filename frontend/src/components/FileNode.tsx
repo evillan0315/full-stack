@@ -57,7 +57,7 @@ interface FileNodeProps {
    * Callback function triggered when a file is selected (e.g., clicked).
    * @param path The path of the selected file.
    */
-  onSelect: (path: string) => void;
+  onSelect: (path: string, isDirectory: boolean) => void;
   /**
    * Callback function triggered when the context menu is opened on the file node (e.g., right-click).
    * @param e The mouse event that triggered the context menu.
@@ -77,6 +77,8 @@ const FileNode = (props: FileNodeProps) => {
   const [open, setOpen] = createSignal(false);
   const [editing, setEditing] = createSignal(false);
   const [newName, setNewName] = createSignal(props.file.name);
+  const [loadingChildren, setLoadingChildren] = createSignal(false);
+  const [children, setChildren] = createSignal<FileItem[]>(props.file.children || []);
 
   // Memoized icon that reacts to `open` state if it's a directory
   const currentIcon = createMemo(() => {
@@ -85,12 +87,29 @@ const FileNode = (props: FileNodeProps) => {
 
   const isDir = props.file.isDirectory;
   // Check if children array exists and has length
-  const hasChildren = createMemo(() => isDir && props.file.children && props.file.children.length > 0);
+  //const hasChildren = createMemo(() => isDir && props.file.children && props.file.children.length > 0);
+  const hasChildren = createMemo(() => children().length > 0);
 
   // Toggle open state for directories
-  const toggle = () => {
-    if (isDir) {
-      setOpen(!open());
+  const toggle = async () => {
+    if (!isDir) return;
+
+    const nowOpen = !open();
+    setOpen(nowOpen);
+
+    if (nowOpen && children().length === 0) {
+      setLoadingChildren(true);
+      try {
+        const response = await api.get(`/file/list?directory=${encodeURIComponent(props.file.path)}`);
+        if (Array.isArray(response.data)) {
+          setChildren(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to load directory contents:', error);
+        alert(`Failed to load contents of ${props.file.name}`);
+      } finally {
+        setLoadingChildren(false);
+      }
     }
   };
 
@@ -99,8 +118,8 @@ const FileNode = (props: FileNodeProps) => {
     if (isDir) {
       toggle(); // Toggle folder open state
     } else {
-      console.log(props.file, 'file handleClick');
-      props.onSelect(props.file.path); // Call onSelect for files
+      props.onSelect(props.file.path, props.file.isDirectory);
+      //props.onSelect(props.file.path); // Call onSelect for files
     }
   };
 
@@ -159,16 +178,14 @@ const FileNode = (props: FileNodeProps) => {
         onContextMenu={(e) => props.onContextMenu(e, props.file)}
         onDblClick={() => {
           if (!isDir && !editing()) {
-            // Only allow double-click to edit files
             setEditing(true);
           }
         }}
       >
-        {/* Indentation for nested items. Adjust ml-4 if already in a nested structure */}
-        {/* For directories, add a small arrow/chevron for expand/collapse */}
-        {isDir && <Icon icon={open() ? 'mdi:chevron-down' : 'mdi:chevron-right'} class="w-4 h-4 text-gray-500" />}
+        {/* Icon representing the file or directory */}
         <Icon width="20" height="20" icon={currentIcon()} />
 
+        {/* File name or input field */}
         <Show when={editing()} fallback={<span class="truncate max-w-[220px]">{props.file.name}</span>}>
           <input
             class="border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-gray-900 text-black dark:text-white rounded px-1 text-sm flex-grow"
@@ -177,26 +194,34 @@ const FileNode = (props: FileNodeProps) => {
             onInput={(e) => setNewName(e.currentTarget.value)}
             onBlur={handleRename}
             onKeyDown={handleInputKeyDown}
-            onClick={(e) => e.stopPropagation()} // Prevent click from bubbling to parent div
+            onClick={(e) => e.stopPropagation()}
           />
         </Show>
+
+        {/* Chevron icon aligned to the right */}
+        {isDir && (
+          <Icon icon={open() ? 'mdi:chevron-down' : 'mdi:chevron-right'} class="w-4 h-4 text-gray-500 ml-auto" />
+        )}
       </div>
 
-      {/* Render children recursively if directory is open and has children */}
+      {/* Children rendering logic */}
       <Show when={open() && hasChildren()}>
-        <div class="pl-5 border-l border-gray-300 dark:border-gray-900 ml-1">
-          {' '}
-          {/* Adjust margin/padding */}
-          <For each={props.file.children}>
-            {(child) => (
-              <FileNode
-                file={child}
-                onSelect={props.onSelect}
-                onContextMenu={props.onContextMenu}
-                onRefresh={props.onRefresh} // Pass refresh prop down
-              />
-            )}
-          </For>
+        <div class="pl-2 border-l border-gray-300 dark:border-gray-900 ml-1">
+          <div class="pl-2 border-l border-gray-300 dark:border-gray-900 ml-1">
+            <Show when={loadingChildren()}>
+              <div class="text-sm text-gray-500 px-2">Loading...</div>
+            </Show>
+            <For each={children()}>
+              {(child) => (
+                <FileNode
+                  file={child}
+                  onSelect={props.onSelect}
+                  onContextMenu={props.onContextMenu}
+                  onRefresh={props.onRefresh}
+                />
+              )}
+            </For>
+          </div>
         </div>
       </Show>
     </div>

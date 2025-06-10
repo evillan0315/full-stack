@@ -11,10 +11,10 @@ export default function Downloader() {
           <b>Download & Extract</b> Audio or Video
         </PageHeader>
         <p>
-              This downloader lets you extract audio or download full video content from platforms like{' '}
-              <strong>YouTube</strong>, <strong>Bilibili</strong>, <strong>Vimeo</strong>, and many others. Powered by{' '}
-              <code>yt-dlp</code>, it supports a wide range of media sources and formats.
-            </p>
+          This downloader lets you extract audio or download full video content from platforms like{' '}
+          <strong>YouTube</strong>, <strong>Bilibili</strong>, <strong>Vimeo</strong>, and many others. Powered by{' '}
+          <code>yt-dlp</code>, it supports a wide range of media sources and formats.
+        </p>
         {/* Main Content */}
         <div class="flex flex-col md:flex-row gap-6">
           <div class="space-y-4 md:w-3/4 rounded-lg border p-6 bg-gray-800/10 border-gray-500/30">
@@ -24,7 +24,6 @@ export default function Downloader() {
           {/* Sidebar Info */}
           <div class="w-full md:w-1/4 space-y-4 p-4 border rounded-lg bg-gray-800/10 border-gray-500/30">
             <h3 class="text-xl font-semibold">🎧 About This Tool</h3>
-            
 
             <h4 class="font-medium text-gray-800 mt-4">✨ Key Features</h4>
             <ul class="list-disc pl-5 text-gray-700 space-y-1">

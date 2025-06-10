@@ -154,10 +154,10 @@ export default function TTSForm() {
           <b>Generate</b> TTS Audio
         </PageHeader>
         <p class="">
-                This interactive TTS generator transforms written prompts into human-like speech using the Google Cloud
-                Text-to-Speech API. Customize the language, assign unique voices to multiple speakers, and preview or
-                download the resulting audio.
-              </p>
+          This interactive TTS generator transforms written prompts into human-like speech using the Google Cloud
+          Text-to-Speech API. Customize the language, assign unique voices to multiple speakers, and preview or download
+          the resulting audio.
+        </p>
         {/* Main Content */}
         <div class="flex flex-col md:flex-row gap-6">
           <div class="space-y-4 md:w-3/4 rounded-lg border p-6 bg-gray-800/10 border-gray-500/30">
@@ -269,7 +269,6 @@ export default function TTSForm() {
           <div class="w-full md:w-1/4 space-y-4 ">
             <div class="p-4 border rounded-lg bg-gray-800/10 border-gray-500/30">
               <h3 class="text-xl font-semibold">🔊 About Text-to-Speech</h3>
-              
 
               <h4 class="font-medium mt-4">✨ Key Features</h4>
               <ul class="list-disc pl-5  space-y-1">

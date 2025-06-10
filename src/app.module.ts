@@ -18,6 +18,7 @@ import { GoogleOAuthService } from './google/google-oauth/google-oauth.service';
 import { SchemaModule } from './schema/schema.module';
 import { LogModule } from './log/log.module';
 import { AudioModule } from './audio/audio.module';
+import { SetupModule } from './setup/setup.module';
 
 import fileConfig from './config/file.config';
 
@@ -45,6 +46,7 @@ import fileConfig from './config/file.config';
       rootPath: join(__dirname, '..', 'assets'), // Points to the 'assets' folder
       serveRoot: '/assets', // The URL prefix for static files (e.g., /assets/project-board.css)
     }),
+    SetupModule,
   ],
   controllers: [AppController],
   providers: [AppService, GoogleOAuthService],

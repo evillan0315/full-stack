@@ -39,7 +39,7 @@ export class ViewsController {
 
   // Render File Listings View
 
-  @Get()
+  @Get('lists')
   @Roles(UserRole.ADMIN)
   @Render('pages/lists') // Assuming 'pages/lists' is your EJS/Handlebars template
   @ApiOperation({
