@@ -2,8 +2,6 @@
 import * as hbs from 'hbs';
 
 export function registerHandlebarsHelpers() {
-
-  
   hbs.registerHelper(
     'selectedAttr',
     function (actual: string, expected: string) {
@@ -25,8 +23,8 @@ export function registerHandlebarsHelpers() {
     return arg1 == arg2; // Simply return true or false
   });*/
   hbs.registerHelper('ifEquals', function (a, b) {
-  return a === b;
-});
+    return a === b;
+  });
   /**
    * Checks if the current model is 'user' AND the field is an image-related field.
    * Usage: {{#ifUserImageField modelName fieldName}} ... {{/ifUserImageField}}
