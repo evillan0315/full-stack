@@ -77,7 +77,7 @@ export default function GenerateDocumentationPage() {
             error={() => (error() ? 'Failed to generate documentation.' : '')}
             generatedContent={content() ?? ''}
           />
-
+          
           {/* Sidebar Info */}
           <div class="w-full md:w-1/4 space-y-4">
             <div class="p-4 border rounded-lg bg-gray-800/10 border-gray-500/30">

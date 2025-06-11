@@ -22,6 +22,7 @@ import { LogModule } from './log/log.module';
 import { AudioModule } from './audio/audio.module';
 import { SetupModule } from './setup/setup.module';
 import { ScreenRecorderModule } from './screen-recorder/screen-recorder.module';
+import { AwsModule } from './aws/aws.module';
 
 import fileConfig from './config/file.config';
 
@@ -117,7 +118,7 @@ import fileConfig from './config/file.config';
      */
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'assets'), // Absolute path to the static files
-      serveRoot: '/assets',  // URL path where the assets are served
+      serveRoot: '/assets', // URL path where the assets are served
     }),
     /**
      * Module for initial setup and configuration.
@@ -127,6 +128,7 @@ import fileConfig from './config/file.config';
      * Module for screen recording functionality.
      */
     ScreenRecorderModule,
+    AwsModule,
   ],
   /**
    * Controllers defined in this module.  Controllers handle incoming requests and route them to appropriate handlers.

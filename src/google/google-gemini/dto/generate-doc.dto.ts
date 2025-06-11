@@ -6,6 +6,7 @@ import {
   IsIn,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { OutputFormat } from '../output-format.enum'; 
 
 export class GenerateDocDto {
   @ApiProperty({
@@ -46,15 +47,15 @@ export class GenerateDocDto {
 
   @ApiProperty({
     description: 'Preferred output format of the documentation',
-    example: 'markdown',
+    example: OutputFormat.Markdown,
     required: false,
-    enum: ['markdown', 'json', 'html', 'text'],
-    default: 'text', // ✅ valid default
+    enum: OutputFormat,
+    default: OutputFormat.Text,
   })
   @IsOptional()
   @IsString()
-  @IsIn(['markdown', 'json', 'html', 'text'], {
+  @IsIn(Object.values(OutputFormat), {
     message: "Output must be one of 'markdown', 'json', 'html', 'text'",
   })
-  output?: 'markdown' | 'json' | 'html' | 'text';
+  output?: OutputFormat;
 }

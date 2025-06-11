@@ -31,6 +31,15 @@
     html.dark .dropdown-menu {
       @apply bg-gray-900;
     }
+    
+    html .markdown-wrapper pre {
+      @apply bg-sky-100;
+      @apply border border-gray-400;
+    }
+    html.dark .markdown-wrapper pre{
+      @apply bg-gray-900;
+      @apply border border-gray-800;
+    }
   }
   
   

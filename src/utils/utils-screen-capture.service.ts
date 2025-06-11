@@ -1,4 +1,4 @@
- import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as screenshot from 'screenshot-desktop';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
@@ -13,7 +13,8 @@ export class ScreenCaptureService {
    * @returns Path to the saved screenshot file.
    */
   async captureScreen(filepath?: string): Promise<string> {
-    const outputPath = filepath || join(process.cwd(), 'downloads', `screen-${Date.now()}.png`);
+    const outputPath =
+      filepath || join(process.cwd(), 'downloads', `screen-${Date.now()}.png`);
     const img = await screenshot({ format: 'png' });
     await writeFile(outputPath, img);
     this.logger.log(`Screenshot saved to ${outputPath}`);

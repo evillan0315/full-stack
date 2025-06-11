@@ -45,3 +45,11 @@ export interface ReadFileResponseDto {
    */
   blob?: string | null;
 }
+
+export interface GenerateCodeDto {
+  prompt: string;
+  topic?: string;
+  language?: string;
+  output?: 'markdown' | 'json' | 'html' | 'text';
+}
+

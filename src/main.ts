@@ -10,6 +10,7 @@ import { join } from 'path';
 import { Logger } from '@nestjs/common';
 import * as hbs from 'hbs';
 import { registerHandlebarsHelpers } from './common/helpers/hbs-helpers';
+import { writeFileSync } from 'fs';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -73,6 +74,8 @@ async function bootstrap() {
       .build();
 
     const document = SwaggerModule.createDocument(app, swaggerConfig);
+    // ✅ Optionally write the swagger spec to file
+    writeFileSync('./swagger.json', JSON.stringify(document, null, 2));
     SwaggerModule.setup('api', app, document);
     console.log('🥞 Swagger is enabled at /api');
   } else {

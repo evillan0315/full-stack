@@ -83,7 +83,7 @@ export default function GenerateDocumentation(props: GenerateDocumentationProps)
         disabled={props.loading()}
       >
         <Icon icon="mdi:file-document-outline" width="2.2em" height="2.2em" />
-        {props.loading() ? 'Generating...' : 'Generate Documentation'}
+        {props.loading() ? 'Generating Documentation...' : 'Generate Documentation'}
       </Button>
 
       <Show when={props.error()}>
@@ -93,9 +93,9 @@ export default function GenerateDocumentation(props: GenerateDocumentationProps)
       <Show when={props.generatedContent}>
         <div>
           <Show
-            when={props.output === 'markdown'}
+            when={props.output() === 'markdown'}
             fallback={
-              <pre class="whitespace-pre-wrap bg-gray-100 p-4 rounded text-sm text-gray-800 overflow-x-auto">
+              <pre class="whitespace-pre-wrap p-4 rounded text-sm overflow-x-auto">
                 {props.generatedContent}
               </pre>
             }

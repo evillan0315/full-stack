@@ -1,6 +1,11 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ScreenRecorderService } from './screen-recorder.service';
-import { ApiTags, ApiOperation, ApiQuery, ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiQuery,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 
 class StartRecordingResponse {
   path: string;
@@ -42,4 +47,3 @@ export class ScreenRecorderController {
     return { status: 'stopped' };
   }
 }
-

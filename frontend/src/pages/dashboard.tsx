@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { SolidApexCharts } from 'solid-apexcharts';
 import { Icon } from '@iconify-icon/solid';
 import MetricCard from '../components/MetricCard';
+import PackageJsonForm from '../components/PackageJsonForm';
 import { PageHeader } from '../components/ui/PageHeader';
 
 export default function Dashboard() {
@@ -72,7 +73,7 @@ export default function Dashboard() {
               )}
             </For>
           </div>
-
+          <PackageJsonForm />
           {/* Applications Section */}
           <div class="grid grid-cols-1 px-4 mt-4">
             <h2 class="leading-0 uppercase tracking-widest text-xl mt-6 mb-10">

@@ -3,6 +3,7 @@
 import { render } from 'solid-js/web';
 import './index.css';
 import App from './App.tsx';
+
 //import ThemeProvider from './contexts/ThemeProvider';
 
 /**

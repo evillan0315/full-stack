@@ -107,7 +107,33 @@ const EditorComponent = (props: EditorComponentProps) => {
       });
     }
   });
-
+  const handleAICodeAction = (action: string) => async () => {
+    setShowAIMenu(false)
+    setLoading(true);
+    showToast(`Preparing to ${action} your code...`, 'info')
+    //setLoadingMessage(`Preparing to ${action} your code...`);
+    try {
+      const payload = {
+        codeSnippet: content(),
+        language: language(),
+        output: 'text',
+      };
+      const response = await api.post(`/google-gemini/${action}-code`, payload);
+      if (!response.data) {
+        throw new Error(`Error  ${action} code from API`);
+      }
+      // Strip triple backticks and language tag if present
+      const cleanedContent = await api.post('/utils/strip-code-block', { content: response.data });
+      //console.log(cleanedContent.data, 'cleanedContent handleAICodeAction');
+      setContent(cleanedContent.data);
+      initEditor(cleanedContent.data);
+    } catch (err) {
+      console.error(`Error ${action} code:`, err);
+    } finally {
+      setLoading(false);
+      setLoadingMessage(``);
+    }
+  };
   /**
    * Asynchronously generates inline documentation for the current code in the editor.
    * It sends the code snippet and language to an API endpoint, retrieves the generated documentation,
@@ -382,14 +408,23 @@ const EditorComponent = (props: EditorComponentProps) => {
                   >
                     <Icon icon="mdi:code" width="2em" height="2em" /> Code Inline Documentation
                   </li>
-                  <li class="px-4 py-2 hover:bg-gray-500/10  cursor-pointer">
-                    Optimize Code (Coming soon)
+                  <li
+                    class="flex items-center justify-start gap-2  px-4 py-2 hover:bg-gray-500/10 cursor-pointer"
+                    onClick={handleAICodeAction('optimize')}
+                  >
+                    <Icon icon="mdi:code-block-braces" width="20" height="20" /> Optimize Code
                   </li>
-                  <li class="px-4 py-2 hover:bg-gray-500/10  cursor-pointer">
-                    Analyze Code (Coming soon)
+                  <li
+                    class="flex items-center justify-start gap-2  px-4 py-2 hover:bg-gray-500/10 cursor-pointer"
+                    onClick={handleAICodeAction('analyze')}
+                  >
+                    <Icon icon="mdi:code-block-parentheses" width="20" height="20" /> Analyze Code
                   </li>
-                  <li class="px-4 py-2 hover:bg-gray-500/10 cursor-pointer">
-                    Repair Code (Coming soon)
+                  <li
+                    class="flex items-center justify-start gap-2  px-4 py-2 hover:bg-gray-500/10 cursor-pointer"
+                    onClick={handleAICodeAction('repair')}
+                  >
+                    <Icon icon="mdi:code-tags-check" width="20" height="20" /> Repair Code
                   </li>
                 </ul>
               </div>

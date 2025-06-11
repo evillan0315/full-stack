@@ -1,4 +1,4 @@
- import { Controller, Get } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ScreenCaptureService } from './utils-screen-capture.service';
 
 @Controller('api/screen')

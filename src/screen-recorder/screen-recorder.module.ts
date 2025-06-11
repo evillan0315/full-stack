@@ -4,6 +4,6 @@ import { ScreenRecorderController } from './screen-recorder.controller';
 
 @Module({
   providers: [ScreenRecorderService],
-  controllers: [ScreenRecorderController]
+  controllers: [ScreenRecorderController],
 })
 export class ScreenRecorderModule {}

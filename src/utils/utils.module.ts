@@ -10,14 +10,24 @@ import { JsDocToMarkdownService } from './utils-jsdoc-to-markdown.service';
 import { ScreenCaptureService } from './utils-screen-capture.service';
 
 @Module({
-  controllers: [UtilsController, EncodingController, JsDocToMarkdownController, ScreenCaptureController],
+  controllers: [
+    UtilsController,
+    EncodingController,
+    JsDocToMarkdownController,
+    ScreenCaptureController,
+  ],
   providers: [
     EncodingService,
     UtilsService,
     MarkdownUtilService,
     JsDocToMarkdownService,
-    ScreenCaptureService
+    ScreenCaptureService,
   ],
-  exports: [EncodingService, UtilsService, JsDocToMarkdownService, ScreenCaptureService],
+  exports: [
+    EncodingService,
+    UtilsService,
+    JsDocToMarkdownService,
+    ScreenCaptureService,
+  ],
 })
 export class UtilsModule {}

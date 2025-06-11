@@ -30,7 +30,7 @@ import { JwtAuthGuard } from './auth.guard';
 import { Response, Request } from 'express';
 
 @ApiTags('Auth')
-@Controller('api/auth')
+@Controller('api/auth-google')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,

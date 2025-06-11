@@ -1,0 +1,6412 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_home",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Homepage rendered"
+          }
+        },
+        "summary": "Redirect to setup if .env is missing",
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "operationId": "AppController_getDashboard",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Dashboard rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render protected dashboard page",
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/profile": {
+      "get": {
+        "operationId": "AppController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Profile rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render protected profile page",
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/terminal": {
+      "get": {
+        "operationId": "AppController_getTerminal",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Terminal rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render protected terminal page",
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/settings": {
+      "get": {
+        "operationId": "AppController_getSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Settings rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render protected settings page",
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/tts": {
+      "get": {
+        "operationId": "AppController_getTTS",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "TTS rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render protected TTS page",
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/login": {
+      "get": {
+        "operationId": "AppController_getLogin",
+        "parameters": [
+          {
+            "name": "error",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login page rendered"
+          },
+          "302": {
+            "description": "Redirected if already logged in"
+          }
+        },
+        "summary": "Render login page",
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/editor": {
+      "get": {
+        "operationId": "AppController_getEditor",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Editor rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render protected editor page",
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/logout": {
+      "get": {
+        "operationId": "AppController_getLogout",
+        "parameters": [
+          {
+            "name": "error",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logout page rendered"
+          },
+          "302": {
+            "description": "Redirected if already logged in"
+          }
+        },
+        "summary": "Render logout page",
+        "tags": [
+          "App"
+        ]
+      },
+      "post": {
+        "operationId": "AppController_handleLogout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "User logged out successfully and redirected"
+          }
+        },
+        "summary": "Log out a user and clear JWT cookie",
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        },
+        "summary": "Log in a user and set JWT cookie",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Logged out successfully"
+          }
+        },
+        "summary": "Log out user (clear cookie)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/github": {
+      "get": {
+        "operationId": "AuthController_githubAuth",
+        "parameters": [],
+        "responses": {
+          "302": {
+            "description": "Redirects to GitHub login"
+          }
+        },
+        "summary": "Initiate GitHub OAuth2 login",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/github/callback": {
+      "get": {
+        "operationId": "AuthController_githubAuthRedirect",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "GitHub login successful with JWT issued"
+          },
+          "401": {
+            "description": "Unauthorized or failed login attempt"
+          }
+        },
+        "summary": "Handle GitHub OAuth2 callback and issue JWT token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/google": {
+      "get": {
+        "operationId": "AuthController_googleAuth",
+        "parameters": [],
+        "responses": {
+          "302": {
+            "description": "Redirects to Google login"
+          }
+        },
+        "summary": "Initiate Google OAuth2 login",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/google/callback": {
+      "get": {
+        "operationId": "AuthController_googleAuthRedirect",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Google login successful with JWT issued"
+          },
+          "401": {
+            "description": "Unauthorized or failed login attempt"
+          }
+        },
+        "summary": "Handle Google OAuth2 callback and issue JWT token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully"
+          },
+          "400": {
+            "description": "Validation failed or user already exists"
+          }
+        },
+        "summary": "Register a new user",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/resend-verification": {
+      "post": {
+        "operationId": "AuthController_resendVerification",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Resend email verification link",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/verify-email": {
+      "get": {
+        "operationId": "AuthController_verifyEmail",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "description": "JWT token for email verification",
+            "schema": {
+              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email verified successfully"
+          },
+          "400": {
+            "description": "Invalid or expired token"
+          }
+        },
+        "summary": "Verify user email address",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "AuthController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "User profile returned"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current authenticated user",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/user": {
+      "post": {
+        "operationId": "UserController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new User",
+        "tags": [
+          "User"
+        ]
+      },
+      "get": {
+        "operationId": "UserController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of User records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateUserDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retrieve all User records",
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/user/paginated": {
+      "get": {
+        "operationId": "UserController_findAllPaginated",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationUserResultDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Paginated User records",
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/user/{id}": {
+      "get": {
+        "operationId": "UserController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Find User by ID",
+        "tags": [
+          "User"
+        ]
+      },
+      "patch": {
+        "operationId": "UserController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid data."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update User by ID",
+        "tags": [
+          "User"
+        ]
+      },
+      "delete": {
+        "operationId": "UserController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete User by ID",
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/user": {
+      "get": {
+        "operationId": "ViewsController_getLists",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List user view rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render user lists view",
+        "tags": [
+          "Views"
+        ]
+      }
+    },
+    "/user/create": {
+      "get": {
+        "operationId": "ViewsController_getCreateForm",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Create user form rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render user creation form",
+        "tags": [
+          "Views"
+        ]
+      },
+      "post": {
+        "operationId": "ViewsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Handle user creation form submission",
+        "tags": [
+          "Views"
+        ]
+      }
+    },
+    "/api/file/list": {
+      "get": {
+        "operationId": "FileController_getFiles",
+        "parameters": [
+          {
+            "name": "directory",
+            "required": false,
+            "in": "query",
+            "description": "Path to the directory (defaults to current working directory)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recursive",
+            "required": false,
+            "in": "query",
+            "description": "List files recursively (defaults to false)",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of files and directories returned successfully"
+          },
+          "400": {
+            "description": "Invalid directory path"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "500": {
+            "description": "Failed to list directory contents"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List files and folders in a directory",
+        "tags": [
+          "File & Folder"
+        ]
+      }
+    },
+    "/api/file/read": {
+      "post": {
+        "description": "Provides file content based on the input source. You can upload a file, specify a local file path, or provide a URL to a remote file.",
+        "operationId": "FileController_readFileContent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Upload a file (optional if filePath or url is provided)"
+                  },
+                  "filePath": {
+                    "type": "string",
+                    "description": "Absolute or relative path to a file on the local file system"
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "URL of a remote file to fetch content from"
+                  },
+                  "generateBlobUrl": {
+                    "type": "boolean",
+                    "description": "If true, returns content as a base64 blob-style data URL."
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadFileResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Read file content from an uploaded file, local path, or URL",
+        "tags": [
+          "File & Folder"
+        ]
+      }
+    },
+    "/api/file/read-many": {
+      "post": {
+        "operationId": "FileController_readMultipleFiles",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Multiple files to upload and read"
+                  },
+                  "generateBlobUrl": {
+                    "type": "boolean",
+                    "description": "If true, returns content as base64 blob-style data URLs."
+                  }
+                },
+                "required": [
+                  "files"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contents of multiple files returned successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReadFileResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No files uploaded or validation failed."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload and read content from multiple files",
+        "tags": [
+          "File & Folder"
+        ]
+      }
+    },
+    "/api/file/proxy": {
+      "get": {
+        "operationId": "FileController_proxy",
+        "parameters": [
+          {
+            "name": "url",
+            "required": true,
+            "in": "query",
+            "description": "The URL of the image to proxy",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image successfully proxied"
+          },
+          "400": {
+            "description": "Missing or invalid image URL"
+          },
+          "500": {
+            "description": "Error fetching or streaming image"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Proxies an image URL and streams the image content",
+        "tags": [
+          "File & Folder"
+        ]
+      }
+    },
+    "/api/file/create": {
+      "post": {
+        "operationId": "FileController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File or folder successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFileDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or path."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new file or folder",
+        "tags": [
+          "File & Folder"
+        ]
+      }
+    },
+    "/api/file/write": {
+      "post": {
+        "description": "Creates a new file or overwrites an existing one with the provided content. Parent directories will be created if they do not exist.",
+        "operationId": "FileController_writeFileContent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "filePath": {
+                    "type": "string",
+                    "description": "Absolute or relative file path",
+                    "example": "/path/to/your/file.txt"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Text content to write into the file",
+                    "example": "This is the content of the file."
+                  }
+                },
+                "required": [
+                  "filePath",
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File written successfully."
+          },
+          "400": {
+            "description": "Both filePath and content are required."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "500": {
+            "description": "Failed to write file."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Write content to a file at a specified path",
+        "tags": [
+          "File & Folder"
+        ]
+      }
+    },
+    "/api/file/delete": {
+      "post": {
+        "operationId": "FileController_deleteFile",
+        "parameters": [
+          {
+            "name": "filePath",
+            "required": true,
+            "in": "query",
+            "description": "The path to the file or folder to delete.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted the file or folder."
+          },
+          "400": {
+            "description": "Path not found or invalid."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "500": {
+            "description": "Failed to delete the file or folder."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a file or folder",
+        "tags": [
+          "File & Folder"
+        ]
+      }
+    },
+    "/file/lists": {
+      "get": {
+        "description": "Displays a list of files and folders from a specified directory.",
+        "operationId": "ViewsController_getLists",
+        "parameters": [
+          {
+            "name": "directory",
+            "required": false,
+            "in": "query",
+            "description": "Optional: Path to the directory to list (defaults to current working directory).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recursive",
+            "required": false,
+            "in": "query",
+            "description": "Optional: If true, lists files recursively (defaults to false).",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File list view rendered successfully"
+          },
+          "400": {
+            "description": "Invalid directory or parameters"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "500": {
+            "description": "Failed to retrieve file listings"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render file system listings view",
+        "tags": [
+          "File Views"
+        ]
+      }
+    },
+    "/file/create": {
+      "get": {
+        "description": "Displays a form for creating new files or folders.",
+        "operationId": "ViewsController_getCreateForm",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Create file/folder form rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render file or folder creation form",
+        "tags": [
+          "File Views"
+        ]
+      },
+      "post": {
+        "operationId": "ViewsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File or folder created successfully, redirects to list view."
+          },
+          "400": {
+            "description": "Invalid input data or creation failed."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Handle file or folder creation form submission",
+        "tags": [
+          "File Views"
+        ]
+      }
+    },
+    "/file/view": {
+      "get": {
+        "description": "Displays the content of a specified file. Only for text-based files.",
+        "operationId": "ViewsController_viewFile",
+        "parameters": [
+          {
+            "name": "filePath",
+            "required": true,
+            "in": "query",
+            "description": "The absolute path to the file to view.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File content view rendered successfully."
+          },
+          "400": {
+            "description": "File path not provided or file not found."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "500": {
+            "description": "Failed to read file content."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render file content view",
+        "tags": [
+          "File Views"
+        ]
+      }
+    },
+    "/file/download": {
+      "get": {
+        "description": "Allows an authenticated administrator to download a specified file.",
+        "operationId": "ViewsController_downloadFile",
+        "parameters": [
+          {
+            "name": "filePath",
+            "required": true,
+            "in": "query",
+            "description": "The absolute path to the file to download.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File successfully downloaded.",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "File path not provided or file not found."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "500": {
+            "description": "Failed to read file for download."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download a file",
+        "tags": [
+          "File Views"
+        ]
+      }
+    },
+    "/api/utils/parse-env-map": {
+      "get": {
+        "description": "Parses a semicolon-delimited key=value string into an object.",
+        "operationId": "UtilsController_parseEnvMap",
+        "parameters": [
+          {
+            "name": "mapString",
+            "required": false,
+            "in": "query",
+            "description": "Semicolon-delimited key=value string to parse",
+            "schema": {
+              "example": "ts=typescript;js=javascript",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parsed key-value map",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "example": {
+                    "ts": "typescript",
+                    "js": "javascript"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Parse ENV-style map string",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/format": {
+      "post": {
+        "operationId": "UtilsController_formatCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FormatCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Formatted code returned as string",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "function test() {\n  return 42;\n}"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Format source code using Prettier",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/convert-to-svg": {
+      "post": {
+        "operationId": "UtilsController_uploadFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "color": {
+                    "type": "string",
+                    "example": "#000000",
+                    "description": "Fill color of the SVG output"
+                  },
+                  "width": {
+                    "type": "number",
+                    "example": 512,
+                    "description": "Resize width (pixels)"
+                  },
+                  "height": {
+                    "type": "number",
+                    "example": 512,
+                    "description": "Resize height (pixels)"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Convert an image to SVG",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/json-to-env": {
+      "post": {
+        "description": "Converts a JSON object (from file upload or request body) into a .env string. Optionally allows direct download of the .env file.",
+        "operationId": "UtilsController_jsonToEnv",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Optional: Upload a JSON file to convert."
+                  },
+                  "json": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "example": {
+                      "DB_HOST": "localhost",
+                      "DB_USER": "admin"
+                    },
+                    "description": "Optional: Provide a JSON object directly in the request body."
+                  },
+                  "download": {
+                    "type": "boolean",
+                    "example": true,
+                    "default": false,
+                    "description": "If true, the .env file will be downloaded; otherwise, the content is returned as plain text."
+                  }
+                },
+                "oneOf": [
+                  {
+                    "required": [
+                      "file"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "json"
+                    ]
+                  }
+                ]
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Optional: Upload a JSON file to convert."
+                  },
+                  "json": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "example": {
+                      "DB_HOST": "localhost",
+                      "DB_USER": "admin"
+                    },
+                    "description": "Optional: Provide a JSON object directly in the request body."
+                  },
+                  "download": {
+                    "type": "boolean",
+                    "example": true,
+                    "default": false,
+                    "description": "If true, the .env file will be downloaded; otherwise, the content is returned as plain text."
+                  }
+                },
+                "oneOf": [
+                  {
+                    "required": [
+                      "file"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "json"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns .env as a file or raw string based on download option",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "DB_HOST=localhost\nDB_USER=admin"
+                }
+              },
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "The .env file content if download is true."
+                }
+              }
+            }
+          }
+        },
+        "summary": "Upload JSON file or provide JSON body to convert to .env",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/env-to-json": {
+      "post": {
+        "description": "Parses a .env file from an upload or filepath and returns its contents as a JSON object.",
+        "operationId": "UtilsController_envToJson",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Upload a .env file or provide a filepath (only one)",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadEnvDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully parsed .env file.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "filepath": {
+                      "type": "string",
+                      "example": ".env.local"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "DB_HOST": "localhost",
+                        "DB_USER": "root"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Convert uploaded .env file or a filepath to JSON",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/extract-title": {
+      "post": {
+        "operationId": "UtilsController_extractTitle",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkdownDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Title successfully extracted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "title": "Hello World"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "summary": "Extracts the first H1 or H2 title from Markdown content",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/parse-select": {
+      "post": {
+        "description": "Parses a simple SELECT SQL string into a structured JSON object.",
+        "operationId": "UtilsController_parseSelect",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sql": {
+                    "type": "string",
+                    "example": "SELECT id, name FROM users WHERE active = 1"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Convert SELECT SQL to JSON",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/parse-insert": {
+      "post": {
+        "description": "Parses a simple INSERT SQL string into a structured JSON object.",
+        "operationId": "UtilsController_parseInsert",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sql": {
+                    "type": "string",
+                    "example": "INSERT INTO users (id, name) VALUES (1, 'Alice')"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Convert INSERT SQL to JSON",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/json-to-insert": {
+      "post": {
+        "description": "Generates a simple INSERT SQL string from a JSON object.",
+        "operationId": "UtilsController_jsonToSql",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "table": {
+                    "type": "string",
+                    "example": "users"
+                  },
+                  "data": {
+                    "type": "object",
+                    "example": {
+                      "id": 1,
+                      "name": "Alice"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Convert JSON to INSERT SQL",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/to-json": {
+      "post": {
+        "operationId": "UtilsController_convertToJson",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "markdown": {
+                    "type": "string",
+                    "example": "# Hello\n\nThis is **bold**."
+                  }
+                },
+                "required": [
+                  "markdown"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "MDAST JSON returned."
+          }
+        },
+        "summary": "Convert Markdown to JSON AST",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/to-markdown": {
+      "post": {
+        "operationId": "UtilsController_convertToMarkdown",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ast": {
+                    "type": "object",
+                    "example": {
+                      "type": "root",
+                      "children": [
+                        {
+                          "type": "heading",
+                          "depth": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": "Hello"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "ast"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Markdown string returned."
+          }
+        },
+        "summary": "Convert JSON AST to Markdown",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/to-html": {
+      "post": {
+        "operationId": "UtilsController_convertToHtml",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "markdown": {
+                    "type": "string",
+                    "example": "# Hello\n\nParagraph here."
+                  }
+                },
+                "required": [
+                  "markdown"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "HTML string returned."
+          }
+        },
+        "summary": "Convert Markdown to HTML",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/strip-code-block": {
+      "post": {
+        "operationId": "UtilsController_stripCodeBlock",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "example": "```typescript\nconst x = 42;\n```"
+                  }
+                },
+                "required": [
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Code block without triple backticks returned."
+          }
+        },
+        "summary": "Remove triple backticks from a code block",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/remove-code-comment": {
+      "post": {
+        "operationId": "UtilsController_removeCodeComment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "example": "/**\n * Adds two numbers\n */\nfunction add(a: number, b: number): number {\n  // Add them\n  return a + b;\n}"
+                  }
+                },
+                "required": [
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Code block with all comments removed is returned."
+          }
+        },
+        "summary": "Remove code comments from a code block (single-line and multi-line)",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/encoding/base64/encode": {
+      "post": {
+        "operationId": "EncodingController_encodeToBase64",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Code string to encode",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "example": "console.log(\"Hello\")"
+                  }
+                },
+                "required": [
+                  "code"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Base64 encoded string",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "encoded": {
+                      "type": "string",
+                      "example": "Y29uc29sZS5sb2goIkhlbGxvIik="
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Encode code to Base64",
+        "tags": [
+          "Encoding"
+        ]
+      }
+    },
+    "/api/encoding/base64/decode": {
+      "post": {
+        "operationId": "EncodingController_decodeFromBase64",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Base64 encoded string to decode",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "encoded": {
+                    "type": "string",
+                    "example": "Y29uc29sZS5sb2goIkhlbGxvIik="
+                  }
+                },
+                "required": [
+                  "encoded"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Decoded code string",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "console.log(\"Hello\")"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Decode code from Base64",
+        "tags": [
+          "Encoding"
+        ]
+      }
+    },
+    "/api/encoding/url/encode": {
+      "post": {
+        "operationId": "EncodingController_encodeToURIComponent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Code string to URL encode",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "example": "console.log(\"Hello\")"
+                  }
+                },
+                "required": [
+                  "code"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "URL-encoded string",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "encoded": {
+                      "type": "string",
+                      "example": "console.log%28%22Hello%22%29"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Encode code to URL-encoded format",
+        "tags": [
+          "Encoding"
+        ]
+      }
+    },
+    "/api/encoding/url/decode": {
+      "post": {
+        "operationId": "EncodingController_decodeFromURIComponent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "URL-encoded string to decode",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "encoded": {
+                    "type": "string",
+                    "example": "console.log%28%22Hello%22%29"
+                  }
+                },
+                "required": [
+                  "encoded"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Decoded code string",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "console.log(\"Hello\")"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Decode code from URL-encoded format",
+        "tags": [
+          "Encoding"
+        ]
+      }
+    },
+    "/api/docs/generate": {
+      "get": {
+        "operationId": "JsDocToMarkdownController_generateMarkdown",
+        "parameters": [
+          {
+            "name": "filePath",
+            "required": true,
+            "in": "query",
+            "description": "Path to the .ts or .tsx file",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Markdown documentation content as string."
+          }
+        },
+        "summary": "Generate Markdown from JSDoc comments",
+        "tags": [
+          "JSDoc"
+        ]
+      }
+    },
+    "/api/docs/export": {
+      "get": {
+        "operationId": "JsDocToMarkdownController_exportMarkdown",
+        "parameters": [
+          {
+            "name": "filePath",
+            "required": true,
+            "in": "query",
+            "description": "Path to the source .ts or .tsx file",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "outputPath",
+            "required": true,
+            "in": "query",
+            "description": "Path where the Markdown file will be written",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully exported Markdown file"
+          }
+        },
+        "summary": "Export Markdown documentation to a file",
+        "tags": [
+          "JSDoc"
+        ]
+      }
+    },
+    "/api/screen/capture": {
+      "get": {
+        "operationId": "ScreenCaptureController_capture",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "ScreenCapture"
+        ]
+      }
+    },
+    "/api/database/tables": {
+      "get": {
+        "operationId": "DatabaseController_getTables",
+        "parameters": [
+          {
+            "name": "connectionString",
+            "required": false,
+            "in": "query",
+            "description": "Optional custom database connection string. Defaults to DATABASE_URL if omitted.",
+            "schema": {
+              "example": "postgresql://postgres:password@localhost:5432/mydb",
+              "type": "string"
+            }
+          },
+          {
+            "name": "dbType",
+            "required": true,
+            "in": "query",
+            "description": "Type of database",
+            "schema": {
+              "enum": [
+                "postgres",
+                "mysql",
+                "mongodb"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tables with column metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "tableName": "users",
+                      "columns": [
+                        {
+                          "column_name": "id",
+                          "data_type": "integer",
+                          "is_nullable": "NO",
+                          "column_default": "nextval('users_id_seq'::regclass)"
+                        },
+                        {
+                          "column_name": "email",
+                          "data_type": "text",
+                          "is_nullable": "NO",
+                          "column_default": null
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all tables and their columns",
+        "tags": [
+          "Database"
+        ]
+      }
+    },
+    "/api/database/create-table": {
+      "post": {
+        "operationId": "DatabaseController_createTable",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTableDto"
+              },
+              "examples": {
+                "example1": {
+                  "summary": "Create users table",
+                  "value": {
+                    "connectionString": "postgresql://postgres:password@localhost:5432/mydb",
+                    "dbType": "postgres",
+                    "tableName": "users",
+                    "columns": [
+                      {
+                        "columnName": "id",
+                        "dataType": "SERIAL PRIMARY KEY"
+                      },
+                      {
+                        "columnName": "email",
+                        "dataType": "TEXT NOT NULL"
+                      },
+                      {
+                        "columnName": "created_at",
+                        "dataType": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Table created successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new table",
+        "tags": [
+          "Database"
+        ]
+      }
+    },
+    "/api/database/columns": {
+      "get": {
+        "operationId": "DatabaseController_getTableColumns",
+        "parameters": [
+          {
+            "name": "connectionString",
+            "required": false,
+            "in": "query",
+            "description": "PostgreSQL connection string",
+            "schema": {
+              "example": "postgresql://postgres:password@localhost:5432/mydb",
+              "type": "string"
+            }
+          },
+          {
+            "name": "tableName",
+            "required": true,
+            "in": "query",
+            "description": "Name of the table to query columns from",
+            "schema": {
+              "example": "users",
+              "type": "string"
+            }
+          },
+          {
+            "name": "columnName",
+            "required": false,
+            "in": "query",
+            "description": "Filter by column name (optional)",
+            "schema": {
+              "example": "email",
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by data type (optional)",
+            "schema": {
+              "example": "text",
+              "type": "string"
+            }
+          },
+          {
+            "name": "isNullable",
+            "required": false,
+            "in": "query",
+            "description": "Filter by nullable status (optional)",
+            "schema": {
+              "example": "NO",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of column metadata matching filters",
+            "schema": {
+              "example": [
+                {
+                  "column_name": "id",
+                  "data_type": "integer",
+                  "is_nullable": "NO",
+                  "column_default": "nextval('users_id_seq'::regclass)"
+                },
+                {
+                  "column_name": "email",
+                  "data_type": "text",
+                  "is_nullable": "NO",
+                  "column_default": null
+                }
+              ]
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ColumnMetadataDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all columns from a specific table with optional filters",
+        "tags": [
+          "Database"
+        ]
+      }
+    },
+    "/api/database/execute": {
+      "post": {
+        "operationId": "DatabaseController_executeSql",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteSqlDto"
+              },
+              "examples": {
+                "validQuery": {
+                  "summary": "Example of a SELECT query on the Documentation table",
+                  "value": {
+                    "sql": "SELECT * FROM \"Documentation\";",
+                    "connectionString": "postgresql://postgres:postgres@localhost:5432/appdb",
+                    "dbType": "postgres"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "SQL execution result"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Execute raw SQL against the target database",
+        "tags": [
+          "Database"
+        ]
+      }
+    },
+    "/api/terminal/ssh/run": {
+      "post": {
+        "description": "Runs a single SSH command on a remote Linux server using either a password or private key authentication. Returns stdout or error output.",
+        "operationId": "TerminalController_runSshCommand",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SshCommandDto"
+              },
+              "examples": {
+                "example1": {
+                  "summary": "Run uptime via password authentication",
+                  "value": {
+                    "host": "192.168.1.10",
+                    "port": 22,
+                    "username": "ubuntu",
+                    "password": "securepassword",
+                    "command": "uptime"
+                  }
+                },
+                "example2": {
+                  "summary": "Run disk usage via private key authentication",
+                  "value": {
+                    "host": "example.com",
+                    "port": 22,
+                    "username": "ec2-user",
+                    "privateKeyPath": "/home/user/.ssh/id_rsa",
+                    "command": "df -h"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Command executed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": "15:42:35 up 2 days,  3:12,  2 users,  load average: 0.15, 0.09, 0.10\n"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or SSH command failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "SSH command failed",
+                    "details": "Permission denied (publickey,password)."
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Execute SSH command on a remote server",
+        "tags": [
+          "Terminal"
+        ]
+      }
+    },
+    "/api/terminal/run": {
+      "post": {
+        "description": "Runs a local terminal command and returns stdout/stderr/exit code.",
+        "operationId": "TerminalController_runCommand",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerminalCommandDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Command executed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "stdout": "example output",
+                    "stderr": "",
+                    "exitCode": 0
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or command failed"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Execute a terminal command locally",
+        "tags": [
+          "Terminal"
+        ]
+      }
+    },
+    "/api/folder": {
+      "post": {
+        "operationId": "FolderController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFolderDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new Folder",
+        "tags": [
+          "File & Folder"
+        ]
+      },
+      "get": {
+        "operationId": "FolderController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of Folder records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateFolderDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retrieve all Folder records",
+        "tags": [
+          "File & Folder"
+        ]
+      }
+    },
+    "/api/folder/paginated": {
+      "get": {
+        "operationId": "FolderController_findAllPaginated",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationFolderResultDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Paginated Folder records",
+        "tags": [
+          "File & Folder"
+        ]
+      }
+    },
+    "/api/folder/{id}": {
+      "get": {
+        "operationId": "FolderController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFolderDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Find Folder by ID",
+        "tags": [
+          "File & Folder"
+        ]
+      },
+      "patch": {
+        "operationId": "FolderController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateFolderDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid data."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update Folder by ID",
+        "tags": [
+          "File & Folder"
+        ]
+      },
+      "delete": {
+        "operationId": "FolderController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete Folder by ID",
+        "tags": [
+          "File & Folder"
+        ]
+      }
+    },
+    "/folder": {
+      "get": {
+        "operationId": "ViewsController_getLists",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List folder view rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render folder lists view",
+        "tags": [
+          "Views"
+        ]
+      }
+    },
+    "/folder/create": {
+      "get": {
+        "operationId": "ViewsController_getCreateForm",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Create folder form rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render folder creation form",
+        "tags": [
+          "Views"
+        ]
+      },
+      "post": {
+        "operationId": "ViewsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Folder created successfully"
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Handle folder creation form submission",
+        "tags": [
+          "Views"
+        ]
+      }
+    },
+    "/api/google-gemini/optimize-code": {
+      "post": {
+        "operationId": "GoogleGeminiController_optimizeCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OptimizeCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Optimized code returned successfully"
+          }
+        },
+        "summary": "Optimize the given code for performance or readability",
+        "tags": [
+          "Google Gemini"
+        ]
+      }
+    },
+    "/api/google-gemini/analyze-code": {
+      "post": {
+        "operationId": "GoogleGeminiController_analyzeCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyzeCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Code analysis returned successfully"
+          }
+        },
+        "summary": "Analyze the given code for issues and improvements",
+        "tags": [
+          "Google Gemini"
+        ]
+      }
+    },
+    "/api/google-gemini/repair-code": {
+      "post": {
+        "operationId": "GoogleGeminiController_repairCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RepairCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Repaired code returned successfully"
+          }
+        },
+        "summary": "Repair syntax or logical errors in the given code",
+        "tags": [
+          "Google Gemini"
+        ]
+      }
+    },
+    "/api/google-gemini/generate-code": {
+      "post": {
+        "operationId": "GoogleGeminiController_generateCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully generated code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "### React UI Component\n\n```tsx\nfunction UserProfileCard() { /* ... */ }\n```"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "502": {
+            "description": "Google Gemini API request failed"
+          }
+        },
+        "summary": "Generate code using Google Gemini",
+        "tags": [
+          "Google Gemini"
+        ]
+      }
+    },
+    "/api/google-gemini/generate-doc": {
+      "post": {
+        "description": "Accepts a code snippet and optional parameters such as language, topic, isComment, and output format to generate documentation using Gemini.",
+        "operationId": "GoogleGeminiController_generateCodeDocumentation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateDocDto"
+              },
+              "examples": {
+                "example1": {
+                  "summary": "JavaScript with inline comments",
+                  "value": {
+                    "codeSnippet": "function add(a, b) {\n  return a + b;\n}",
+                    "language": "JavaScript",
+                    "topic": "Math utilities",
+                    "isComment": true,
+                    "output": "markdown"
+                  }
+                },
+                "example2": {
+                  "summary": "TypeScript without comments, JSON output",
+                  "value": {
+                    "codeSnippet": "export class AuthService {\n  login(user: any) {\n    return user;\n  }\n}",
+                    "language": "TypeScript",
+                    "topic": "Authentication Service",
+                    "isComment": false,
+                    "output": "json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Generated documentation based on the provided code snippet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "markdown": "### Math utilities\n\n```js\n// Adds two numbers\nfunction add(a, b) {\n  return a + b;\n}\n```"
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad gateway - Gemini API failure or invalid response."
+          }
+        },
+        "summary": "Generate documentation from code snippet using Google Gemini",
+        "tags": [
+          "Google Gemini"
+        ]
+      }
+    },
+    "/api/google-gemini-image/caption": {
+      "post": {
+        "operationId": "GoogleGeminiImageController_captionImage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImageCaptionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Generate a caption for an image URL using Gemini",
+        "tags": [
+          "Google Gemini"
+        ]
+      }
+    },
+    "/api/google-gemini-image/caption-url": {
+      "post": {
+        "operationId": "GoogleGeminiImageController_captionFromUrl",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaptionFromUrlDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Caption generated successfully"
+          },
+          "400": {
+            "description": "Invalid image URL or request"
+          },
+          "502": {
+            "description": "Failed to process image with Gemini"
+          }
+        },
+        "summary": "Generate a caption for an image URL",
+        "tags": [
+          "Google Gemini"
+        ]
+      }
+    },
+    "/api/google-gemini-image/caption-file": {
+      "post": {
+        "operationId": "GoogleGeminiImageController_captionFromFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaptionFromFileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Caption generated successfully"
+          },
+          "400": {
+            "description": "Invalid file path or request"
+          },
+          "502": {
+            "description": "Failed to process image with Gemini"
+          }
+        },
+        "summary": "Generate a caption for a local image file",
+        "tags": [
+          "Google Gemini"
+        ]
+      }
+    },
+    "/api/google-tts/generate": {
+      "post": {
+        "operationId": "GoogleGeminiTtsController_generateAudio",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TtsRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the generated WAV audio file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Generate TTS audio with multiple speakers using Google Gemini",
+        "tags": [
+          "Google Gemini"
+        ]
+      }
+    },
+    "/api/schema": {
+      "post": {
+        "operationId": "SchemaController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSchemaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateSchemaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new Schema",
+        "tags": [
+          "Schema"
+        ]
+      },
+      "get": {
+        "operationId": "SchemaController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of Schema records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateSchemaDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retrieve all Schema records",
+        "tags": [
+          "Schema"
+        ]
+      }
+    },
+    "/api/schema/paginated": {
+      "get": {
+        "operationId": "SchemaController_findAllPaginated",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationSchemaResultDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Paginated Schema records",
+        "tags": [
+          "Schema"
+        ]
+      }
+    },
+    "/api/schema/{id}": {
+      "get": {
+        "operationId": "SchemaController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateSchemaDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Find Schema by ID",
+        "tags": [
+          "Schema"
+        ]
+      },
+      "patch": {
+        "operationId": "SchemaController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSchemaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSchemaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid data."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update Schema by ID",
+        "tags": [
+          "Schema"
+        ]
+      },
+      "delete": {
+        "operationId": "SchemaController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete Schema by ID",
+        "tags": [
+          "Schema"
+        ]
+      }
+    },
+    "/schema": {
+      "get": {
+        "operationId": "ViewsController_getLists",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List schema view rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render schema lists view",
+        "tags": [
+          "Views"
+        ]
+      }
+    },
+    "/schema/create": {
+      "get": {
+        "operationId": "ViewsController_getCreateForm",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Create schema form rendered"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Render schema creation form",
+        "tags": [
+          "Views"
+        ]
+      },
+      "post": {
+        "operationId": "ViewsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSchemaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Schema created successfully"
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Handle schema creation form submission",
+        "tags": [
+          "Views"
+        ]
+      }
+    },
+    "/api/log": {
+      "post": {
+        "operationId": "LogController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLogDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateLogDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Forbidden."
+          }
+        },
+        "summary": "Create a new Log",
+        "tags": [
+          "Log"
+        ]
+      },
+      "get": {
+        "operationId": "LogController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of Log records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateLogDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Forbidden."
+          }
+        },
+        "summary": "Retrieve all Log records",
+        "tags": [
+          "Log"
+        ]
+      }
+    },
+    "/api/log/paginated": {
+      "get": {
+        "operationId": "LogController_findAllPaginated",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationLogResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Paginated Log records",
+        "tags": [
+          "Log"
+        ]
+      }
+    },
+    "/api/log/{id}": {
+      "get": {
+        "operationId": "LogController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateLogDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "summary": "Find Log by ID",
+        "tags": [
+          "Log"
+        ]
+      },
+      "patch": {
+        "operationId": "LogController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLogDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateLogDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid data."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "summary": "Update Log by ID",
+        "tags": [
+          "Log"
+        ]
+      },
+      "delete": {
+        "operationId": "LogController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        },
+        "summary": "Delete Log by ID",
+        "tags": [
+          "Log"
+        ]
+      }
+    },
+    "/log": {
+      "get": {
+        "operationId": "ViewsController_getLists",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List log view rendered"
+          }
+        },
+        "summary": "Render log lists view",
+        "tags": [
+          "Views"
+        ]
+      }
+    },
+    "/log/create": {
+      "get": {
+        "operationId": "ViewsController_getCreateForm",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Create log form rendered"
+          }
+        },
+        "summary": "Render log creation form",
+        "tags": [
+          "Views"
+        ]
+      },
+      "post": {
+        "operationId": "ViewsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLogDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Log created successfully"
+          },
+          "400": {
+            "description": "Invalid input data"
+          }
+        },
+        "summary": "Handle log creation form submission",
+        "tags": [
+          "Views"
+        ]
+      }
+    },
+    "/audio/extract": {
+      "post": {
+        "operationId": "AudioController_extract",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "example": "https://www.youtube.com/watch?v=xyz"
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": [
+                      "mp3",
+                      "webm",
+                      "m4a",
+                      "wav",
+                      "mp4",
+                      "flv"
+                    ],
+                    "default": "mp3"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "example": "youtube",
+                    "description": "Source provider such as youtube, vimeo, udemy, etc."
+                  },
+                  "cookieAccess": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether to include authentication cookies for private content."
+                  }
+                },
+                "required": [
+                  "url"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the extracted audio/video file path.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "filePath": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Extract audio/video from a URL",
+        "tags": [
+          "Audio"
+        ]
+      }
+    },
+    "/setup": {
+      "get": {
+        "operationId": "SetupController_setup",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Setup page rendered"
+          }
+        },
+        "summary": "Render server setup page",
+        "tags": [
+          "Setup"
+        ]
+      },
+      "post": {
+        "operationId": "SetupController_generateEnv",
+        "parameters": [],
+        "responses": {
+          "302": {
+            "description": ".env file created or updated"
+          }
+        },
+        "summary": "Generate or update .env file",
+        "tags": [
+          "Setup"
+        ]
+      }
+    },
+    "/api/record/start": {
+      "get": {
+        "operationId": "ScreenRecorderController_start",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": false,
+            "in": "query",
+            "description": "Optional output file name (e.g., ./recordings/custom.mp4)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recording started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartRecordingResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Start screen recording",
+        "tags": [
+          "Screen Recorder"
+        ]
+      }
+    },
+    "/api/record/stop": {
+      "get": {
+        "operationId": "ScreenRecorderController_stop",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Recording stopped successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopRecordingResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Stop screen recording",
+        "tags": [
+          "Screen Recorder"
+        ]
+      }
+    },
+    "/api/aws/rds": {
+      "get": {
+        "operationId": "RdsController_listInstances",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns a list of all PostgreSQL RDS instances"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all PostgreSQL RDS instances",
+        "tags": [
+          "AWS"
+        ]
+      },
+      "post": {
+        "operationId": "RdsController_createInstance",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "RDS instance creation parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "dbInstanceIdentifier"
+                ],
+                "properties": {
+                  "dbInstanceIdentifier": {
+                    "type": "string",
+                    "example": "my-postgres-db"
+                  },
+                  "dbInstanceClass": {
+                    "type": "string",
+                    "example": "db.t3.micro"
+                  },
+                  "allocatedStorage": {
+                    "type": "number",
+                    "example": 20
+                  },
+                  "masterUsername": {
+                    "type": "string",
+                    "example": "postgres"
+                  },
+                  "masterUserPassword": {
+                    "type": "string",
+                    "example": "StrongPassword123!"
+                  },
+                  "vpcSecurityGroupIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "sg-12345678"
+                    ]
+                  },
+                  "dbSubnetGroupName": {
+                    "type": "string",
+                    "example": "my-db-subnet-group"
+                  },
+                  "availabilityZone": {
+                    "type": "string",
+                    "example": "us-east-1a"
+                  },
+                  "multiAZ": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Key": {
+                          "type": "string"
+                        },
+                        "Value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "example": [
+                      {
+                        "Key": "Environment",
+                        "Value": "Production"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "RDS instance created successfully"
+          },
+          "400": {
+            "description": "Invalid input parameters"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new PostgreSQL RDS instance",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/rds/{id}": {
+      "get": {
+        "operationId": "RdsController_getInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "RDS instance identifier",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns details of the specified RDS instance"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "RDS instance not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get details of a specific RDS instance",
+        "tags": [
+          "AWS"
+        ]
+      },
+      "delete": {
+        "operationId": "RdsController_deleteInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "RDS instance identifier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skipFinalSnapshot",
+            "required": false,
+            "in": "query",
+            "description": "Whether to skip taking a final snapshot",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "finalDBSnapshotIdentifier",
+            "required": false,
+            "in": "query",
+            "description": "Name for the final snapshot",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RDS instance deletion initiated"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "RDS instance not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete an RDS instance",
+        "tags": [
+          "AWS"
+        ]
+      },
+      "put": {
+        "operationId": "RdsController_modifyInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "RDS instance identifier",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "RDS instance modification parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbInstanceClass": {
+                    "type": "string",
+                    "example": "db.t3.small"
+                  },
+                  "allocatedStorage": {
+                    "type": "number",
+                    "example": 30
+                  },
+                  "masterUserPassword": {
+                    "type": "string",
+                    "example": "NewStrongPassword123!"
+                  },
+                  "backupRetentionPeriod": {
+                    "type": "number",
+                    "example": 14
+                  },
+                  "preferredBackupWindow": {
+                    "type": "string",
+                    "example": "03:00-04:00"
+                  },
+                  "preferredMaintenanceWindow": {
+                    "type": "string",
+                    "example": "sun:05:00-sun:06:00"
+                  },
+                  "multiAZ": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "engineVersion": {
+                    "type": "string",
+                    "example": "13.7"
+                  },
+                  "allowMajorVersionUpgrade": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "autoMinorVersionUpgrade": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "applyImmediately": {
+                    "type": "boolean",
+                    "example": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RDS instance modified successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "RDS instance not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modify an RDS instance",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/rds/{id}/stop": {
+      "post": {
+        "operationId": "RdsController_stopInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "RDS instance identifier",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RDS instance stopped successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "RDS instance not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stop an RDS instance",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/rds/{id}/start": {
+      "post": {
+        "operationId": "RdsController_startInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "RDS instance identifier",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RDS instance started successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "RDS instance not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Start an RDS instance",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/rds/{id}/reboot": {
+      "post": {
+        "operationId": "RdsController_rebootInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "RDS instance identifier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "forceFailover",
+            "required": false,
+            "in": "query",
+            "description": "Whether to force a failover during reboot",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RDS instance rebooted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "RDS instance not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reboot an RDS instance",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/ec2": {
+      "get": {
+        "operationId": "Ec2Controller_listInstances",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of EC2 instances"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all EC2 instances",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/ec2/{id}": {
+      "get": {
+        "operationId": "Ec2Controller_getInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "EC2 instance ID",
+            "schema": {
+              "example": "i-0123456789abcdef0",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "EC2 instance details"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Instance not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get EC2 instance details",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/ec2/{id}/status": {
+      "get": {
+        "operationId": "Ec2Controller_getInstanceStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "EC2 instance ID",
+            "schema": {
+              "example": "i-0123456789abcdef0",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "EC2 instance status"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Instance not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get EC2 instance status",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/ec2/start/{id}": {
+      "post": {
+        "operationId": "Ec2Controller_startInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "EC2 instance ID",
+            "schema": {
+              "example": "i-0123456789abcdef0",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Instance start initiated"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Instance not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Start an EC2 instance",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/ec2/stop/{id}": {
+      "post": {
+        "operationId": "Ec2Controller_stopInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "EC2 instance ID",
+            "schema": {
+              "example": "i-0123456789abcdef0",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Instance stop initiated"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Instance not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stop an EC2 instance",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/ec2/terminate/{id}": {
+      "post": {
+        "operationId": "Ec2Controller_terminateInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "EC2 instance ID",
+            "schema": {
+              "example": "i-0123456789abcdef0",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Instance termination initiated"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "404": {
+            "description": "Instance not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Terminate an EC2 instance",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/ec2/launch": {
+      "post": {
+        "operationId": "Ec2Controller_launchInstance",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LaunchInstanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Instance launched successfully"
+          },
+          "400": {
+            "description": "Failed to launch instance"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Launch a new EC2 instance",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/ec2/{id}/tags": {
+      "post": {
+        "operationId": "Ec2Controller_addTags",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "EC2 instance ID",
+            "schema": {
+              "example": "i-0123456789abcdef0",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Tags to add to the instance",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "Name": "Production Server",
+                  "Environment": "Production"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tags added successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add tags to an EC2 instance",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/billing/cost-usage": {
+      "get": {
+        "operationId": "AwsBillingController_getCostAndUsage",
+        "parameters": [
+          {
+            "name": "granularity",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "MONTHLY",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2025-03-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2025-05-01",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The cost and usage data was successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CostAndUsageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "500": {
+            "description": "Failed to retrieve cost and usage data."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get AWS Cost and Usage",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/billing/budgets": {
+      "get": {
+        "operationId": "AwsBillingController_getBudgetDetails",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The budget details were successfully retrieved."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
+          "500": {
+            "description": "Failed to retrieve budget details."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get AWS Budget details",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/dynamodb/store-command": {
+      "post": {
+        "operationId": "DynamodbController_storeCommand",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreCommandDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Command stored successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Store a command in DynamoDB",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/dynamodb/stored-commands": {
+      "get": {
+        "operationId": "DynamodbController_getStoredCommands",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Stored commands retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retrieve stored commands from DynamoDB",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/dynamodb/create-table": {
+      "post": {
+        "operationId": "DynamodbController_createTable",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tableName": {
+                    "type": "string"
+                  },
+                  "keySchema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "attributeDefinitions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "provisionedThroughput": {
+                    "type": "object",
+                    "properties": {
+                      "ReadCapacityUnits": {
+                        "type": "number"
+                      },
+                      "WriteCapacityUnits": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Table created successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new DynamoDB table",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/dynamodb/list-tables": {
+      "get": {
+        "operationId": "DynamodbController_listTables",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved table names"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all DynamoDB tables",
+        "tags": [
+          "AWS"
+        ]
+      }
+    },
+    "/api/aws/dynamodb/list-data/{tableName}": {
+      "get": {
+        "operationId": "DynamodbController_listTableData",
+        "parameters": [
+          {
+            "name": "tableName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all stored data for a specific table",
+        "tags": [
+          "AWS"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Auth API",
+    "description": "Authentication and Role Protected APIs",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "Auth",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "jwt"
+      }
+    },
+    "schemas": {
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "StrongPassword123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "StrongPassword123"
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+1234567890"
+          },
+          "role": {
+            "type": "string",
+            "example": "USER"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "email field"
+          },
+          "emailVerified": {
+            "format": "date-time",
+            "type": "string",
+            "description": "emailVerified field"
+          },
+          "image": {
+            "type": "string",
+            "description": "image field"
+          },
+          "name": {
+            "type": "string",
+            "description": "name field"
+          },
+          "phone_number": {
+            "type": "string",
+            "description": "phone_number field"
+          }
+        },
+        "required": [
+          "email",
+          "emailVerified",
+          "image",
+          "name",
+          "phone_number"
+        ]
+      },
+      "PaginationUserResultDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateUserDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "email field"
+          },
+          "emailVerified": {
+            "format": "date-time",
+            "type": "string",
+            "description": "emailVerified field"
+          },
+          "image": {
+            "type": "string",
+            "description": "image field"
+          },
+          "name": {
+            "type": "string",
+            "description": "name field"
+          },
+          "phone_number": {
+            "type": "string",
+            "description": "phone_number field"
+          }
+        }
+      },
+      "ReadFileResponseDto": {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "The absolute or relative path to the file on the server, if applicable (e.g., for local files).",
+            "example": "/path/to/your/file.ts",
+            "nullable": true
+          },
+          "filename": {
+            "type": "string",
+            "description": "The original filename (e.g., \"document.pdf\", \"index.ts\").",
+            "example": "example.ts"
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "The MIME type of the file (e.g., \"text/plain\", \"application/json\").",
+            "example": "text/typescript"
+          },
+          "language": {
+            "type": "string",
+            "description": "The detected programming language of the file content, if applicable (e.g., \"typescript\", \"json\", \"markdown\").",
+            "example": "typescript",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "description": "The content of the file. For text-based files, this is the raw text. For binary files, it is the base64-encoded string.",
+            "example": "console.log(\"Hello World\");"
+          },
+          "blob": {
+            "type": "string",
+            "description": "A base64 encoded data URL (blob) of the file, if requested. Format: `data:[<mediatype>][;base64],<data>`",
+            "example": "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==",
+            "nullable": true
+          }
+        },
+        "required": [
+          "filename",
+          "mimeType",
+          "content"
+        ]
+      },
+      "CreateFileDto": {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "Path to file or directory"
+          },
+          "isDirectory": {
+            "type": "boolean",
+            "description": "Whether this is a directory",
+            "default": false
+          },
+          "content": {
+            "type": "string",
+            "description": "Optional content for the file (ignored if directory)"
+          },
+          "type": {
+            "type": "string",
+            "description": "Whether it is a folder or a file.",
+            "default": "file"
+          }
+        },
+        "required": [
+          "filePath",
+          "isDirectory"
+        ]
+      },
+      "FormatCodeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "function test() { return 42; }"
+          },
+          "language": {
+            "type": "string",
+            "example": "javascript"
+          }
+        },
+        "required": [
+          "code",
+          "language"
+        ]
+      },
+      "UploadEnvDto": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "Upload your .env file via multipart/form-data. Either `file` or `filepath` must be provided."
+          },
+          "filepath": {
+            "type": "string",
+            "description": "Optional path to a local .env file on the server. Either `file` or `filepath` must be provided.",
+            "example": ".env.local"
+          },
+          "_note_either_file_or_filepath": {
+            "type": "string",
+            "description": "Indicates that either `file` (uploaded .env) or `filepath` (local path) must be provided, but not necessarily both.",
+            "enum": [
+              "file_or_filepath"
+            ],
+            "readOnly": true
+          }
+        }
+      },
+      "MarkdownDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Markdown content containing a title (# Title)",
+            "example": "# Hello World\nThis is some markdown."
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "ColumnDto": {
+        "type": "object",
+        "properties": {
+          "columnName": {
+            "type": "string",
+            "example": "id"
+          },
+          "dataType": {
+            "type": "string",
+            "example": "integer"
+          }
+        },
+        "required": [
+          "columnName",
+          "dataType"
+        ]
+      },
+      "CreateTableDto": {
+        "type": "object",
+        "properties": {
+          "connectionString": {
+            "type": "string",
+            "example": "postgresql://user:pass@localhost:5432/db"
+          },
+          "tableName": {
+            "type": "string",
+            "example": "users"
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ColumnDto"
+            }
+          },
+          "dbType": {
+            "type": "string",
+            "example": "postgres",
+            "enum": [
+              "postgres",
+              "mysql",
+              "mongodb"
+            ]
+          }
+        },
+        "required": [
+          "connectionString",
+          "tableName",
+          "columns",
+          "dbType"
+        ]
+      },
+      "ColumnMetadataDto": {
+        "type": "object",
+        "properties": {
+          "column_name": {
+            "type": "string",
+            "example": "id"
+          },
+          "data_type": {
+            "type": "string",
+            "example": "integer"
+          },
+          "is_nullable": {
+            "type": "string",
+            "example": "NO",
+            "description": "Indicates whether the column is nullable"
+          },
+          "column_default": {
+            "type": "object",
+            "example": "nextval('users_id_seq'::regclass)",
+            "nullable": true
+          }
+        },
+        "required": [
+          "column_name",
+          "data_type",
+          "is_nullable",
+          "column_default"
+        ]
+      },
+      "ExecuteSqlDto": {
+        "type": "object",
+        "properties": {
+          "sql": {
+            "type": "string",
+            "example": "SELECT * FROM users;",
+            "description": "SQL script to be executed."
+          },
+          "connectionString": {
+            "type": "string",
+            "example": "postgresql://user:pass@localhost:5432/db",
+            "description": "Optional connection string. Defaults to DATABASE_URL."
+          },
+          "dbType": {
+            "type": "string",
+            "example": "postgres",
+            "enum": [
+              "postgres",
+              "mysql"
+            ],
+            "description": "Type of the database."
+          }
+        },
+        "required": [
+          "sql",
+          "dbType"
+        ]
+      },
+      "SshCommandDto": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "privateKeyPath": {
+            "type": "string"
+          },
+          "command": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "host",
+          "username",
+          "command"
+        ]
+      },
+      "TerminalCommandDto": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "Shell command to execute",
+            "example": "ls -la"
+          },
+          "cwd": {
+            "type": "string",
+            "description": "Working directory where the command should be run",
+            "example": "./"
+          }
+        },
+        "required": [
+          "command",
+          "cwd"
+        ]
+      },
+      "CreateFolderDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "name field"
+          },
+          "path": {
+            "type": "string",
+            "description": "path field"
+          },
+          "parentId": {
+            "type": "string",
+            "description": "parentId field"
+          }
+        },
+        "required": [
+          "name",
+          "path",
+          "parentId"
+        ]
+      },
+      "PaginationFolderResultDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateFolderDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "UpdateFolderDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "name field"
+          },
+          "path": {
+            "type": "string",
+            "description": "path field"
+          },
+          "parentId": {
+            "type": "string",
+            "description": "parentId field"
+          }
+        }
+      },
+      "OptimizeCodeDto": {
+        "type": "object",
+        "properties": {
+          "codeSnippet": {
+            "type": "string",
+            "description": "The code snippet to optimize for performance or readability",
+            "example": "function add(a, b) { return a + b; }"
+          },
+          "language": {
+            "type": "string",
+            "description": "Optional programming language of the code snippet",
+            "example": "JavaScript"
+          },
+          "output": {
+            "type": "string",
+            "description": "Preferred output format of the optimized code",
+            "example": "markdown",
+            "enum": [
+              "markdown",
+              "json",
+              "html",
+              "text"
+            ],
+            "default": "text"
+          }
+        },
+        "required": [
+          "codeSnippet"
+        ]
+      },
+      "AnalyzeCodeDto": {
+        "type": "object",
+        "properties": {
+          "codeSnippet": {
+            "type": "string",
+            "description": "The code snippet to analyze for issues, improvements, or best practices",
+            "example": "let total = 0; for (let i = 0; i < items.length; i++) { total += items[i]; }"
+          },
+          "language": {
+            "type": "string",
+            "description": "Optional programming language of the code snippet",
+            "example": "TypeScript"
+          },
+          "output": {
+            "type": "string",
+            "description": "Preferred output format of the code analysis",
+            "example": "text",
+            "enum": [
+              "markdown",
+              "json",
+              "html",
+              "text"
+            ],
+            "default": "text"
+          }
+        },
+        "required": [
+          "codeSnippet"
+        ]
+      },
+      "RepairCodeDto": {
+        "type": "object",
+        "properties": {
+          "codeSnippet": {
+            "type": "string",
+            "description": "The code snippet to repair by fixing syntax or logical errors",
+            "example": "functon greet() { console.log(\"Hello\") }"
+          },
+          "language": {
+            "type": "string",
+            "description": "Optional programming language of the code snippet",
+            "example": "JavaScript"
+          },
+          "output": {
+            "type": "string",
+            "description": "Preferred output format of the repaired code",
+            "example": "json",
+            "enum": [
+              "markdown",
+              "json",
+              "html",
+              "text"
+            ],
+            "default": "text"
+          }
+        },
+        "required": [
+          "codeSnippet"
+        ]
+      },
+      "GenerateCodeDto": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "The instruction or prompt for code generation",
+            "example": "Create a React component that displays a user profile card."
+          },
+          "language": {
+            "type": "string",
+            "description": "Optional programming language for the generated code",
+            "example": "TypeScript"
+          },
+          "topic": {
+            "type": "string",
+            "description": "Optional topic or context for the code generation",
+            "example": "React UI Components"
+          },
+          "output": {
+            "type": "string",
+            "description": "Preferred output format of the generated code",
+            "example": "markdown",
+            "enum": [
+              "markdown",
+              "json",
+              "html",
+              "text"
+            ],
+            "default": "text"
+          }
+        },
+        "required": [
+          "prompt"
+        ]
+      },
+      "GenerateDocDto": {
+        "type": "object",
+        "properties": {
+          "codeSnippet": {
+            "type": "string",
+            "description": "The code snippet to document",
+            "example": "function greet(name) { return `Hello, ${name}`; }"
+          },
+          "language": {
+            "type": "string",
+            "description": "Optional programming language of the code",
+            "example": "JavaScript"
+          },
+          "topic": {
+            "type": "string",
+            "description": "Optional topic or context for the code",
+            "example": "Greeting Utility Functions"
+          },
+          "isComment": {
+            "type": "boolean",
+            "description": "Whether to generate documentation as inline code comments",
+            "example": true,
+            "default": false
+          },
+          "output": {
+            "type": "string",
+            "description": "Preferred output format of the documentation",
+            "example": "markdown",
+            "enum": [
+              "markdown",
+              "json",
+              "html",
+              "text"
+            ],
+            "default": "text"
+          }
+        },
+        "required": [
+          "codeSnippet"
+        ]
+      },
+      "ImageCaptionDto": {
+        "type": "object",
+        "properties": {
+          "imageUrl": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          },
+          "prompt": {
+            "type": "string",
+            "example": "Caption this image."
+          }
+        },
+        "required": [
+          "imageUrl"
+        ]
+      },
+      "CaptionFromUrlDto": {
+        "type": "object",
+        "properties": {
+          "imageUrl": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          },
+          "prompt": {
+            "type": "string",
+            "example": "What is shown in this image?"
+          }
+        },
+        "required": [
+          "imageUrl"
+        ]
+      },
+      "CaptionFromFileDto": {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "example": "./assets/sample.jpg"
+          },
+          "prompt": {
+            "type": "string",
+            "example": "Provide a short caption for this file."
+          }
+        },
+        "required": [
+          "filePath"
+        ]
+      },
+      "SpeakerDto": {
+        "type": "object",
+        "properties": {
+          "speaker": {
+            "type": "string",
+            "example": "Eddie",
+            "description": "Speaker name as referenced in the prompt"
+          },
+          "voiceName": {
+            "type": "string",
+            "example": "Kore",
+            "description": "Voice name to use for the speaker"
+          }
+        },
+        "required": [
+          "speaker",
+          "voiceName"
+        ]
+      },
+      "TtsRequestDto": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "example": "Eddie: AI is changing everything!\nMarionette: And it's influencing fashion too.",
+            "description": "Text prompt with named speakers"
+          },
+          "speakers": {
+            "description": "Array of speaker-voice configurations",
+            "example": [
+              {
+                "speaker": "Eddie",
+                "voiceName": "Kore"
+              },
+              {
+                "speaker": "Marionette",
+                "voiceName": "Puck"
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpeakerDto"
+            }
+          },
+          "languageCode": {
+            "type": "string",
+            "example": "en-US",
+            "description": "Language code for the speech synthesis (optional)"
+          }
+        },
+        "required": [
+          "prompt",
+          "speakers"
+        ]
+      },
+      "CreateSchemaDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "name field"
+          },
+          "schema": {
+            "type": "object",
+            "description": "schema field"
+          }
+        },
+        "required": [
+          "name",
+          "schema"
+        ]
+      },
+      "PaginationSchemaResultDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateSchemaDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "UpdateSchemaDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "name field"
+          },
+          "schema": {
+            "type": "object",
+            "description": "schema field"
+          }
+        }
+      },
+      "CreateLogDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "data field"
+          },
+          "type": {
+            "type": "string",
+            "description": "type field"
+          }
+        },
+        "required": [
+          "data",
+          "type"
+        ]
+      },
+      "PaginationLogResultDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateLogDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
+        ]
+      },
+      "UpdateLogDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "data field"
+          },
+          "type": {
+            "type": "string",
+            "description": "type field"
+          }
+        }
+      },
+      "StartRecordingResponse": {
+        "type": "object",
+        "properties": {}
+      },
+      "StopRecordingResponse": {
+        "type": "object",
+        "properties": {}
+      },
+      "LaunchInstanceDto": {
+        "type": "object",
+        "properties": {
+          "imageId": {
+            "type": "string",
+            "description": "The ID of the AMI to use for the instance",
+            "example": "ami-0abcdef1234567890"
+          },
+          "instanceType": {
+            "type": "string",
+            "description": "The type of instance to launch",
+            "enum": [
+              "t2.micro",
+              "t2.small",
+              "t2.medium",
+              "t3.micro",
+              "t3.small",
+              "t3.medium",
+              "t3.large"
+            ],
+            "example": "t2.micro"
+          },
+          "securityGroupIds": {
+            "description": "The IDs of the security groups for the instance",
+            "example": [
+              "sg-0123456789abcdef0"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subnetId": {
+            "type": "string",
+            "description": "The ID of the subnet to launch the instance into",
+            "example": "subnet-0123456789abcdef0"
+          },
+          "keyName": {
+            "type": "string",
+            "description": "The name of the key pair to use for the instance",
+            "example": "my-key-pair"
+          },
+          "tags": {
+            "type": "object",
+            "description": "Tags to apply to the instance",
+            "example": {
+              "Name": "My Instance",
+              "Environment": "Development"
+            }
+          },
+          "userData": {
+            "type": "string",
+            "description": "User data to make available to the instance",
+            "example": "#!/bin/bash\necho \"Hello, World!\" > /tmp/hello.txt"
+          }
+        },
+        "required": [
+          "imageId",
+          "instanceType"
+        ]
+      },
+      "CostAndUsageResponse": {
+        "type": "object",
+        "properties": {
+          "TotalCost": {
+            "type": "object",
+            "description": "The total cost for the requested time period, including metrics like BlendedCost.",
+            "example": {
+              "BlendedCost": {
+                "Amount": "0.0579495744",
+                "Unit": "USD"
+              }
+            }
+          },
+          "Granularity": {
+            "type": "string",
+            "description": "The granularity of the cost report (e.g., MONTHLY).",
+            "example": "MONTHLY"
+          },
+          "StartDate": {
+            "type": "string",
+            "description": "The start date of the report in YYYY-MM-DD format.",
+            "example": "2025-03-01"
+          },
+          "EndDate": {
+            "type": "string",
+            "description": "The end date of the report in YYYY-MM-DD format.",
+            "example": "2025-05-01"
+          }
+        },
+        "required": [
+          "TotalCost",
+          "Granularity",
+          "StartDate",
+          "EndDate"
+        ]
+      },
+      "StoreCommandDto": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+}

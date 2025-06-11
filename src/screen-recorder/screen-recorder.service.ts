@@ -8,7 +8,9 @@ export class ScreenRecorderService {
   private recordingProcess: ChildProcessWithoutNullStreams | null = null;
 
   startRecording(filename?: string): string {
-    const outputFile = filename || join(process.cwd(), 'recordings', `recording-${Date.now()}.mp4`);
+    const outputFile =
+      filename ||
+      join(process.cwd(), 'recordings', `recording-${Date.now()}.mp4`);
 
     // Get the appropriate ffmpeg args based on the platform
     const ffmpegArgs = this.getFfmpegArgs(outputFile);
@@ -40,7 +42,15 @@ export class ScreenRecorderService {
   private getFfmpegArgs(outputFile: string): string[] {
     if (process.platform === 'darwin') {
       // macOS (check available devices with: ffmpeg -f avfoundation -list_devices true -i "")
-      return ['-f', 'avfoundation', '-framerate', '30', '-i', '1:none', outputFile];
+      return [
+        '-f',
+        'avfoundation',
+        '-framerate',
+        '30',
+        '-i',
+        '1:none',
+        outputFile,
+      ];
     }
 
     if (process.platform === 'win32') {
@@ -52,12 +62,15 @@ export class ScreenRecorderService {
     const resolution = process.env.RESOLUTION || '1920x1080'; // optionally make this configurable
 
     return [
-      '-video_size', resolution,
-      '-framerate', '30',
-      '-f', 'x11grab',
-      '-i', `${display}`,
-      outputFile
+      '-video_size',
+      resolution,
+      '-framerate',
+      '30',
+      '-f',
+      'x11grab',
+      '-i',
+      `${display}`,
+      outputFile,
     ];
   }
 }
-

@@ -3,7 +3,7 @@ import { ApiOperation, ApiQuery, ApiTags, ApiResponse } from '@nestjs/swagger';
 import { JsDocToMarkdownService } from './utils-jsdoc-to-markdown.service';
 
 @ApiTags('JSDoc')
-@Controller('docs')
+@Controller('api/docs')
 export class JsDocToMarkdownController {
   constructor(private readonly jsdocService: JsDocToMarkdownService) {}
 

@@ -157,7 +157,7 @@ export default function MarkdownViewer(props: MarkdownViewerProps) {
   return (
     <div class="markdown-wrapper">
       <div
-        class="prose prose-sm sm:prose lg:prose-lg dark:prose-invert max-w-none font-sans text-neutral-200"
+        class="prose prose-sm sm:prose lg:prose-lg dark:prose-invert max-w-none font-sans"
         ref={(el) => (container = el)}
       />
     </div>
