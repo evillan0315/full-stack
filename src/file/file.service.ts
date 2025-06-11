@@ -240,9 +240,11 @@ export class FileService {
             if (mimeType === 'application/mp4') {
               mimeType = 'video/mp4';
             }
-
-            const lang = this.utilsService.detectLanguage(filename, mimeType); // Use utilsService.detectLanguage
-
+            
+            let lang = this.utilsService.detectLanguage(filename, mimeType); // Use utilsService.detectLanguage
+            if (mimeType.startsWith('image/')) {
+		  lang = 'image';
+		}
             return {
               name: entry,
               path: fullPath,

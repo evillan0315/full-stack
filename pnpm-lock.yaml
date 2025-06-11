@@ -263,6 +263,9 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.2
+      screenshot-desktop:
+        specifier: ^1.15.1
+        version: 1.15.1
       sharp:
         specifier: ^0.34.1
         version: 0.34.1
@@ -6480,6 +6483,11 @@ packages:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
+  rimraf@2.6.3:
+    resolution: {integrity: sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
+    hasBin: true
+
   rollup@4.40.2:
     resolution: {integrity: sha512-tfUOg6DTP4rhQ3VjOO6B4wyrJnGOX85requAXvqYTHsOgb2TFJdZ3aWpT8W2kPoypSGP7dZUyzxJ9ee4buM5Fg==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -6521,6 +6529,9 @@ packages:
   schema-utils@4.3.2:
     resolution: {integrity: sha512-Gn/JaSk/Mt9gYubxTtSn/QCV4em9mpAPiR1rqy/Ocu19u/G9J5WWdNoUT4SiV6mFC3y6cxyFcFwdzPM3FgxGAQ==}
     engines: {node: '>= 10.13.0'}
+
+  screenshot-desktop@1.15.1:
+    resolution: {integrity: sha512-4j9bDZSFnkRqH53bAw5W+ZhdGKiTUcUDohO6NZjL6QSC/6AXbhUqJ9YXygjHrYcSOUD4IcLty6uQ1ES7PSsomg==}
 
   seek-bzip@2.0.0:
     resolution: {integrity: sha512-SMguiTnYrhpLdk3PwfzHeotrcwi8bNV4iemL9tx9poR/yeaMYwB9VzR1w7b57DuWpuqR8n6oZboi0hj3AxZxQg==}
@@ -6905,6 +6916,10 @@ packages:
   tar@7.4.3:
     resolution: {integrity: sha512-5S7Va8hKfV7W5U6g3aYxXmlPoZVAwUMy9AOKyF2fVuZa2UD3qZjg578OrLRt8PcNN1PleVaL/5/yYATNL0ICUw==}
     engines: {node: '>=18'}
+
+  temp@0.9.4:
+    resolution: {integrity: sha512-yYrrsWnrXMcdsnu/7YMYAofM1ktpL5By7vZhf15CrXijWWrEYZks5AXBudalfSWJLlnen/QUJUB5aoB0kqZUGA==}
+    engines: {node: '>=6.0.0'}
 
   terser-webpack-plugin@5.3.14:
     resolution: {integrity: sha512-vkZjpUjb6OMS7dhV+tILUW6BhpDR7P2L/aQSAv+Uwk+m8KATX9EccViHTJR2qDtACKPIYndLGCyl3FMo+r2LMw==}
@@ -15065,6 +15080,10 @@ snapshots:
 
   reusify@1.1.0: {}
 
+  rimraf@2.6.3:
+    dependencies:
+      glob: 7.2.3
+
   rollup@4.40.2:
     dependencies:
       '@types/estree': 1.0.7
@@ -15138,6 +15157,10 @@ snapshots:
       ajv: 8.17.1
       ajv-formats: 2.1.1(ajv@8.17.1)
       ajv-keywords: 5.1.0(ajv@8.17.1)
+
+  screenshot-desktop@1.15.1:
+    dependencies:
+      temp: 0.9.4
 
   seek-bzip@2.0.0:
     dependencies:
@@ -15605,6 +15628,11 @@ snapshots:
       minizlib: 3.0.2
       mkdirp: 3.0.1
       yallist: 5.0.0
+
+  temp@0.9.4:
+    dependencies:
+      mkdirp: 0.5.6
+      rimraf: 2.6.3
 
   terser-webpack-plugin@5.3.14(@swc/core@1.11.24(@swc/helpers@0.5.17))(webpack@5.99.6(@swc/core@1.11.24(@swc/helpers@0.5.17))):
     dependencies:

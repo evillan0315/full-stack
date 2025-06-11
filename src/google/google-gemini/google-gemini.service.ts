@@ -16,7 +16,7 @@ export class GoogleGeminiService {
     this.apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GOOGLE_GEMINI_MODEL}:generateContent?key=${process.env.GOOGLE_GEMINI_API_KEY}`;
   }
 
-  async generateDocumentation(dto: GenerateDocDto): Promise<string> {
+  async generateCodeDocumentation(dto: GenerateDocDto): Promise<string> {
     const {
       codeSnippet,
       language,

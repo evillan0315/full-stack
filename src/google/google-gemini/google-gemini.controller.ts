@@ -55,7 +55,7 @@ export class GoogleGeminiController {
     status: 502,
     description: 'Bad gateway - Gemini API failure or invalid response.',
   })
-  async generateDocumentation(@Body() body: GenerateDocDto): Promise<string> {
-    return this.geminiService.generateDocumentation(body);
+  async generateCodeDocumentation(@Body() body: GenerateDocDto): Promise<string> {
+    return this.geminiService.generateCodeDocumentation(body);
   }
 }

@@ -98,8 +98,6 @@ export default function Editor() {
     setIsLoading(true);
     try {
       const response = await api.post('/file/read', { filePath: path });
-      console.log(response.data, 'loadFile response.data');
-
       if (!response.data || typeof response.data.content !== 'string') {
         throw new Error('Invalid file content format received from API');
       }

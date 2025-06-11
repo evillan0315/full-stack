@@ -164,7 +164,7 @@ const EditorComponent = (props: EditorComponentProps) => {
       setLanguage(response.data?.language);
       initEditor(code);
     } catch (err) {
-      showToast((err as Error).message, 'error');
+      //showToast((err as Error).message, 'error');
       setError((err as Error).message);
     } finally {
       setLoading(false);

@@ -51,6 +51,11 @@ const benefits = [
     title: 'Customizable',
     description: 'Tailor the platform to your specific needs with flexible options.',
   },
+  {
+    icon: 'mdi:rocket-launch',
+    title: 'Boost Productivity',
+    description: 'Capture screens, record workflows, and generate code documentation with built-in AI tools.',
+  },
 ];
 const editor_features = [
   {
@@ -102,6 +107,34 @@ const editor_features = [
     icon: 'mdi:shield-account-outline',
     description: 'Secure your workspace with JWT-based authentication and customizable role-based access control.',
     page: 'f1b13e8b-41cf-4d02-9d90-918b94ea88e7',
+  },
+  {
+    id: '1e6fbbd3-d437-41fa-a96c-bf6f510bf4c1',
+    title: 'Screen Recording',
+    icon: 'mdi:record-rec',
+    description: 'Record your screen directly from the browser to create tutorials or share your workflow.',
+    page: 'page-id-screen-recording',
+  },
+  {
+    id: '3a0e2dc6-1ea3-45e4-a429-66c4a5e7a2c8',
+    title: 'Screen Capture',
+    icon: 'mdi:camera-outline',
+    description: 'Take instant screenshots of your code editor or project workspace.',
+    page: 'page-id-screen-capture',
+  },
+  {
+    id: 'd3be56c7-4047-4f57-bff3-48c05cb7f30e',
+    title: 'Code Documentation Generator',
+    icon: 'mdi:file-document-edit-outline',
+    description: 'Automatically extract and generate markdown documentation from your source code.',
+    page: 'page-id-doc-generator',
+  },
+  {
+    id: '9b4d9db2-fb8d-471e-bb48-c0074d6826e0',
+    title: 'AI Code Generator',
+    icon: 'mdi:robot-outline',
+    description: 'Leverage AI to generate, refactor, or explain code directly within the editor.',
+    page: 'page-id-ai-code-generator',
   },
 ];
 

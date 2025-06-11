@@ -36,7 +36,7 @@ export const FileGallery = () => {
       ...file,
       url: `${import.meta.env.BASE_URL_API}/api/media/${encodeURIComponent(file.name)}`,
     }));
-    console.log(result, 'result');
+
     const playableIndexes = result
       .map((f, i) => (f.lang === 'video' || f.lang === 'audio' ? i : null))
       .filter((i) => i !== null) as number[];
@@ -71,18 +71,25 @@ export const FileGallery = () => {
   });
 
   const groupedFiles = () => {
-    const grouped: Record<string, typeof files extends () => infer R ? R[] : any[]> = {
-      video: [],
-      audio: [],
-      image: [],
-    };
-
-    for (const file of files() || []) {
-      grouped[file.lang].push(file);
-    }
-
-    return grouped;
+  const grouped: Record<string, typeof files extends () => infer R ? R[] : any[]> = {
+    video: [],
+    audio: [],
+    image: [],
   };
+
+  for (const file of files() || []) {
+    const lang = file?.lang;
+
+    if (lang && grouped.hasOwnProperty(lang)) {
+      grouped[lang].push(file);
+    } else {
+      console.warn(`Unsupported or undefined lang: "${lang}"`, file);
+      // Optionally: handle or store undefined/unsupported langs
+    }
+  }
+
+  return grouped;
+};
 
   return (
     <div class="p-4">
@@ -102,7 +109,7 @@ export const FileGallery = () => {
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
                   <For each={groupedFiles()[type]}>
                     {(file, index) => (
-                      <div class="p-6 border rounded-lg bg-gray-800/10">
+                      <div class="p-2 border rounded-lg bg-gray-800/10">
                         <p class="text-sm font-medium break-words mb-2">{file.name}</p>
 
                         <Show when={file.lang === 'video'}>
