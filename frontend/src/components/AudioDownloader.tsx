@@ -5,16 +5,68 @@ import { Button } from './ui/Button';
 
 const socket = io(`${import.meta.env.BASE_URL_API}`);
 
+/**
+ * `AudioDownloader` is a SolidJS component that allows users to download audio (and video) from various online platforms like YouTube and Bilibili.
+ * It utilizes socket.io for communication with a backend server responsible for extracting and converting the media.
+ *
+ * @returns {JSX.Element} - A JSX element representing the audio downloader component.
+ */
 export default function AudioDownloader() {
+  /**
+   * `url` is a SolidJS signal that stores the URL of the media to be downloaded.
+   *
+   * @type {[() => string, (v: string) => string]} - A tuple containing the getter and setter functions for the URL signal.
+   */
   const [url, setUrl] = createSignal('');
+  /**
+   * `format` is a SolidJS signal that stores the desired format for the downloaded media (e.g., mp3, wav, mp4).
+   *
+   * @type {[() => string, (v: string) => string]} - A tuple containing the getter and setter functions for the format signal.
+   */
   const [format, setFormat] = createSignal('mp3');
+  /**
+   * `provider` is a SolidJS signal that stores the name of the media provider (e.g., youtube, bilibili).
+   *
+   * @type {[() => string, (v: string) => string]} - A tuple containing the getter and setter functions for the provider signal.
+   */
   const [provider, setProvider] = createSignal('youtube');
+  /**
+   * `cookieAccess` is a SolidJS signal that determines whether cookies should be used when accessing the media provider. This is useful for accessing content that requires authentication.
+   *
+   * @type {[() => boolean, (v: boolean) => boolean]} - A tuple containing the getter and setter functions for the cookie access signal.
+   */
   const [cookieAccess, setCookieAccess] = createSignal(false);
+  /**
+   * `progress` is a SolidJS signal that stores the download progress as a percentage (0-100).
+   *
+   * @type {[() => number, (v: number) => number]} - A tuple containing the getter and setter functions for the progress signal.
+   */
   const [progress, setProgress] = createSignal(0);
+  /**
+   * `loading` is a SolidJS signal that indicates whether the download process is currently in progress.
+   *
+   * @type {[() => boolean, (v: boolean) => boolean]} - A tuple containing the getter and setter functions for the loading signal.
+   */
   const [loading, setIsLoading] = createSignal(false);
+  /**
+   * `filePath` is a SolidJS signal that stores the path to the downloaded file on the server.
+   *
+   * @type {[() => string, (v: string) => string]} - A tuple containing the getter and setter functions for the file path signal.
+   */
   const [filePath, setFilePath] = createSignal('');
+  /**
+   * `error` is a SolidJS signal that stores any error message that occurred during the download process.
+   *
+   * @type {[() => string, (v: string) => string]} - A tuple containing the getter and setter functions for the error signal.
+   */
   const [error, setError] = createSignal('');
 
+  /**
+   * `handleSubmit` is an event handler that initiates the audio extraction process. It sets the loading state to true, resets the progress, file path, and error messages, and emits a 'extract_audio' event to the server via socket.io.
+   * The event includes the URL, format, provider, and cookie access settings.
+   *
+   * @returns {void}
+   */
   const handleSubmit = () => {
     setIsLoading(true);
     setProgress(0);
@@ -29,7 +81,21 @@ export default function AudioDownloader() {
     });
   };
 
+  /**
+   * `onMount` is a SolidJS lifecycle hook that is executed after the component has been mounted to the DOM.
+   * It sets up socket.io event listeners for 'download_progress', 'download_complete', and 'download_error' events.
+   * It also sets up an `onCleanup` hook to remove these event listeners when the component is unmounted, preventing memory leaks.
+   *
+   * @returns {void}
+   */
   onMount(() => {
+    /**
+     * Listens for 'download_progress' events from the server.
+     * Updates the progress signal and sets loading to false when progress reaches 100%.
+     *
+     * @param {object} data - The data received from the server.
+     * @param {number} data.progress - The download progress as a percentage.
+     */
     socket.on('download_progress', (data) => {
       setProgress(data.progress);
       if (data.progress >= 100) {
@@ -37,15 +103,35 @@ export default function AudioDownloader() {
       }
     });
 
+    /**
+     * Listens for 'download_complete' events from the server.
+     * Updates the filePath signal with the path to the downloaded file.
+     *
+     * @param {object} data - The data received from the server.
+     * @param {string} data.filePath - The path to the downloaded file.
+     */
     socket.on('download_complete', (data) => {
       setFilePath(data.filePath);
     });
 
+    /**
+     * Listens for 'download_error' events from the server.
+     * Updates the error signal with the error message and sets loading to false.
+     *
+     * @param {object} data - The data received from the server.
+     * @param {string} data.message - The error message.
+     */
     socket.on('download_error', (data) => {
       setError(data.message);
       setIsLoading(false);
     });
 
+    /**
+     * `onCleanup` is a SolidJS lifecycle hook that is executed when the component is unmounted from the DOM.
+     * It removes the socket.io event listeners to prevent memory leaks and ensure that the component does not continue to listen for events after it has been unmounted.
+     *
+     * @returns {void}
+     */
     onCleanup(() => {
       socket.off('download_progress');
       socket.off('download_complete');

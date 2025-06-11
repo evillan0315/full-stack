@@ -1,7 +1,16 @@
-// src/components/Toaster.tsx
+// File: /media/eddie/Data/projects/nestJS/nest-modules/full-stack/frontend/src/components/Toaster.tsx
 import { For } from 'solid-js';
 import { toasts } from '../stores/toast';
 
+/**
+ *  Toaster Component.
+ *
+ *  A component responsible for displaying toast notifications in a fixed position
+ *  on the screen.  It renders a list of toasts retrieved from the `toasts` store,
+ *  applying different background colors based on the toast type (success, error, info).
+ *
+ *  @returns {JSX.Element} A JSX element representing the Toaster component.
+ */
 export default function Toaster() {
   return (
     <div class="fixed top-10 right-10 space-y-2 z-50">

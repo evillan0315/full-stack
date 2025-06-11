@@ -4,7 +4,7 @@ import MobileNav from './MobileNav';
 import type { MenuItem } from './types';
 import { company } from '../../data/app';
 import Logo from '../Logo';
-import { AvatarMenu } from './ProfileNav';
+import AvatarMenu from '../ui/AvatarMenu';
 import { ThemeToggle } from '../ThemeToggle';
 export default function Header() {
   return (

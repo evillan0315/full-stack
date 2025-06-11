@@ -36,33 +36,38 @@ export default function AvatarMenu() {
       }
     >
       <div class="relative flex items-center">
-        <Button
-          onClick={() => setIsOpen((prev) => !prev)}
-          class="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border-2 text-sm font-semibold focus:outline-none"
+        <Show
+          when={auth.user()?.image}
+          fallback={
+            <>
+              <Button variant="secondary">{getInitial()}</Button>
+            </>
+          }
         >
-          <Show when={auth.user()?.image} fallback={<span>{getInitial()}</span>}>
-            <img src={auth.user()?.image!} alt="Profile" class="h-full w-full object-cover" />
-          </Show>
-        </Button>
+          <button onClick={() => setIsOpen((prev) => !prev)} class="h-8 w-8">
+            <img
+              src={`${import.meta.env.BASE_URL_API}/api/file/proxy?url=${encodeURIComponent(auth.user()?.image ?? '')}`}
+              alt="Profile"
+              class="rounded-full h-full w-full object-cover"
+            />
+          </button>
+        </Show>
 
         <Show when={isOpen()}>
           <div
             ref={menuRef}
-            class="absolute top-9 right-0 z-50 mt-2 w-48 origin-top-right rounded-md bg-gray-800/10 border-gray-500/30 p-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            class="dropdown-menu absolute top-9 right-0 z-50 mt-2 w-48 origin-top-right rounded-md p-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
           >
             <A
               href="/profile"
-              class="block w-full px-4 py-2 text-left text-sm text-neutral-300 rounded-md hover:bg-neutral-700 hover:text-white"
+              class="block w-full px-4 py-2 text-left text-sm rounded-md"
               onClick={() => setIsOpen(false)}
             >
               View Profile
             </A>
-            <button
-              onClick={handleLogout}
-              class="block w-full px-4 py-2 text-left text-sm text-neutral-300 rounded-md hover:bg-neutral-700 hover:text-white"
-            >
+            <Button onClick={handleLogout} variant="secondary">
               Logout
-            </button>
+            </Button>
           </div>
         </Show>
       </div>

@@ -11,7 +11,7 @@ import tailwindcss from '@tailwindcss/vite';
 // `process.cwd()` is the current working directory
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), ''); // Load all env vars (empty prefix means all)
-  
+  console.log(env, process.cwd());
   return {
     plugins: [tailwindcss(), solidPlugin()],
     // publicDir: false, // Reconsider this if you have static assets like favicon.ico
@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/api': {
           // Use the env variable loaded by `loadEnv`
-          target: env.BASE_URL_API,
+          target: env.BASE_URL,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
@@ -66,6 +66,7 @@ export default defineConfig(({ mode }) => {
         credentials: true,
       },
       port: 3000,
+      allowedHosts: ['board-api.duckdns.org']
     },
 
     define: {

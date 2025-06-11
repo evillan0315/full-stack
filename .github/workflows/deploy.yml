@@ -48,17 +48,17 @@ jobs:
             cd /var/www/webapps/board-api
 
             echo "✅ Node version: $(node -v)"
-            echo "✅ Installing pnpm and pm2..."
-            npm install -g pnpm pm2
+            echo "✅ Installing pm2..."
+            npm install -g pm2
 
             echo "📦 Installing dependencies..."
-            pnpm install
+            npm install
             
             echo "Generating database..."
             npx prisma generate
             
             echo "⚙️ Building project..."
-            pnpm build
+            npm run build
 
             echo "🚀 Starting api server PM2 process..."
             pm2 delete api-server

@@ -307,7 +307,7 @@ export class FileController {
 
   // Delete File or Folder
 
-  @Delete('delete')
+  @Post('delete')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete a file or folder' })
   @ApiQuery({
@@ -326,7 +326,7 @@ export class FileController {
     description: 'Failed to delete the file or folder.',
   })
   async deleteFile(
-    @Query('filePath') filePath: string,
+    @Body('filePath') filePath: string,
   ): Promise<{ success: boolean; message: string }> {
     if (!filePath) {
       throw new BadRequestException('File path is required for deletion.');

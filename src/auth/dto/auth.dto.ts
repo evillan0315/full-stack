@@ -65,6 +65,10 @@ export class CreateJwtUserDto {
   @ApiProperty({ example: 'john.jpg', required: false })
   @IsOptional()
   image?: string;
+
+  @ApiProperty({ example: 'Google', required: false })
+  @IsOptional()
+  provider?: string;
 }
 export class LoginDto {
   @ApiProperty({ example: 'user@example.com' })

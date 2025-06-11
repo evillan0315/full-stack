@@ -3,6 +3,8 @@ import { Icon } from '@iconify-icon/solid';
 import { Button } from '../components/ui/Button';
 import ToggleSwitch from '../components/ui/ToggleSwitch';
 import { PageHeader } from '../components/ui/PageHeader';
+import TTSFormComponent from '../components/TTSFormComponent';
+
 import api from '../services/api';
 
 interface SpeakerConfig {
@@ -149,9 +151,11 @@ export default function TTSForm() {
 
   return (
     <div class="flex flex-col max-w-7xl mx-auto">
-      <div class="flex-1 scroll-smooth px-4 py-4 space-y-4 mt-2">
+      <div class="flex-1 scroll-smooth px-4 space-y-4">
         <PageHeader icon="mdi:tts">
-          <b>Generate</b> TTS Audio
+          <h2 class="leading-0 uppercase tracking-widest text-xl">
+            <b>TTS</b> Audio
+          </h2>
         </PageHeader>
         <p class="">
           This interactive TTS generator transforms written prompts into human-like speech using the Google Cloud
@@ -160,110 +164,26 @@ export default function TTSForm() {
         </p>
         {/* Main Content */}
         <div class="flex flex-col md:flex-row gap-6">
-          <div class="space-y-4 md:w-3/4 rounded-lg border p-6 bg-gray-800/10 border-gray-500/30">
-            <label class="block mb-1 text-lg font-medium">Prompt</label>
-            <textarea
-              rows={4}
-              class="w-full p-3 min-h-[160px] border border-gray-500/30 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-              placeholder="Enter your prompt here..."
-              value={prompt()}
-              onInput={(e) => setPrompt(e.currentTarget.value)}
-            />
-
-            <div>
-              <label class="block mb-1 text-sm font-medium">Language</label>
-              <select
-                class="w-full p-2 border border-gray-500/30 rounded-md"
-                value={language()}
-                onChange={(e) => setLanguage(e.currentTarget.value)}
-              >
-                <For each={languageOptions}>{(lang) => <option value={lang.code}>{lang.label}</option>}</For>
-              </select>
-            </div>
-
-            <div class="space-y-2">
-              <label class="block font-medium">Speakers</label>
-              <For each={speakers()}>
-                {(speaker, index) => (
-                  <div class="flex flex-col gap-2">
-                    <div class="flex items-center gap-2">
-                      <input
-                        type="text"
-                        class="w-1/2 p-2 border border-gray-500/30 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-                        placeholder="Speaker name"
-                        value={speaker.speaker}
-                        onInput={(e) => updateSpeaker(index(), 'speaker', e.currentTarget.value)}
-                      />
-                      <select
-                        class="w-1/2 p-2 border border-gray-500/30 rounded-md"
-                        value={speaker.voiceName}
-                        onChange={(e) => updateSpeaker(index(), 'voiceName', e.currentTarget.value)}
-                      >
-                        <For each={voiceOptions}>
-                          {(opt) => (
-                            <option value={opt.name}>
-                              {opt.name === 'Custom' ? 'Custom (manual)' : `${opt.name} (${opt.tone})`}
-                            </option>
-                          )}
-                        </For>
-                      </select>
-                      <Button
-                        variant="outline"
-                        onClick={() => removeSpeaker(index())}
-                        class="w-8 h-8 px-1 py-1 text-sm"
-                      >
-                        <Icon icon="mdi:close" width="18" height="18" class="text-red-500" />
-                      </Button>
-                    </div>
-                    <Show when={speaker.voiceName === 'Custom'}>
-                      <input
-                        type="text"
-                        class="w-full p-2 border border-gray-500/30 rounded-md"
-                        placeholder="Enter custom voice name"
-                        onInput={(e) => updateSpeaker(index(), 'voiceName', e.currentTarget.value)}
-                      />
-                    </Show>
-                  </div>
-                )}
-              </For>
-              <div class="flex item-center justify-between">
-                <Button onClick={addSpeaker} variant="secondary" class="primary px-4 py-1">
-                  + Add Speaker
-                </Button>
-                <ToggleSwitch label="Autoplay" checked={autoPlay()} onChange={setAutoPlay} />
-              </div>
-            </div>
-
-            <Button
-              class="px-4 py-3 w-full text-xl mt-2 mb-6 gap-4 disabled:bg-gray-200"
-              onClick={handleSubmit}
-              variant="secondary"
-              disabled={loading()}
-            >
-              <Icon icon="mdi:tts" width="2.2em" height="2.2em" />
-              {loading() ? 'Generating...' : 'Generate Audio'}
-            </Button>
-
-            {error() && <p class="text-red-500">{error()}</p>}
-
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
-              <Show when={audioSrc()}>
-                <audio controls class="w-full rounded-lg shadow-lg">
-                  <source src={audioSrc()} type="audio/wav" />
-                  Your browser does not support the audio element.
-                </audio>
-              </Show>
-              <Show when={audioBlob()}>
-                <Button
-                  class="w-full flex items-center gap-2 px-2 py-2 uppercase tracking-widest"
-                  onClick={downloadAudio}
-                >
-                  <Icon icon="mdi:download" width="2em" height="2em" />
-                  Download Audio
-                </Button>
-              </Show>
-            </div>
-          </div>
+          <TTSFormComponent
+            prompt={prompt}
+            setPrompt={setPrompt}
+            language={language}
+            setLanguage={setLanguage}
+            languageOptions={languageOptions}
+            speakers={speakers}
+            updateSpeaker={updateSpeaker}
+            removeSpeaker={removeSpeaker}
+            addSpeaker={addSpeaker}
+            voiceOptions={voiceOptions}
+            autoPlay={autoPlay}
+            setAutoPlay={setAutoPlay}
+            handleSubmit={handleSubmit}
+            loading={loading}
+            error={error}
+            audioSrc={audioSrc}
+            audioBlob={audioBlob}
+            downloadAudio={downloadAudio}
+          />
 
           {/* Sidebar Info */}
           <div class="w-full md:w-1/4 space-y-4 ">

@@ -485,4 +485,57 @@ export class UtilsController {
   async convertToHtml(@Body('markdown') markdown: string): Promise<string> {
     return this.utilsService.markdownToHtml(markdown);
   }
+
+  @Post('strip-code-block')
+  @ApiOperation({ summary: 'Remove triple backticks from a code block' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        content: {
+          type: 'string',
+          example: '```typescript\nconst x = 42;\n```',
+        },
+      },
+      required: ['content'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Code block without triple backticks returned.',
+  })
+  async stripCodeBlock(@Body('content') content: string): Promise<string> {
+    return this.utilsService.stripTripleBackticks(content);
+  }
+  
+  @Post('remove-code-comment')
+@ApiOperation({ summary: 'Remove code comments from a code block (single-line and multi-line)' })
+@ApiBody({
+  schema: {
+    type: 'object',
+    properties: {
+      content: {
+        type: 'string',
+        example: `
+/**
+ * Adds two numbers
+ */
+function add(a: number, b: number): number {
+  // Add them
+  return a + b;
+}
+        `.trim(),
+      },
+    },
+    required: ['content'],
+  },
+})
+@ApiResponse({
+  status: 201,
+  description: 'Code block with all comments removed is returned.',
+})
+async removeCodeComment(@Body('content') content: string): Promise<string> {
+  return this.utilsService.removeComments(content);
+}
+
 }

@@ -427,7 +427,7 @@ export class FileService {
   async createLocalFileOrFolder(
     dto: CreateFileDto,
   ): Promise<{ success: boolean; message: string }> {
-    const { filePath, isDirectory, content = '' } = dto;
+    const { filePath, isDirectory, content } = dto;
     const resolvedPath = path.resolve(filePath); // Resolve to an absolute path for consistency
 
     try {
@@ -437,8 +437,10 @@ export class FileService {
       } else {
         // Validate file extension for new file creation
         this.validateFileExtension(resolvedPath);
+        const finalContent: string =
+          content?.trim() === '' || content == null ? ' ' : content;
         await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
-        await fs.writeFile(resolvedPath, content, 'utf-8');
+        await fs.writeFile(resolvedPath, finalContent, 'utf-8');
         return { success: true, message: `File created at ${resolvedPath}` };
       }
     } catch (error) {

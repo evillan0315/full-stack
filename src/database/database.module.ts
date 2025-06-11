@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { DatabaseService } from './database.service';
 import { DatabaseController } from './database.controller';
-import { PostgresModule } from './postgres/postgres.module';
+//import { PostgresModule } from './postgres/postgres.module';
 
 @Module({
-  imports: [PostgresModule],
+  //imports: [PostgresModule],
   providers: [DatabaseService],
   controllers: [DatabaseController],
 })

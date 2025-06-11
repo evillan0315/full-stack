@@ -6,13 +6,4 @@ html {
     color 0.3s ease;
 }
 
-/* Example dark mode background and text */
-html.dark {
-  background-color: #121212;
-  color: #f0f0f0;
-}
 
-html.light {
-  background-color: #fff;
-  color: #000;
-}

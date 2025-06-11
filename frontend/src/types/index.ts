@@ -10,7 +10,7 @@ export interface FileItem {
   type: 'file' | 'folder';
   children?: FileItem[]; // Optional: for nested file/folder structures
   size?: number; // Optional: file size in bytes
-  lastModified?: Date; // Optional: last modification date
+  url?: string;
 }
 
 export interface ReadFileResponseDto {

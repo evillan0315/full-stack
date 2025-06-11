@@ -1,4 +1,4 @@
-// src/components/FileManager.tsx
+// File: /media/eddie/Data/projects/nestJS/nest-modules/full-stack/frontend/src/components/FileManager.tsx
 
 import { createSignal, createMemo, onMount, onCleanup, For, Show } from 'solid-js';
 import api from '../services/api';
@@ -10,20 +10,51 @@ import * as path from 'path-browserify';
 
 // --- Interfaces ---
 
+/**
+ * Represents the state of the context menu.
+ */
 type ContextMenuState = {
+  /**
+   * The x-coordinate of the context menu.
+   */
   x: number;
+  /**
+   * The y-coordinate of the context menu.
+   */
   y: number;
+  /**
+   * The file item associated with the context menu.  Null if no file is associated.
+   */
   file: FileItem | null;
+  /**
+   * Whether the context menu is visible.
+   */
   visible: boolean;
 };
 
+/**
+ * Defines the props for the FileManager component.
+ */
 interface FileManagerProps {
+  /**
+   * Callback function to be executed when a file is selected.
+   * @param path The path of the selected file.
+   */
   onFileSelect?: (path: string) => void;
+  /**
+   * A function that accepts a refresh function as a parameter.  This allows the parent component to trigger a refresh of the file list.
+   * @param refreshFn A function that, when called, refreshes the file list.  Optionally takes a directory path as an argument.
+   */
   refreshList?: (refreshFn: (directory?: string) => Promise<void>) => void;
 }
 
 // --- Helper Functions ---
 
+/**
+ * Builds a tree structure from a flat array of file items.
+ * @param files An array of FileItem objects representing files and folders.
+ * @returns An array of FileItem objects representing the root nodes of the file tree.
+ */
 function buildTree(files: FileItem[] = []): FileItem[] {
   const map = new Map<string, FileItem & { children: FileItem[] }>();
 
@@ -70,10 +101,27 @@ function buildTree(files: FileItem[] = []): FileItem[] {
 
 // --- FileManager Component ---
 
+/**
+ * A component that displays a file manager interface.
+ * @param props The props for the FileManager component.
+ * @returns A JSX element representing the file manager.
+ */
 export default function FileManager(props: FileManagerProps) {
+  /**
+   * A signal that holds the array of file items.
+   */
   const [files, setFiles] = createSignal<FileItem[]>([]);
+  /**
+   * A signal that holds the current path being displayed.
+   */
   const [currentPath, setCurrentPath] = createSignal<string>('/');
+  /**
+   * A signal that indicates whether the file list is loading.
+   */
   const [loading, setLoading] = createSignal(true);
+  /**
+   * A signal that holds the state of the context menu.
+   */
   const [contextMenu, setContextMenu] = createSignal<ContextMenuState>({
     x: 0,
     y: 0,
@@ -81,6 +129,10 @@ export default function FileManager(props: FileManagerProps) {
     visible: false,
   });
 
+  /**
+   * A memoized value that represents the file tree based on the current path and files.
+   *  If the API returns a flat list of files in the current directory, this simply returns `files()`.
+   */
   const fileTree = createMemo(() => {
     // If your API returns all files and folders recursively, `buildTree` is needed.
     // If your API returns only direct children of `currentPath()`, you might filter `files()` here
@@ -94,6 +146,10 @@ export default function FileManager(props: FileManagerProps) {
     return files(); // if files() is already the flat list of current dir children
   });
 
+  /**
+   * Fetches the files for a given directory from the API.
+   * @param directory The directory to fetch files from. Defaults to the root directory ('./').
+   */
   const fetchFiles = async (directory?: string) => {
     setLoading(true);
     try {
@@ -119,8 +175,19 @@ export default function FileManager(props: FileManagerProps) {
     }
   };
 
+  /**
+   * Passes the `fetchFiles` function to the parent component via the `refreshList` prop.
+   * Allows the parent to trigger a file list refresh.
+   */
   props.refreshList?.((dir?: string) => fetchFiles(dir || currentPath())); // Pass currentPath as default
 
+  /**
+   * Handles the selection of a file node.
+   * If the node is a directory, it fetches the files for that directory.
+   * If the node is a file, it calls the `onFileSelect` callback.
+   * @param filePath The path of the selected file.
+   * @param isDirectory Whether the selected node is a directory.
+   */
   const handleFileNodeSelect = (filePath: string, isDirectory: boolean) => {
     if (isDirectory) {
       fetchFiles(filePath);
@@ -129,6 +196,11 @@ export default function FileManager(props: FileManagerProps) {
     }
   };
 
+  /**
+   * Handles the display of the context menu.
+   * @param e The mouse event that triggered the context menu.
+   * @param file The file item associated with the context menu.
+   */
   const handleContextMenu = (e: MouseEvent, file: FileItem) => {
     e.preventDefault();
     setContextMenu({
@@ -139,8 +211,15 @@ export default function FileManager(props: FileManagerProps) {
     });
   };
 
+  /**
+   * Closes the context menu.
+   */
   const closeContextMenu = () => setContextMenu((prev) => ({ ...prev, visible: false }));
 
+  /**
+   * Handles clicks outside the context menu, closing it.
+   * @param e The mouse event that triggered the click.
+   */
   const handleClickOutside = (e: MouseEvent) => {
     const menuElement = document.getElementById('context-menu');
     if (menuElement && !menuElement.contains(e.target as Node)) {
@@ -148,6 +227,11 @@ export default function FileManager(props: FileManagerProps) {
     }
   };
 
+  /**
+   * Handles file actions such as opening, deleting, and creating files and folders.
+   * @param action The action to perform ('open', 'delete', 'create').
+   * @param type The type of file to create ('file', 'folder'). Only relevant for the 'create' action.
+   */
   const handleFileAction = async (action: 'open' | 'delete' | 'create', type?: 'file' | 'folder') => {
     const file = contextMenu().file;
     if (!file) return;
@@ -198,15 +282,26 @@ export default function FileManager(props: FileManagerProps) {
     }
   };
 
+  /**
+   * A lifecycle hook that is called when the component is mounted.
+   * Fetches the files for the current path and adds a click listener to the document.
+   */
   onMount(() => {
     fetchFiles(currentPath());
     document.addEventListener('click', handleClickOutside);
   });
 
+  /**
+   * A lifecycle hook that is called when the component is unmounted.
+   * Removes the click listener from the document.
+   */
   onCleanup(() => {
     document.removeEventListener('click', handleClickOutside);
   });
 
+  /**
+   * Navigates to the parent directory.
+   */
   const navigateUp = () => {
     const parentPath = path.dirname(currentPath());
     // Ensure we don't go above the root. path.dirname('/') typically returns '/'.
@@ -218,41 +313,6 @@ export default function FileManager(props: FileManagerProps) {
 
   return (
     <div class="relative w-full h-full flex flex-col">
-      {/* Path Navigation / Controls */}
-      <div class="flex items-center p-2 border-b bg-gray-100 dark:bg-gray-700">
-        <button
-          onClick={currentPath() !== '/' ? navigateUp : undefined}
-          disabled={currentPath() === '/'}
-          class={`p-2 rounded ${currentPath() === '/' ? 'text-gray-400 cursor-not-allowed' : 'hover:bg-gray-200 dark:hover:bg-gray-600'}`}
-          title="Go Up"
-        >
-          <Icon icon="mdi:arrow-up-bold" class="w-5 h-5" />
-        </button>
-        <span class="mx-2 text-sm font-medium">Path: {currentPath() === '/' ? '/' : `${currentPath()}`}</span>
-        <button
-          onClick={() => fetchFiles(currentPath())}
-          class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 ml-auto"
-          title="Refresh"
-        >
-          <Icon icon="mdi:refresh" class="w-5 h-5" />
-        </button>
-        <button
-          onClick={() => handleFileAction('create', 'file')}
-          class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 ml-2"
-          title="New File"
-        >
-          <Icon icon="mdi:file-plus" class="w-5 h-5" />
-        </button>
-        <button
-          onClick={() => handleFileAction('create', 'folder')}
-          class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 ml-2"
-          title="New Folder"
-        >
-          <Icon icon="mdi:folder-plus" class="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* File List / Loading */}
       <div class="flex-grow overflow-auto p-4">
         <Show
           when={!loading()}
@@ -282,7 +342,7 @@ export default function FileManager(props: FileManagerProps) {
       <Show when={contextMenu().visible && contextMenu().file}>
         <div
           id="context-menu"
-          class="fixed min-w-[160px] border shadow-md rounded p-2 z-50 bg-white dark:bg-gray-800"
+          class="fixed min-w-[160px] border shadow-md rounded p-2 z-50"
           style={{
             top: `${contextMenu().y}px`,
             left: `${contextMenu().x}px`,
@@ -295,7 +355,7 @@ export default function FileManager(props: FileManagerProps) {
 
           <ul class="space-y-1">
             <li
-              class="text-sm text-yellow-500 hover:underline cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+              class="text-sm text-yellow-500 cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
               onClick={() => handleFileAction('open')}
             >
               Open
@@ -303,13 +363,13 @@ export default function FileManager(props: FileManagerProps) {
 
             <Show when={contextMenu().file!.type === 'folder'}>
               <li
-                class="text-sm text-green-600 hover:underline cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                class="text-sm text-green-600 cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleFileAction('create', 'file')}
               >
                 ➕ New File
               </li>
               <li
-                class="text-sm text-green-600 hover:underline cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                class="text-sm text-green-600 cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => handleFileAction('create', 'folder')}
               >
                 📁 New Folder
@@ -317,7 +377,7 @@ export default function FileManager(props: FileManagerProps) {
             </Show>
 
             <li
-              class="text-sm text-red-500 hover:underline cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+              class="text-sm text-red-500 cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
               onClick={() => handleFileAction('delete')}
             >
               ❌ Delete

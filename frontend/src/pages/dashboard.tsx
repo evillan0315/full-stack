@@ -49,7 +49,9 @@ export default function Dashboard() {
       <div class="flex flex-col max-w-7xl mx-auto">
         <div class="flex-1 scroll-smooth px-4 py-4 space-y-4 mt-2">
           <PageHeader icon="mdi:view-dashboard">
-            <b>Dash</b>board
+            <h1 class="leading-0 uppercase tracking-widest text-2xl">
+              <b>Dash</b>board
+            </h1>
           </PageHeader>
           {/* Metrics Cards */}
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4  mt-4">

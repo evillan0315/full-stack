@@ -1,19 +1,58 @@
 import { createSignal, Show } from 'solid-js';
+import { type JSX } from 'solid-js';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from '@solidjs/router';
 import Loading from './Loading';
 import SignInWithGoogle from './SignInWithGoogle';
 import SignInWithGithub from './SignInWithGithub';
 
-const LoginForm = () => {
+/**
+ * LoginForm component provides a user interface for signing in with email and password.
+ * It utilizes the AuthContext for authentication and the Solid Router for navigation.
+ *
+ * @returns {JSX.Element} A SolidJS component representing the login form.
+ */
+export default function LoginForm(): JSX.Element {
+  /**
+   * Accesses the login function from the AuthContext.
+   */
   const { login } = useAuth();
+
+  /**
+   * Accesses the navigation function from the Solid Router.
+   */
   const navigate = useNavigate();
 
+  /**
+   * `username` signal stores the user's email address input.
+   */
   const [username, setUsername] = createSignal('');
+
+  /**
+   * `password` signal stores the user's password input.
+   */
   const [password, setPassword] = createSignal('');
+
+  /**
+   * `error` signal stores any error message that occurs during the login process.
+   * It is initialized to `null`.
+   */
   const [error, setError] = createSignal<string | null>(null);
+
+  /**
+   * `loading` signal indicates whether the login process is currently in progress.
+   * It is used to display a loading indicator.
+   */
   const [loading, setLoading] = createSignal(false);
 
+  /**
+   * Handles the form submission.  It prevents the default form submission behavior,
+   * sets the `loading` signal to `true`, attempts to log in the user, and navigates
+   * to the dashboard on success.  If an error occurs, it sets the `error` signal
+   * with the error message.  Finally, it sets the `loading` signal to `false`.
+   *
+   * @param {Event} e The form submission event.
+   */
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     setError(null);
@@ -75,6 +114,4 @@ const LoginForm = () => {
       </div>
     </Show>
   );
-};
-
-export default LoginForm;
+}

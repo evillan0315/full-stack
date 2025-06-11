@@ -1,13 +1,27 @@
-// src/components/ThemeToggle.tsx
+// File: /media/eddie/Data/projects/nestJS/nest-modules/full-stack/frontend/src/components/ThemeToggle.tsx
 
 import { Show } from 'solid-js';
 import type { JSX } from 'solid-js';
 import { theme, toggleTheme } from '../stores/theme';
 import { useStore } from '@nanostores/solid';
 
+/**
+ * Props for the ThemeToggle component.
+ */
 interface ThemeToggleProps {
+  /**
+   * Optional CSS class to apply to the button.  Allows for customization of the button's appearance.
+   */
   class?: string;
 }
+
+/**
+ * A simple button that toggles the application's theme between light and dark mode.
+ * It uses a basic icon to represent the current theme.
+ *
+ * @param {ThemeToggleProps} props - The component's props, allowing for optional CSS class customization.
+ * @returns {JSX.Element} A JSX element representing the theme toggle button.
+ */
 export const ThemeToggle = (props: ThemeToggleProps): JSX.Element => {
   const $theme = useStore(theme);
   const isDark = () => $theme() === 'dark';
@@ -40,10 +54,13 @@ export const ThemeToggle = (props: ThemeToggleProps): JSX.Element => {
 };
 
 /**
- * Animated Theme Toggle Button
- 
+ * Animated Theme Toggle Button Component.
+ *
+ * This component provides a visually appealing theme toggle switch with an animated transition.
+ *
+ * @param {ThemeToggleProps} props - The component's props, allowing for optional CSS class customization.
+ * @returns {JSX.Element} A JSX element representing the animated theme toggle button.
  */
-
 export const AnimatedThemeToggle = (props: ThemeToggleProps): JSX.Element => {
   const $theme = useStore(theme);
   const isDark = () => $theme() === 'dark';
@@ -89,7 +106,11 @@ export const AnimatedThemeToggle = (props: ThemeToggleProps): JSX.Element => {
 };
 
 /**
- * Fancy Theme Toggle Button
+ * A fancy button that toggles the application's theme between light and dark mode.
+ * It uses dynamic background and text colors, along with animated icon transitions for a visually appealing effect.
+ *
+ * @param {ThemeToggleProps} props - The component's props, allowing for optional CSS class customization.
+ * @returns {JSX.Element} A JSX element representing the fancy theme toggle button.
  */
 export const FancyThemeToggle = (props: ThemeToggleProps): JSX.Element => {
   const $theme = useStore(theme);
@@ -126,5 +147,3 @@ export const FancyThemeToggle = (props: ThemeToggleProps): JSX.Element => {
     </>
   );
 };
-
-//export default { ThemeToggle, AnimatedThemeToggle, FancyThemeToggle };

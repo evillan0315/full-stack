@@ -78,7 +78,7 @@ const FileManagerContainer = (props: FileManagerContainerProps) => {
       style={`flex: ${typeof props.left === 'function' ? props.left() : props.left || 1}`} // Default to 1 if not provided
     >
       {/* Sticky Collapsible Header */}
-      <div class="sticky top-0 z-20 border-b border-gray-950 bg-white dark:bg-gray-800">
+      <div class="sticky top-0 z-20 border-b bg-gray-500/10 border-gray-500/30">
         <div class="flex items-center justify-between p-2">
           <button
             class="flex items-center gap-2 px-2 py-1 text-sm uppercase tracking-widest text-left dark:hover:text-yellow-500"

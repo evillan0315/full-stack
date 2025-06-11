@@ -20,7 +20,9 @@ export default function FileGalleryPage() {
       <div class="flex flex-col max-w-7xl mx-auto">
         <div class="flex-1 scroll-smooth px-4 py-4 space-y-4 mt-2">
           <PageHeader icon="mdi:folder">
-            <b>File</b> Gallery
+            <h1 class="leading-0 uppercase tracking-widest text-2xl">
+              <b>File</b> Gallery
+            </h1>
           </PageHeader>
           <p>
             The File Gallery provides an interactive interface to browse, preview, and play downloaded media files. It

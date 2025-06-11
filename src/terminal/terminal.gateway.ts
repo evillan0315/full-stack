@@ -118,10 +118,11 @@ Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
       });
     };
 
-    sendSystemInfo();
-    const interval = setInterval(sendSystemInfo, 5000);
-    this.systemIntervalMap.set(clientId, interval);
-
+    //sendSystemInfo();
+    //const interval = setInterval(sendSystemInfo, 5000);
+    //this.systemIntervalMap.set(clientId, interval);
+    client.emit('outputPath', info.cwd);
+    client.emit('outputInfo', info);
     client.on('disconnect', () => this.handleDisconnect(client));
   }
 

@@ -38,16 +38,22 @@ export function AvatarMenu() {
       }
     >
       <div class="relative flex items-center justify-center">
-        <Button
-          onClick={() => setIsOpen((prev) => !prev)}
-          variant="primary"
-          class="rounded-full w-8 h-8 "
-          aria-label="Toggle menu"
+        <Show
+          when={user()?.image}
+          fallback={
+            <>
+              <Button variant="secondary">{getInitial()}</Button>
+            </>
+          }
         >
-          <Show when={user()?.image} fallback={<span class="text-gray-950">{getInitial()}</span>}>
-            <img src={user()?.image!} alt="Profile" class="h-full w-full object-cover" />
-          </Show>
-        </Button>
+          <button onClick={() => setIsOpen((prev) => !prev)} class="h-8 w-8">
+            <img
+              src={`/api/file/proxy?url=${encodeURIComponent(user()?.image ?? '')}`}
+              alt="Profile"
+              class="rounded-full h-full w-full object-cover"
+            />
+          </button>
+        </Show>
 
         <Show when={isOpen()}>
           <div

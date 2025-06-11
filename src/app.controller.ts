@@ -1,3 +1,5 @@
+// File: /media/eddie/Data/projects/nestJS/nest-modules/full-stack/src/app.controller.ts
+
 import {
   Controller,
   Get,
@@ -33,6 +35,11 @@ import { AuthService } from './auth/auth.service';
 import { RegisterDto, LoginDto } from './auth/dto/auth.dto';
 import { CurrentUser } from './auth/decorators/current-user.decorator';
 
+/**
+ * AppController handles the main routes of the application, including the homepage,
+ * dashboard, login, logout, and other protected pages. It uses guards to protect
+ * certain routes and renders views using Handlebars.
+ */
 @ApiTags('App')
 @Controller()
 export class AppController {
@@ -41,6 +48,14 @@ export class AppController {
     private readonly authService: AuthService,
   ) {}
 
+  /**
+   * Handles the root route and renders the homepage.  If the .env file is missing,
+   * it redirects the user to the setup page.
+   *
+   * @param {Request} req The Express Request object.
+   * @param {Response} res The Express Response object.
+   * @returns {Promise<void>} A promise that resolves when the homepage is rendered or the user is redirected.
+   */
   @Get()
   @Render('pages/index')
   @ApiOperation({ summary: 'Redirect to setup if .env is missing' })
@@ -60,6 +75,13 @@ export class AppController {
     });
   }
 
+  /**
+   * Handles the 'dashboard' route and renders a protected dashboard page.
+   * Requires a valid JWT and specific user roles (ADMIN, USER, MANAGER).
+   *
+   * @param {Request} req The Express Request object.
+   * @returns {object} An object containing a message and authentication status.
+   */
   @Get('dashboard')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.USER, UserRole.MANAGER)
@@ -75,6 +97,13 @@ export class AppController {
       isAuthenticated: Boolean(req.cookies?.accessToken),
     };
   }
+  /**
+   * Handles the 'profile' route and renders a protected profile page.
+   * Requires a valid JWT and specific user roles (ADMIN, USER, MANAGER).
+   *
+   * @param {Request} req The Express Request object.
+   * @returns {object} An object containing a message and authentication status.
+   */
   @Get('profile')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.USER, UserRole.MANAGER)
@@ -90,6 +119,13 @@ export class AppController {
       isAuthenticated: Boolean(req.cookies?.accessToken),
     };
   }
+  /**
+   * Handles the 'terminal' route and renders a protected terminal page.
+   * Requires a valid JWT and the ADMIN user role.
+   *
+   * @param {Request} req The Express Request object.
+   * @returns {object} An object containing a message and authentication status.
+   */
   @Get('terminal')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -105,6 +141,13 @@ export class AppController {
       isAuthenticated: Boolean(req.cookies?.accessToken),
     };
   }
+  /**
+   * Handles the 'settings' route and renders a protected settings page.
+   * Requires a valid JWT and specific user roles (ADMIN, USER, MANAGER).
+   *
+   * @param {Request} req The Express Request object.
+   * @returns {object} An object containing a message and authentication status.
+   */
   @Get('settings')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.USER, UserRole.MANAGER)
@@ -120,6 +163,13 @@ export class AppController {
       isAuthenticated: Boolean(req.cookies?.accessToken),
     };
   }
+  /**
+   * Handles the 'tts' route and renders a protected TTS page.
+   * Requires a valid JWT and specific user roles (ADMIN, USER, MANAGER).
+   *
+   * @param {Request} req The Express Request object.
+   * @returns {object} An object containing a message and authentication status.
+   */
   @Get('tts')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.USER, UserRole.MANAGER)
@@ -135,6 +185,12 @@ export class AppController {
       isAuthenticated: Boolean(req.cookies?.accessToken),
     };
   }
+  /**
+   * Handles the 'login' route and renders the login page.
+   *
+   * @param {Request} req The Express Request object.
+   * @returns {Promise<object>} An object containing a message and authentication status.
+   */
   @Get('login')
   @Render('pages/index')
   @ApiOperation({ summary: 'Render login page' })
@@ -149,6 +205,13 @@ export class AppController {
       isAuthenticated: Boolean(req.cookies?.accessToken),
     };
   }
+  /**
+   * Handles the 'editor' route and renders a protected editor page.
+   * Requires a valid JWT and specific user roles (ADMIN, USER, MANAGER).
+   *
+   * @param {Request} req The Express Request object.
+   * @returns {object} An object containing a message and authentication status.
+   */
   @Get('editor')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.USER, UserRole.MANAGER)
@@ -175,6 +238,14 @@ export class AppController {
       layout: 'layouts/editor',
     };
   }*/
+  /**
+   * Handles the 'logout' route and renders the logout page.
+   * Clears the 'accessToken' cookie to log the user out.
+   *
+   * @param {Request} req The Express Request object.
+   * @param {Response} res The Express Response object.
+   * @returns {Promise<{ url: string }>} An object containing the URL to redirect to.
+   */
   @Get('logout')
   @Render('pages/index')
   @ApiOperation({ summary: 'Render logout page' })
@@ -186,6 +257,13 @@ export class AppController {
     return { url: '/login' };
   }
 
+  /**
+   * Handles the POST request to the 'logout' route.
+   * Clears the 'accessToken' cookie and redirects the user to the login page.
+   *
+   * @param {Response} res The Express Response object with passthrough enabled.
+   * @returns {{ url: string }} An object containing the URL to redirect to.
+   */
   @Post('logout')
   @Redirect('/login')
   @ApiOperation({ summary: 'Log out a user and clear JWT cookie' })

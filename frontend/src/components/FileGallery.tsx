@@ -2,7 +2,7 @@ import { createResource, Show, For, createSignal, onCleanup } from 'solid-js';
 import api from '../services/api';
 import Loading from './Loading';
 
-import type { ReadFileDto } from '../types';
+import type { ReadFileResponseDto, FileItem } from '../types';
 
 const getFileType = (filename: string): 'video' | 'audio' | 'image' | 'unknown' => {
   const ext = filename.split('.').pop()?.toLowerCase();
@@ -30,19 +30,15 @@ export const FileGallery = () => {
   };
 
   const [files] = createResource(async () => {
-    const res = await api.get<ReadFileDto[]>(directory());
+    const res = await api.get<FileItem[]>(directory());
 
     const result = res.data.map((file) => ({
-      name: file.name,
-      type: getFileType(file.name),
-      lang: file.lang,
-      mimeType: file.mimeType,
-      path: file.path,
+      ...file,
       url: `${import.meta.env.BASE_URL_API}/api/media/${encodeURIComponent(file.name)}`,
     }));
-
+    console.log(result, 'result');
     const playableIndexes = result
-      .map((f, i) => (f.type === 'video' || f.type === 'audio' ? i : null))
+      .map((f, i) => (f.lang === 'video' || f.lang === 'audio' ? i : null))
       .filter((i) => i !== null) as number[];
 
     if (playableIndexes.length > 0) {
@@ -79,11 +75,10 @@ export const FileGallery = () => {
       video: [],
       audio: [],
       image: [],
-      unknown: [],
     };
 
     for (const file of files() || []) {
-      grouped[file.type].push(file);
+      grouped[file.lang].push(file);
     }
 
     return grouped;
@@ -147,10 +142,6 @@ export const FileGallery = () => {
 
                         <Show when={file.lang === 'image'}>
                           <img src={file.url} alt={file.name} class="w-full h-auto rounded" />
-                        </Show>
-
-                        <Show when={file.type === 'unknown'}>
-                          <p class="text-red-500">Unsupported file type</p>
                         </Show>
                       </div>
                     )}

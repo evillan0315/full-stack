@@ -173,7 +173,7 @@ const FileNode = (props: FileNodeProps) => {
   return (
     <div class="relative">
       <div
-        class="cursor-pointer hover:bg-gray-900/50 px-1 rounded flex items-center gap-x-2"
+        class="cursor-pointer hover:bg-gray-700/10 px-1 rounded flex items-center gap-x-2"
         onClick={handleClick}
         onContextMenu={(e) => props.onContextMenu(e, props.file)}
         onDblClick={() => {
@@ -188,7 +188,7 @@ const FileNode = (props: FileNodeProps) => {
         {/* File name or input field */}
         <Show when={editing()} fallback={<span class="truncate max-w-[220px]">{props.file.name}</span>}>
           <input
-            class="border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-gray-900 text-black dark:text-white rounded px-1 text-sm flex-grow"
+            class=" rounded px-1 text-sm flex-grow"
             value={newName()}
             autofocus
             onInput={(e) => setNewName(e.currentTarget.value)}
@@ -206,10 +206,10 @@ const FileNode = (props: FileNodeProps) => {
 
       {/* Children rendering logic */}
       <Show when={open() && hasChildren()}>
-        <div class="pl-2 border-l border-gray-300 dark:border-gray-900 ml-1">
-          <div class="pl-2 border-l border-gray-300 dark:border-gray-900 ml-1">
+        <div class="pl-2 border-l border-gray-500/30 ml-1">
+          <div class="pl-2 border-l border-gray-500/30 ml-1">
             <Show when={loadingChildren()}>
-              <div class="text-sm text-gray-500 px-2">Loading...</div>
+              <div class="text-sm px-2">Loading...</div>
             </Show>
             <For each={children()}>
               {(child) => (

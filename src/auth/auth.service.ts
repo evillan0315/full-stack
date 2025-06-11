@@ -1,3 +1,5 @@
+// File: /media/eddie/Data/projects/nestJS/nest-modules/full-stack/src/auth/auth.service.ts
+
 import {
   BadRequestException,
   Injectable,
@@ -24,14 +26,33 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { OAuthService } from './oauth.service';
 import { CreateJwtUserDto } from './dto/auth.dto';
 
+/**
+ * AuthService handles user authentication and authorization logic.
+ * It provides methods for user registration, login, email verification,
+ * and integration with OAuth providers like Google and GitHub.
+ */
 @Injectable()
 export class AuthService {
+  /**
+   * Constructor for AuthService.
+   * @param prisma - PrismaService for database interactions.
+   * @param jwtService - JwtService for generating and verifying JWT tokens.
+   * @param mailService - MailService for sending emails.
+   * @param oauthService - OAuthService for handling OAuth authentication.
+   */
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
     private readonly oauthService: OAuthService,
   ) {}
+
+  /**
+   * Generates an email verification token for a given user ID.
+   * @param userId - The ID of the user to generate the token for.
+   * @returns The generated JWT token.
+   * @private
+   */
   private generateEmailVerificationToken(userId: string) {
     return this.jwtService.sign(
       { sub: userId },
@@ -41,12 +62,13 @@ export class AuthService {
       },
     );
   }
-  /*async generateToken(payload: any) {
-    return await this.jwtService.signAsync(payload, {
-      secret: process.env.JWT_SECRET,
-      expiresIn: '1d',
-    });
-  }*/
+
+  /**
+   * Logs in a user with the provided credentials.
+   * @param dto - The LoginDto containing the user's email and password.
+   * @returns A promise that resolves to an object containing the access token and user data.
+   * @throws UnauthorizedException if the credentials are invalid.
+   */
   async login(dto: LoginDto): Promise<{ accessToken: string; user: any }> {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
@@ -77,6 +99,13 @@ export class AuthService {
     const accessToken = await this.generateToken(payload);
     return { accessToken, user: payload };
   }
+
+  /**
+   * Registers a new user.
+   * @param dto - The RegisterDto containing the user's registration information.
+   * @returns A promise that resolves to an object containing a success message.
+   * @throws InternalServerErrorException if user creation fails.
+   */
   async register(dto: RegisterDto) {
     const hash = await bcrypt.hash(dto.password, 10);
     const createUser = {
@@ -114,6 +143,12 @@ export class AuthService {
     return { message: 'Verification email sent.' };
   }
 
+  /**
+   * Verifies a user's email address using a verification token.
+   * @param token - The email verification token.
+   * @returns A promise that resolves to an object containing a success message.
+   * @throws BadRequestException if the token is invalid or expired.
+   */
   async verifyEmail(token: string) {
     try {
       const payload = this.jwtService.verify(token, {
@@ -130,6 +165,13 @@ export class AuthService {
       throw new BadRequestException('Invalid or expired token.');
     }
   }
+
+  /**
+   * Resends the email verification email to a user.
+   * @param email - The email address of the user.
+   * @returns A promise that resolves to an object containing a success message.
+   * @throws NotFoundException if the user is not found.
+   */
   async resendVerification(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
 
@@ -147,6 +189,12 @@ export class AuthService {
 
     return { message: 'Verification email sent.' };
   }
+
+  /**
+   * Validates a user by ID and returns their information.
+   * @param userId - The ID of the user to validate.
+   * @returns A promise that resolves to the user's information.
+   */
   async validateUser(userId: string) {
     return this.prisma.user.findUnique({
       where: { id: userId },
@@ -161,6 +209,14 @@ export class AuthService {
       },
     });
   }
+
+  /**
+   * Validates an OAuth profile from a given provider (Google or GitHub).
+   * @param provider - The OAuth provider ('google' or 'github').
+   * @param profile - The user's profile data from the provider.
+   * @param tokens - The access and refresh tokens from the provider.
+   * @returns A promise that resolves to the validated user data.
+   */
   async validateOAuthProfile(
     provider: 'google' | 'github',
     profile: GoogleProfileDto | GitHubProfileDto,
@@ -169,6 +225,11 @@ export class AuthService {
     return await this.oauthService.validate(provider, profile, tokens);
   }
 
+  /**
+   * Generates a JWT token for a given user payload.
+   * @param payload - The user payload to include in the token.
+   * @returns A promise that resolves to the generated JWT token.
+   */
   async generateToken(payload: CreateJwtUserDto): Promise<string> {
     return this.jwtService.signAsync(payload);
   }

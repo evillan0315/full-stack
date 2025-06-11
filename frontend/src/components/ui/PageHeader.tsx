@@ -29,7 +29,7 @@ export function PageHeader(props: PageHeaderProps) {
       {...others}
     >
       {local.icon && <Icon icon={local.icon} width="2.2em" height="2.2em" />}
-      <h1 class="leading-0 uppercase tracking-widest text-2xl">{local.children}</h1>
+      {local.children}
     </div>
   );
 }

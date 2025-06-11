@@ -8,7 +8,9 @@ export default function Downloader() {
     <div class="flex flex-col max-w-7xl mx-auto">
       <div class="flex-1 scroll-smooth px-4 py-4 space-y-4 mt-2">
         <PageHeader icon="mdi:multimedia">
-          <b>Download & Extract</b> Audio or Video
+          <h1 class="leading-0 uppercase tracking-widest text-2xl">
+            <b>Download & Extract</b> Audio or Video
+          </h1>
         </PageHeader>
         <p>
           This downloader lets you extract audio or download full video content from platforms like{' '}
