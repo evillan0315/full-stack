@@ -17,8 +17,20 @@ export class GoogleGeminiService {
   }
 
   async generateDocumentation(dto: GenerateDocDto): Promise<string> {
-    const { codeSnippet, language, topic, isComment } = dto;
-    const prompt = this.buildPrompt(codeSnippet, language, topic, isComment);
+    const {
+      codeSnippet,
+      language,
+      topic,
+      isComment = false,
+      output = 'markdown',
+    } = dto;
+    const prompt = this.buildPrompt(
+      codeSnippet,
+      language,
+      topic,
+      isComment,
+      output,
+    );
 
     const body = {
       contents: [
@@ -40,18 +52,30 @@ export class GoogleGeminiService {
         }),
       );
 
-      const generatedDoc =
+      const generatedText =
         response?.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
-      if (!generatedDoc) {
+      if (!generatedText) {
         throw new HttpException(
           'Invalid response from Google Gemini API',
           HttpStatus.BAD_GATEWAY,
         );
       }
 
-      // Combine original code with documentation output
-      return `\n${generatedDoc}\n`;
+      switch (output) {
+        case 'json':
+          return JSON.stringify({ documentation: generatedText }, null, 2);
+
+        case 'markdown':
+          return `### ${topic || 'Documentation'}\n\n\`\`\`${language || ''}\n${generatedText}\n\`\`\``;
+
+        case 'html':
+          return `<h3>${topic || 'Documentation'}</h3><pre><code>${generatedText}</code></pre>`;
+
+        case 'text':
+        default:
+          return `\n${generatedText}\n`;
+      }
     } catch (error) {
       throw new HttpException(
         `Google Gemini API request failed: ${error?.message || error}`,
@@ -65,16 +89,29 @@ export class GoogleGeminiService {
     language?: string,
     topic?: string,
     isComment?: boolean,
-    outputFormat?: 'markdown' | 'default',
+    output?: 'markdown' | 'json' | 'html' | 'text',
   ): string {
-    const langText = language ? `in ${language}` : '';
+    const langText = language ? ` in ${language}` : '';
     const topicText = topic ? ` related to ${topic}` : '';
-    const commentText = isComment ? ' comments' : '';
-    const formatText =
-      outputFormat === 'markdown'
-        ? ' Format the documentation using Markdown.'
-        : `Output as ${language}`;
+    const commentText = isComment ? ' with inline comments' : '';
 
-    return `Generate comprehensive documentation${commentText} ${langText}${topicText} for the following code:\n\n${codeSnippet}\n\n${formatText}`;
+    let formatText = '';
+    switch (output) {
+      case 'markdown':
+        formatText = 'Format the documentation using **Markdown**.';
+        break;
+      case 'json':
+        formatText = 'Respond with a well-structured JSON object.';
+        break;
+      case 'html':
+        formatText = 'Format the output as HTML content.';
+        break;
+      case 'text':
+      default:
+        formatText = `Output as ${language}`;
+        break;
+    }
+
+    return `Generate comprehensive documentation${commentText}${langText}${topicText} for the following code:\n\n${codeSnippet}\n\n${formatText}`;
   }
 }

@@ -26,7 +26,7 @@ export class JsDocToMarkdownService {
       .replace(/^\/\*\*\s*/, '')
       .replace(/\s*\*\/$/, '')
       .split('\n')
-      .map(line => line.trim().replace(/^\*\s?/, ''));
+      .map((line) => line.trim().replace(/^\*\s?/, ''));
 
     let markdown = '';
     const paramLines: string[] = [];
@@ -95,8 +95,11 @@ export class JsDocToMarkdownService {
    */
   async generateMarkdownDoc(filePath: string): Promise<string> {
     const blocks = await this.extractJsDocBlocks(filePath);
-    const sections = blocks.map(block => this.parseJsDocToMarkdown(block));
-    return `# Documentation for ${path.basename(filePath)}\n\n` + sections.join('\n\n---\n\n');
+    const sections = blocks.map((block) => this.parseJsDocToMarkdown(block));
+    return (
+      `# Documentation for ${path.basename(filePath)}\n\n` +
+      sections.join('\n\n---\n\n')
+    );
   }
 
   /**
@@ -109,4 +112,3 @@ export class JsDocToMarkdownService {
     await fs.writeFile(path.resolve(outputPath), markdown, 'utf-8');
   }
 }
-

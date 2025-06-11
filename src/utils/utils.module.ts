@@ -7,10 +7,14 @@ import { UtilsService } from './utils.service';
 import { MarkdownUtilService } from './utils-markdown.service';
 import { JsDocToMarkdownService } from './utils-jsdoc-to-markdown.service';
 
-
 @Module({
   controllers: [UtilsController, EncodingController, JsDocToMarkdownController],
-  providers: [EncodingService, UtilsService, MarkdownUtilService, JsDocToMarkdownService],
+  providers: [
+    EncodingService,
+    UtilsService,
+    MarkdownUtilService,
+    JsDocToMarkdownService,
+  ],
   exports: [EncodingService, UtilsService, JsDocToMarkdownService],
 })
 export class UtilsModule {}

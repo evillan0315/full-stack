@@ -507,16 +507,19 @@ export class UtilsController {
   async stripCodeBlock(@Body('content') content: string): Promise<string> {
     return this.utilsService.stripTripleBackticks(content);
   }
-  
+
   @Post('remove-code-comment')
-@ApiOperation({ summary: 'Remove code comments from a code block (single-line and multi-line)' })
-@ApiBody({
-  schema: {
-    type: 'object',
-    properties: {
-      content: {
-        type: 'string',
-        example: `
+  @ApiOperation({
+    summary:
+      'Remove code comments from a code block (single-line and multi-line)',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        content: {
+          type: 'string',
+          example: `
 /**
  * Adds two numbers
  */
@@ -525,17 +528,16 @@ function add(a: number, b: number): number {
   return a + b;
 }
         `.trim(),
+        },
       },
+      required: ['content'],
     },
-    required: ['content'],
-  },
-})
-@ApiResponse({
-  status: 201,
-  description: 'Code block with all comments removed is returned.',
-})
-async removeCodeComment(@Body('content') content: string): Promise<string> {
-  return this.utilsService.removeComments(content);
-}
-
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Code block with all comments removed is returned.',
+  })
+  async removeCodeComment(@Body('content') content: string): Promise<string> {
+    return this.utilsService.removeComments(content);
+  }
 }

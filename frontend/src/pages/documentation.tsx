@@ -7,14 +7,17 @@ import api from '../services/api';
 
 export default function GenerateDocumentationPage() {
   const [prompt, setPrompt] = createSignal('');
-  const [topic, setTopic] = createSignal('React');
+  const [topic, setTopic] = createSignal('SolidJS');
+  const [output, setOutput] = createSignal('markdown');
   const [language, setLanguage] = createSignal('ts');
   const [isComment, setIsComment] = createSignal(true);
   const [loading, setLoading] = createSignal(false);
   const [content, setContent] = createSignal('');
   const [error, setError] = createSignal('');
-  const topicOptions = ['React', 'SolidJS', 'NestJS', 'Vue', 'Angular'];
+  const topicOptions = ['','React', 'SolidJS', 'NestJS', 'Vue', 'Angular'];
+
   const languageOptions = [
+    { code: '', label: '' },
     { code: 'ts', label: 'TypeScript' },
     { code: 'js', label: 'JavaScript' },
     { code: 'py', label: 'Python' },
@@ -29,7 +32,8 @@ export default function GenerateDocumentationPage() {
         codeSnippet: prompt(),
         language: language(),
         topic: topic(),
-        isComment: isComment(),
+        isComment: false,
+        output: ''
       });
       if (!response.data) throw new Error('Failed to generate documentation');
 
@@ -60,6 +64,8 @@ export default function GenerateDocumentationPage() {
             setPrompt={setPrompt}
             topic={topic}
             setTopic={setTopic}
+            output={output}
+            setOutput={setOutput}
             topicOptions={topicOptions}
             language={language}
             setLanguage={setLanguage}

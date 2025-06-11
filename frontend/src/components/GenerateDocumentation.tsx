@@ -11,16 +11,20 @@ type GenerateDocumentationProps = {
   topic: () => string;
   setTopic: (val: string) => void;
   topicOptions: string[];
+  output: () => string;
+  setOutput: (val: string) => void;
   language: () => string;
   setLanguage: (val: string) => void;
   languageOptions: { code: string; label: string }[];
   isComment: () => boolean;
   setIsComment: (val: boolean) => void;
-  handleSubmit: () => void;
+  handleSubmit: (format: string) => void;
   loading: () => boolean;
   error: () => string;
   generatedContent: string | null;
 };
+
+const outputFormats = ['markdown', 'html', 'json', 'text'];
 
 export default function GenerateDocumentation(props: GenerateDocumentationProps): JSX.Element {
   return (
@@ -33,7 +37,10 @@ export default function GenerateDocumentation(props: GenerateDocumentationProps)
         value={props.prompt()}
         onInput={(e) => props.setPrompt(e.currentTarget.value)}
       />
-
+      <div class="flex items-center gap-2 mt-1">
+        <ToggleSwitch label="Inline Comments" checked={props.isComment()} onChange={props.setIsComment} />
+      </div>
+     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div>
         <label class="block mb-1 text-sm font-medium">Topic (Framework)</label>
         <select
@@ -56,13 +63,22 @@ export default function GenerateDocumentation(props: GenerateDocumentationProps)
         </select>
       </div>
 
-      <div class="flex items-center gap-2 mt-1">
-        <ToggleSwitch label="Inline Comments" checked={props.isComment()} onChange={props.setIsComment} />
+      <div>
+        <label class="block mb-1 text-sm font-medium">Output Format</label>
+        <select
+          class="w-full p-2 border border-gray-500/30 bg-sky-100 text-gray-950 rounded-md"
+          value={props.output()}
+          onChange={(e) => props.setOutput(e.currentTarget.value)}
+        >
+          <For each={outputFormats}>{(format) => <option value={format}>{format}</option>}</For>
+        </select>
       </div>
 
+      
+     </div>
       <Button
         class="px-4 py-3 w-full text-xl mt-2 mb-6 gap-4 disabled:bg-gray-200"
-        onClick={props.handleSubmit}
+        onClick={() => props.handleSubmit(props.output)}
         variant="secondary"
         disabled={props.loading()}
       >
@@ -73,11 +89,22 @@ export default function GenerateDocumentation(props: GenerateDocumentationProps)
       <Show when={props.error()}>
         <p class="text-red-500">{props.error()}</p>
       </Show>
+
       <Show when={props.generatedContent}>
-        <div class="">
-          <MarkdownViewer content={props.generatedContent} />
+        <div>
+          <Show
+            when={props.output === 'markdown'}
+            fallback={
+              <pre class="whitespace-pre-wrap bg-gray-100 p-4 rounded text-sm text-gray-800 overflow-x-auto">
+                {props.generatedContent}
+              </pre>
+            }
+          >
+            <MarkdownViewer content={props.generatedContent!} />
+          </Show>
         </div>
       </Show>
     </div>
   );
 }
+

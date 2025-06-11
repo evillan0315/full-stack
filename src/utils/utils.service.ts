@@ -791,23 +791,25 @@ export class UtilsService {
       .replace(/^```[a-zA-Z]*\n?/, '') // remove starting triple backticks with optional language
       .replace(/```$/, ''); // remove ending triple backticks
   }
-  
-   /**
+
+  /**
    * Removes all comments (single-line and block) from the provided code string.
    * @param code The source code string.
    * @returns Code string with comments removed.
    */
-removeComments(code: string): string {
-  return code
-    // Remove JSX-style comments: {/* ... */}
-    .replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, '')
-    // Remove multi-line comments: /* ... */
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    // Remove single-line comments: // ...
-    .replace(/\/\/.*(?=[\n\r])/g, '')
-    // Trim trailing whitespace from each line
-    .split('\n')
-    .map(line => line.trimEnd())
-    .join('\n');
-}
+  removeComments(code: string): string {
+    return (
+      code
+        // Remove JSX-style comments: {/* ... */}
+        .replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, '')
+        // Remove multi-line comments: /* ... */
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        // Remove single-line comments: // ...
+        .replace(/\/\/.*(?=[\n\r])/g, '')
+        // Trim trailing whitespace from each line
+        .split('\n')
+        .map((line) => line.trimEnd())
+        .join('\n')
+    );
+  }
 }

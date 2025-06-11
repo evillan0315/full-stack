@@ -57,7 +57,10 @@ export class MarkdownUtilService {
    * Loads a global CSS file to be injected into the HTML output.
    */
   private async loadGlobalCss(): Promise<void> {
-    const cssPath = path.resolve(__dirname, '../../../assets/github-markdown-light.css');
+    const cssPath = path.resolve(
+      __dirname,
+      '../../../assets/github-markdown-light.css',
+    );
     try {
       this.globalCssContent = await fs.readFile(cssPath, 'utf8');
     } catch (error) {
@@ -66,4 +69,3 @@ export class MarkdownUtilService {
     }
   }
 }
-

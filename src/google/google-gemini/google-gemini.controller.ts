@@ -13,42 +13,47 @@ export class GoogleGeminiController {
   @ApiOperation({
     summary: 'Generate documentation from code snippet using Google Gemini',
     description:
-      'Takes a code snippet, optional language, topic, and isComment flag to generate documentation using Gemini.',
+      'Accepts a code snippet and optional parameters such as language, topic, isComment, and output format to generate documentation using Gemini.',
   })
   @ApiBody({
     type: GenerateDocDto,
     examples: {
       example1: {
-        summary: 'JavaScript with comments',
+        summary: 'JavaScript with inline comments',
         value: {
           codeSnippet: 'function add(a, b) {\n  return a + b;\n}',
           language: 'JavaScript',
           topic: 'Math utilities',
           isComment: true,
+          output: 'markdown',
         },
       },
       example2: {
-        summary: 'TypeScript without comments',
+        summary: 'TypeScript without comments, JSON output',
         value: {
           codeSnippet:
             'export class AuthService {\n  login(user: any) {\n    return user;\n  }\n}',
           language: 'TypeScript',
           topic: 'Authentication Service',
           isComment: false,
+          output: 'json',
         },
       },
     },
   })
   @ApiResponse({
     status: 200,
-    description: 'Generated documentation string',
+    description: 'Generated documentation based on the provided code snippet.',
     schema: {
-      example: '// Adds two numbers and returns the result.',
+      example: {
+        markdown:
+          '### Math utilities\n\n```js\n// Adds two numbers\nfunction add(a, b) {\n  return a + b;\n}\n```',
+      },
     },
   })
   @ApiResponse({
     status: 502,
-    description: 'Bad gateway - Gemini API failure or invalid response',
+    description: 'Bad gateway - Gemini API failure or invalid response.',
   })
   async generateDocumentation(@Body() body: GenerateDocDto): Promise<string> {
     return this.geminiService.generateDocumentation(body);

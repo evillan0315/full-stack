@@ -121,7 +121,7 @@ const EditorComponent = (props: EditorComponentProps) => {
       const payload = {
         codeSnippet: content(),
         language: language(),
-        //topic: 'SolidJS',
+        output: 'text',
         isComment: true,
       };
 
