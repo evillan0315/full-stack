@@ -1,9 +1,11 @@
-# Contributing to Auth Module
+# Contributing to ProBoard Module
 
 Thank you for your interest in contributing to the **Auth Module** project! We welcome all contributions, including bug reports, feature requests, documentation improvements, and code submissions.
 
 This guide will help you understand how to contribute and the standards we follow.
+
 ## Table of Contents
+
 - [Getting Started](#getting-started)
 - [How to Contribute](#how-to-contribute)
 - [Code Style Guidelines](#code-style-guidelines)
@@ -13,6 +15,7 @@ This guide will help you understand how to contribute and the standards we follo
 - [License](#license)
 
 ---
+
 ## Getting Started
 
 1. **Fork the Repository**  

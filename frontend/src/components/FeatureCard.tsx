@@ -1,46 +1,6 @@
 import type { JSX } from 'solid-js';
 import { Icon } from '@iconify-icon/solid';
-
-/**
- * Props for the FeatureCard component.
- */
-type FeatureCardProps = {
-  /**
-   * The icon to display in the card. This should be a valid icon identifier
-   * supported by the `@iconify-icon/solid` library.  For example, 'mdi:account'.
-   *
-   * @example
-   * ```typescript
-   * <FeatureCard icon="mdi:account" title="Account Management" description="Manage your user accounts efficiently." />
-   * ```
-   *
-   *  **Best Practices:**
-   *  - Refer to the `@iconify-icon/solid` documentation for available icon sets and identifiers.
-   *  - Consider creating a type alias or enum for valid icon values if your application uses a limited set of icons.  This will improve type safety.
-   *  - Use a consistent naming convention for icons to improve maintainability.
-   */
-  icon: any; // You can refine this type based on your icon system
-
-  /**
-   * The title of the feature card.  This will be displayed prominently.
-   *
-   * @example
-   * ```typescript
-   * <FeatureCard title="Performance Optimization" description="Improve the speed and responsiveness of your application." />
-   * ```
-   */
-  title: string;
-
-  /**
-   * A brief description of the feature.  This provides more detail about what the feature does.
-   *
-   * @example
-   * ```typescript
-   * <FeatureCard title="Real-time Data" description="Access up-to-date information from various sources." />
-   * ```
-   */
-  description: string;
-};
+import type { FeatureCardProps } from '../types/types';
 
 /**
  * A card component to display a feature with an icon, title, and description.

@@ -23,7 +23,6 @@ import Downloader from './pages/downloader';
 import Dashboard from './pages/dashboard';
 
 import GeneratePage from './pages/generate';
-import FileGalleryPage from './pages/file-gallery';
 
 import Home from './pages/home';
 
@@ -97,21 +96,6 @@ export default function App() {
             component={() => (
               <ProtectedRoute>
                 <Dashboard />
-              </ProtectedRoute>
-            )}
-          />
-
-          {/**
-           * Defines the route for the file gallery page, protected by authentication.
-           * @path "/file-gallery"
-           * @component {FileGalleryPage}
-           * @protected
-           */}
-          <Route
-            path="/file-gallery"
-            component={() => (
-              <ProtectedRoute>
-                <FileGalleryPage />
               </ProtectedRoute>
             )}
           />

@@ -6,7 +6,7 @@ import {
   IsIn,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { OutputFormat } from '../output-format.enum'; 
+import { OutputFormat } from '../output-format.enum';
 
 export class GenerateDocDto {
   @ApiProperty({

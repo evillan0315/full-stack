@@ -21,7 +21,7 @@ export class GoogleGeminiService {
   ) {
     this.apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GOOGLE_GEMINI_MODEL}:generateContent?key=${process.env.GOOGLE_GEMINI_API_KEY}`;
   }
-  
+
   // --- Optimize Code ---
   async optimizeCode(dto: OptimizeCodeDto): Promise<string> {
     const { codeSnippet, language, output = OutputFormat.Text } = dto;
@@ -99,10 +99,10 @@ export class GoogleGeminiService {
       );
     }
   }
-  
+
   async generateCode(dto: GenerateCodeDto): Promise<string> {
     const { prompt, language, topic, output = OutputFormat.Text } = dto;
-    
+
     const fullPrompt = this.buildCodePrompt(prompt, language, topic, output);
 
     const body = {
@@ -134,19 +134,19 @@ export class GoogleGeminiService {
       }
 
       switch (output) {
-  case OutputFormat.Json:
-    return JSON.stringify({ code: generatedCode }, null, 2);
+        case OutputFormat.Json:
+          return JSON.stringify({ code: generatedCode }, null, 2);
 
-  case OutputFormat.Markdown:
-    return `### ${topic || 'Generated Code'}\n\n\`\`\`${language || ''}\n${generatedCode}\n\`\`\``;
+        case OutputFormat.Markdown:
+          return `### ${topic || 'Generated Code'}\n\n\`\`\`${language || ''}\n${generatedCode}\n\`\`\``;
 
-  case OutputFormat.Html:
-    return `<h3>${topic || 'Generated Code'}</h3><pre><code>${generatedCode}</code></pre>`;
+        case OutputFormat.Html:
+          return `<h3>${topic || 'Generated Code'}</h3><pre><code>${generatedCode}</code></pre>`;
 
-  case OutputFormat.Text:
-  default:
-    return `\n${generatedCode}\n`;
-}
+        case OutputFormat.Text:
+        default:
+          return `\n${generatedCode}\n`;
+      }
     } catch (error) {
       throw new HttpException(
         `Google Gemini API request failed: ${error?.message || error}`,
@@ -236,25 +236,24 @@ export class GoogleGeminiService {
     let formatText = '';
     let returnText = ``;
     switch (output) {
-    case OutputFormat.Markdown:
-      formatText = 'Return the response as Markdown-formatted code.';
-      returnText = `Generate a documentation for ${topicText} using ${language}:\n\n${codeSnippet}\n\n${formatText}`;
-      break;
-    case OutputFormat.Json:
-      formatText = 'Respond with a JSON object containing the code.';
-      returnText = `Generate comprehensive documentation${commentText}${langText}${topicText} for the following code:\n\n${codeSnippet}\n\n${formatText}`;
-      break;
-    case OutputFormat.Html:
-      formatText = 'Respond with HTML formatted output.';
-      returnText = `Generate comprehensive documentation${commentText}${langText}${topicText} for the following code:\n\n${codeSnippet}\n\n${formatText}`;
-      break;
-    case OutputFormat.Text:
-    default:
-      formatText = `Respond with plain ${language || 'text'} code only.`;
-      returnText = `Generate comprehensive documentation${commentText}${langText}${topicText} for the following code:\n\n${codeSnippet}\n\n${formatText}`;
-      break;
-  }
-    
+      case OutputFormat.Markdown:
+        formatText = 'Return the response as Markdown-formatted code.';
+        returnText = `Generate a documentation for ${topicText} using ${language}:\n\n${codeSnippet}\n\n${formatText}`;
+        break;
+      case OutputFormat.Json:
+        formatText = 'Respond with a JSON object containing the code.';
+        returnText = `Generate comprehensive documentation${commentText}${langText}${topicText} for the following code:\n\n${codeSnippet}\n\n${formatText}`;
+        break;
+      case OutputFormat.Html:
+        formatText = 'Respond with HTML formatted output.';
+        returnText = `Generate comprehensive documentation${commentText}${langText}${topicText} for the following code:\n\n${codeSnippet}\n\n${formatText}`;
+        break;
+      case OutputFormat.Text:
+      default:
+        formatText = `Respond with plain ${language || 'text'} code only.`;
+        returnText = `Generate comprehensive documentation${commentText}${langText}${topicText} for the following code:\n\n${codeSnippet}\n\n${formatText}`;
+        break;
+    }
 
     return returnText;
   }
@@ -270,20 +269,20 @@ export class GoogleGeminiService {
 
     let formatText = '';
     switch (output) {
-    case OutputFormat.Markdown:
-      formatText = 'Return the response as Markdown-formatted code.';
-      break;
-    case OutputFormat.Json:
-      formatText = 'Respond with a JSON object containing the code.';
-      break;
-    case OutputFormat.Html:
-      formatText = 'Respond with HTML formatted output.';
-      break;
-    case OutputFormat.Text:
-    default:
-      formatText = `Respond with plain ${language || 'text'} code only.`;
-      break;
-  }
+      case OutputFormat.Markdown:
+        formatText = 'Return the response as Markdown-formatted code.';
+        break;
+      case OutputFormat.Json:
+        formatText = 'Respond with a JSON object containing the code.';
+        break;
+      case OutputFormat.Html:
+        formatText = 'Respond with HTML formatted output.';
+        break;
+      case OutputFormat.Text:
+      default:
+        formatText = `Respond with plain ${language || 'text'} code only.`;
+        break;
+    }
 
     return `Generate${langText} code${topicText}.\n\nInstruction: ${instruction}\n\n${formatText}`;
   }

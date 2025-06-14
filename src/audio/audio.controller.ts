@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { AudioService } from './audio.service';
 
@@ -48,24 +48,32 @@ export class AudioController {
     },
   })
   async extract(
-    @Body('url') url: string,
-    @Body('provider') provider: string,
-    @Body('cookieAccess') cookieAccess: boolean,
-    @Body('format')
-    format: 'mp3' | 'webm' | 'm4a' | 'wav' | 'mp4' | 'flv' = 'mp3',
+    @Body() body: {
+      url: string;
+      provider?: string;
+      cookieAccess?: boolean;
+      format?: 'mp3' | 'webm' | 'm4a' | 'wav' | 'mp4' | 'flv';
+    },
   ): Promise<{ filePath: string }> {
+    const { url, provider, cookieAccess = false, format = 'mp3' } = body;
+
+    if (!url) {
+      throw new BadRequestException('The URL is required.');
+    }
+
     const allowedFormats = ['mp3', 'webm', 'm4a', 'wav', 'mp4', 'flv'] as const;
     type Format = (typeof allowedFormats)[number];
 
     const isValidFormat = (f: string): f is Format =>
       allowedFormats.includes(f as Format);
 
-    const requestedFormat = isValidFormat(format) ? format : 'webm';
+    const selectedFormat = isValidFormat(format) ? format : 'webm';
 
     const filePath = await this.audioService.extractAudioVideoFromYoutube(
       url,
-      requestedFormat,
-      undefined, // Progress callback if needed
+      selectedFormat,
+      undefined, // Progress callback (optional)
+      undefined, // File path callback (optional)
       provider,
       cookieAccess,
     );
@@ -73,3 +81,4 @@ export class AudioController {
     return { filePath };
   }
 }
+

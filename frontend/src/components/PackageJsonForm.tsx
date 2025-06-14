@@ -72,24 +72,14 @@ const PackageJsonForm: Component = () => {
   const handleScriptsChange = (scriptName: string, scriptValue: string) => {
     const updatedScripts = { ...packageJson().scripts, [scriptName]: scriptValue };
     setPackageJson({ ...packageJson(), scripts: updatedScripts });
-    localStorage.setItem(
-      'packageJsonData',
-      JSON.stringify({ ...packageJson(), scripts: updatedScripts }),
-    );
+    localStorage.setItem('packageJsonData', JSON.stringify({ ...packageJson(), scripts: updatedScripts }));
   };
 
-  const handleDependencyChange = (
-    dependencyName: string,
-    dependencyVersion: string,
-    isDev: boolean,
-  ) => {
+  const handleDependencyChange = (dependencyName: string, dependencyVersion: string, isDev: boolean) => {
     const target = isDev ? 'devDependencies' : 'dependencies';
     const updatedDependencies = { ...packageJson()[target], [dependencyName]: dependencyVersion };
     setPackageJson({ ...packageJson(), [target]: updatedDependencies });
-    localStorage.setItem(
-      'packageJsonData',
-      JSON.stringify({ ...packageJson(), [target]: updatedDependencies }),
-    );
+    localStorage.setItem('packageJsonData', JSON.stringify({ ...packageJson(), [target]: updatedDependencies }));
   };
 
   const handleAddScript = () => {
@@ -113,10 +103,7 @@ const PackageJsonForm: Component = () => {
       setPackageJson({ ...packageJson(), [fieldName]: '' }); // Initialize value
       setNewFieldName(''); //reset field
 
-      localStorage.setItem(
-        'packageJsonData',
-        JSON.stringify({ ...packageJson(), [fieldName]: '' }),
-      );
+      localStorage.setItem('packageJsonData', JSON.stringify({ ...packageJson(), [fieldName]: '' }));
     }
   };
 
@@ -138,7 +125,7 @@ const PackageJsonForm: Component = () => {
       <div class="space-y-4">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div class="flex flex-col">
-            <label htmlFor="name" class="font-medium">
+            <label for="name" class="font-medium">
               Name:
             </label>
             <input
@@ -151,7 +138,7 @@ const PackageJsonForm: Component = () => {
           </div>
 
           <div class="flex flex-col">
-            <label htmlFor="version" class="font-medium">
+            <label for="version" class="font-medium">
               Version:
             </label>
             <input
@@ -164,7 +151,7 @@ const PackageJsonForm: Component = () => {
           </div>
         </div>
         <div class="flex flex-col">
-          <label htmlFor="description" class="font-medium">
+          <label for="description" class="font-medium">
             Description:
           </label>
           <textarea
@@ -176,7 +163,7 @@ const PackageJsonForm: Component = () => {
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div class="flex flex-col">
-            <label htmlFor="main" class="font-medium">
+            <label for="main" class="font-medium">
               Main:
             </label>
             <input
@@ -189,7 +176,7 @@ const PackageJsonForm: Component = () => {
           </div>
 
           <div class="flex flex-col">
-            <label htmlFor="author" class="font-medium">
+            <label for="author" class="font-medium">
               Author:
             </label>
             <input
@@ -202,7 +189,7 @@ const PackageJsonForm: Component = () => {
           </div>
 
           <div class="flex flex-col">
-            <label htmlFor="license" class="font-medium">
+            <label for="license" class="font-medium">
               License:
             </label>
             <input
@@ -227,7 +214,7 @@ const PackageJsonForm: Component = () => {
           <For each={Object.keys(packageJson().scripts || {})}>
             {(scriptName) => (
               <div class="flex flex-col">
-                <label htmlFor={`script-${scriptName}`} class="font-medium">
+                <label for={`script-${scriptName}`} class="font-medium">
                   {scriptName}:
                 </label>
                 <input
@@ -258,7 +245,7 @@ const PackageJsonForm: Component = () => {
             <For each={Object.keys(packageJson().dependencies || {})}>
               {(dependencyName) => (
                 <div class="flex items-center justify-start gap-4">
-                  <label htmlFor={`dependency-${dependencyName}`} class="font-medium w-1/2">
+                  <label for={`dependency-${dependencyName}`} class="font-medium w-1/2">
                     {dependencyName}:
                   </label>
                   <input
@@ -266,9 +253,7 @@ const PackageJsonForm: Component = () => {
                     id={`dependency-${dependencyName}`}
                     class="border rounded px-3 py-2"
                     value={packageJson().dependencies![dependencyName] || ''}
-                    onInput={(e) =>
-                      handleDependencyChange(dependencyName, e.currentTarget.value, false)
-                    }
+                    onInput={(e) => handleDependencyChange(dependencyName, e.currentTarget.value, false)}
                   />
                 </div>
               )}
@@ -292,7 +277,7 @@ const PackageJsonForm: Component = () => {
             <For each={Object.keys(packageJson().devDependencies || {})}>
               {(dependencyName) => (
                 <div class="flex items-center justify-start gap-4">
-                  <label htmlFor={`dev-dependency-${dependencyName}`} class="font-medium w-1/2">
+                  <label for={`dev-dependency-${dependencyName}`} class="font-medium w-1/2">
                     {dependencyName}:
                   </label>
                   <input
@@ -300,9 +285,7 @@ const PackageJsonForm: Component = () => {
                     id={`dev-dependency-${dependencyName}`}
                     class="border rounded px-3 py-2"
                     value={packageJson().devDependencies![dependencyName] || ''}
-                    onInput={(e) =>
-                      handleDependencyChange(dependencyName, e.currentTarget.value, true)
-                    }
+                    onInput={(e) => handleDependencyChange(dependencyName, e.currentTarget.value, true)}
                   />
                 </div>
               )}
@@ -322,10 +305,7 @@ const PackageJsonForm: Component = () => {
             value={newFieldName()}
             onInput={(e) => setNewFieldName(e.currentTarget.value)}
           />
-          <button
-            class="bg-green-600 px-3 py-1 rounded hover:bg-green-700"
-            onClick={handleAddExtraField}
-          >
+          <button class="bg-green-600 px-3 py-1 rounded hover:bg-green-700" onClick={handleAddExtraField}>
             Add Field
           </button>
         </div>
@@ -334,7 +314,7 @@ const PackageJsonForm: Component = () => {
           <For each={extraFields()}>
             {(field) => (
               <div class="flex items-center gap-2">
-                <label htmlFor={`extra-${field}`} class="w-32 font-medium">
+                <label for={`extra-${field}`} class="w-32 font-medium">
                   {field}:
                 </label>
                 <input

@@ -1,225 +1,211 @@
-// src/pages/editor.tsx
-
-import { createSignal, onMount, onCleanup, createEffect, Show } from 'solid-js';
+import { createSignal, onMount, Show, onCleanup } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
-import type { Component } from 'solid-js'; // Component type is not used here, can be removed
 import { Icon } from '@iconify-icon/solid';
+import { useStore } from '@nanostores/solid';
+
+import DropdownMenu from '../components/ui/DropdownMenu';
+import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
-import EditorComponent from '../components/EditorComponent';
-// import FileManager from '../components/FileManager'; // No longer needed here
-import FileManagerContainer from '../components/FileManagerContainer';
 import GridResizer from '../components/GridResizer';
 import TerminalDrawer from '../components/TerminalDrawer';
-import FileTabs from '../components/FileTabs';
-import api from '../services/api';
+import { EditorStatusBar } from '../components/editor/EditorStatusBar';
 
-/**
- * The main `Editor` page component that provides:
- * - A file manager panel for selecting files
- * - A code editor panel with syntax highlighting
- * - A resizable layout controlled by a grid resizer
- * - An optional terminal drawer for command execution
- */
+import {
+  editorOriginalContent,
+  editorFilePath,
+  editorOpenTabs,
+  editorContent,
+  editorUnsaved,
+} from '../stores/editorContent';
+import { showToast } from '../stores/toast';
+
+import FileTabs from '../components/file/FileTabs';
+import { useEditorFile } from '../hooks/useEditorFile';
+import EditorComponent from '../components/editor/EditorComponent';
+import FileManagerContainer from '../components/file/FileManagerContainer';
+
 export default function Editor() {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = createSignal(false);
   const [terminalOpen, setTerminalOpen] = createSignal(false);
-  // Use fileContent and filePath for the currently displayed file in the editor
-  // The filePath here will be the `activeTab()`
-  const [fileContent, setFileContent] = createSignal<string>('');
-  const [fileLang, setFileLang] = createSignal<string>('');
-  const [codeDocs, setCodeDocs] = createSignal<string>('');
-  // State for layout resizing
-  const [left, setLeft] = createSignal(0.225); // Initial flex-grow ratio for file manager
-  const isHorizontal = () => false; // Determines if the split is horizontal or vertical
-  const [bottom, setBottom] = createSignal(0.225);
-  // Refs for grid resizing
-  let gridRef!: HTMLDivElement; // Main container for grid layout
-  let resizerRef!: HTMLDivElement; // Ref for the resizer element itself
+  const [left, setLeft] = createSignal(0.225);
 
-  // States for managing open files and active tab
-  const [openTabs, setOpenTabs] = createSignal<string[]>([]);
-  const [activeTab, setActiveTab] = createSignal<string>('');
+  let gridRef: HTMLDivElement | undefined;
+  let resizerRef: HTMLDivElement | undefined;
 
-  /**
-   * Handles resizing of the file manager/editor split pane.
-   * @param clientX - Mouse X coordinate
-   * @param clientY - Mouse Y coordinate
-   */
-  const changeLeft = (clientX: number, clientY: number) => {
-    // Ensure gridRef and resizerRef are available
+  // ✅ Initialize useEditorFile ONCE at the component level
+  const editorFileHook = useEditorFile(
+    (loadedContent) => {
+      editorContent.set(loadedContent);
+
+      // Update original content so isDirty becomes false
+      editorOriginalContent.set(loadedContent);
+
+      const prev = editorUnsaved.get();
+      editorUnsaved.set({
+        ...prev,
+        [editorFilePath.get()]: false,
+      });
+      //showToast(`Loaded ${editorFilePath.get()}`, 'success');
+    },
+    () => {
+      // After save, original content matches saved content
+      editorOriginalContent.set(editorContent.get());
+
+      const prev = editorUnsaved.get();
+      editorUnsaved.set({
+        ...prev,
+        [editorFilePath.get()]: false,
+      });
+      //showToast(`Saved ${editorFilePath.get()}`, 'success');
+    },
+  );
+
+  const changeLeft = (clientX: number) => {
     if (!gridRef || !resizerRef) return;
-
     const rect = gridRef.getBoundingClientRect();
-    let position: number;
-    let size: number;
+    const position = clientX - rect.left - resizerRef.offsetWidth / 2;
+    const size = rect.width - resizerRef.offsetWidth;
+    const percentage = Math.min(Math.max(position / size, 0.1), 0.75);
+    setLeft(percentage);
+  };
 
-    if (isHorizontal()) {
-      // For horizontal split (top/bottom panels)
-      position = clientY - rect.top - resizerRef.offsetHeight / 2;
-      size = gridRef.offsetHeight - resizerRef.offsetHeight;
-    } else {
-      // For vertical split (left/right panels)
-      position = clientX - rect.left - resizerRef.offsetWidth / 2;
-      size = gridRef.offsetWidth - resizerRef.offsetWidth;
+  const loadFile = (path: string) => {
+    if (!path) return;
+
+    editorFilePath.set(path);
+    editorFileHook.fetchFile(path);
+  };
+
+  const handleTabClick = (path: string) => {
+    if (path !== editorFilePath.get()) {
+      loadFile(path);
     }
-
-    // Calculate percentage and constrain it to a reasonable range
-    const percentage = position / size;
-    const percentageAdjusted = Math.min(Math.max(percentage, 0.1), 0.75); // Min 10%, Max 75%
-
-    setLeft(percentageAdjusted);
   };
-  const changeBottom = (clientX: number, clientY: number) => {
-    // Ensure gridRef and resizerRef are available
-    if (!gridRef || !resizerRef) return;
 
-    const rect = gridRef.getBoundingClientRect();
-    let position: number;
-    let size: number;
-    position = clientY - rect.top - resizerRef.offsetHeight / 2;
-    size = gridRef.offsetHeight - resizerRef.offsetHeight;
+  const handleTabClose = (closedPath: string) => {
+    const remainingTabs = editorOpenTabs.get().filter((t) => t !== closedPath);
+    editorOpenTabs.set(remainingTabs);
 
-    // Calculate percentage and constrain it to a reasonable range
-    const percentage = position / size;
-    const percentageAdjusted = Math.min(Math.max(percentage, 0.1), 0.75); // Min 10%, Max 75%
-
-    setBottom(percentageAdjusted);
-  };
-  /**
-   * Loads file content from the backend for a given path.
-   * Also manages open tabs and active tab state.
-   * @param path - Path to the file being loaded
-   */
-  const loadFile = async (path: string) => {
-    if (path === activeTab() && fileContent()) return;
-
-    setIsLoading(true);
-    try {
-      const response = await api.post('/file/read', { filePath: path });
-      if (!response.data || typeof response.data.content !== 'string') {
-        throw new Error('Invalid file content format received from API');
+    if (editorFilePath.get() === closedPath) {
+      if (remainingTabs.length > 0) {
+        loadFile(remainingTabs[remainingTabs.length - 1]);
+      } else {
+        editorFilePath.set('');
+        editorContent.set('');
       }
-
-      setFileContent(response.data.content);
-      setFileLang(response.data.language);
-      setOpenTabs((tabs) => (tabs.includes(path) ? tabs : [...tabs, path]));
-      setActiveTab(path);
-    } catch (err) {
-      console.error(`Error loading file "${path}":`, err);
-      const errorMessage = (err as any)?.response?.data?.message || (err as Error).message || 'Unknown error';
-      setFileContent(`Error loading file: ${errorMessage}`);
-    } finally {
-      setIsLoading(false);
     }
   };
-  
-  /**
-   * Effect to handle initial authentication and initial file loading.
-   */
   onMount(() => {
+    document.addEventListener('editor-load-file', (e: Event) => {
+      const path = (e as CustomEvent).detail.path;
+      loadFile(path);
+    });
+
     if (!isAuthenticated()) {
       navigate('/login', { replace: true });
-    } else {
-      // Optionally load a default file (e.g., README.md) on initial mount
-      // Only if no tab is active or no files are open
-      if (openTabs().length === 0 && !activeTab()) {
-        loadFile('./README.md'); // Or any other default file
-      }
+      return;
     }
 
-    // No need for updateWidths if flexbox handles it and resizer manages proportions
-    // window.addEventListener('resize', updateWidths); // Removed as it's not directly used for flex layout
+    const initial = editorFilePath.get();
+    loadFile(initial);
   });
 
   onCleanup(() => {
-    // window.removeEventListener('resize', updateWidths); // Removed corresponding cleanup
-  });
-
-  // Effect to update EditorComponent's content when activeTab changes
-  createEffect(() => {
-    if (activeTab() && !isLoading()) {
-      // You might not need to reload here if loadFile already handles activeTab change.
-      // This effect would be for if `fileContent` was managed externally.
-      // Since `loadFile` sets `fileContent`, this effect might be redundant or for complex sync scenarios.
-      // If EditorComponent needs to react directly to `activeTab` changing for non-content reasons, keep it.
-      // If EditorComponent uses `filePath` and `fileContent` signals, it will react automatically.
-    }
+    document.removeEventListener('editor-load-file', () => {});
   });
 
   return (
-    <div>
+    <Show when={isAuthenticated()} fallback={<div>Please Login</div>}>
       <div
-        ref={gridRef} // Assign ref to the main grid container
-        class="flex h-[calc(100vh-5rem)] min-h-0 flex-1 flex-col font-sans "
-        classList={{
-          'md:flex-row': !isHorizontal(), // Apply flex-row for horizontal panels
-          'dark': true, // Keep dark mode class if always dark
-        }}
+        ref={(el) => (gridRef = el)}
+        class="flex h-[calc(100vh-5rem)] min-h-0 flex-1 flex-col font-sans dark md:flex-row"
       >
-        {/* File Manager Container */}
-        {/* FIX: Removed FileManager={FileManager} as it's not a valid prop */}
         <FileManagerContainer left={left} loadFile={loadFile} />
-
-        {/* Grid Resizer */}
-        <GridResizer ref={resizerRef} isHorizontal={isHorizontal()} onResize={changeLeft} />
-
-        {/* Code Editor Panel */}
-        <div class="flex min-h-0 min-w-0 flex-col overflow-auto" style={`flex: ${1 - left()}`}>
-          {/* File Tabs */}
-          <FileTabs
-            openTabs={openTabs()}
-            activeTab={activeTab()}
-            onTabClick={(path) => {
-              setActiveTab(path);
-              loadFile(path); // Load content when tab is clicked
-            }}
-            onTabClose={(closedPath) => {
-              setOpenTabs((tabs) => tabs.filter((t) => t !== closedPath));
-              if (closedPath === activeTab()) {
-                const remaining = openTabs().filter((t) => t !== closedPath);
-                if (remaining.length > 0) {
-                  // Load the last remaining tab
-                  loadFile(remaining[remaining.length - 1]);
-                } else {
-                  // No tabs left, clear editor
-                  setActiveTab('');
-                  setFileContent('');
-                }
-              }
-            }}
-          />
-          {/* Editor Component */}
+        <GridResizer ref={(el) => (resizerRef = el)} isHorizontal={false} onResize={changeLeft} />
+        
+        <div class="flex min-h-0 min-w-0 flex-col" style={`flex: ${1 - left()}`}>
+        
+          <FileTabs />
+          
           <EditorComponent
-            filePath={activeTab()} // Pass the path of the active tab
-            initialContent={fileContent()} // Pass the loaded content
-            isLoading={isLoading()} // Pass loading state
-            // Add any other props EditorComponent expects, e.g., onSave, language etc.
+            //content={editorContent.get()}
+            //filePath={editorFilePath.get()}
+            onSave={() => {
+              editorFileHook.saveFile();
+
+              // Update the original content so isDirty recomputes to false
+              editorOriginalContent.set(editorContent.get());
+              const prev = editorUnsaved.get();
+              editorUnsaved.set({
+                ...prev,
+                [editorFilePath.get()]: false,
+              });
+            }}
+            onChange={(content) => {
+              editorFileHook.setContent(content);
+              editorContent.set(content);
+
+              const prev = editorUnsaved.get();
+              editorUnsaved.set({
+                ...prev,
+                [editorFilePath.get()]: true,
+              });
+            }}
           />
+
           <Show when={terminalOpen()}>
-            {/* Integrated Terminal Drawer */}
             <TerminalDrawer
               isOpen={terminalOpen()}
               setIsOpen={setTerminalOpen}
               position="bottom"
               size="200px"
               fontSize={12}
-              resizable={true}
+              resizable
               draggable={false}
             />
           </Show>
-          <div class="fixed -bottom-2 right-0 z-60">
-            <button
-              title="Open Terminal"
-              onClick={() => setTerminalOpen(!terminalOpen())}
-              class=" py-2 px-1 shadow-lg cursor-pointer"
-            >
-              <Icon icon="mdi:code-greater-than-or-equal" width="1.4em" height="1.4em" />
-            </button>
+
+          <div class="editor-footer flex items-center justify-between border-t px-6">
+            <EditorStatusBar />
+
+            <div class="flex items-center justify-between gap-4 py-2">
+              <DropdownMenu
+                variant="outline"
+                icon="mdi:code"
+                items={[
+                  { label: 'Format Code', icon: 'mdi:format-align-right', onClick: () => showToast('Format', 'info') },
+                  { label: 'Remove Comments', icon: 'mdi:code', onClick: () => showToast('Remove comments', 'info') },
+                ]}
+              />
+              <DropdownMenu
+                icon="mdi:wand"
+                variant="outline"
+                items={[
+                  { label: 'Inline Documentation', icon: 'mdi:code', onClick: () => showToast('Doc', 'info') },
+                  {
+                    label: 'Optimize Code',
+                    icon: 'mdi:code-block-braces',
+                    onClick: () => showToast('Optimize', 'info'),
+                  },
+                  {
+                    label: 'Analyze Code',
+                    icon: 'mdi:code-block-parentheses',
+                    onClick: () => showToast('Analyze', 'info'),
+                  },
+                  { label: 'Repair Code', icon: 'mdi:code-tags-check', onClick: () => showToast('Repair', 'info') },
+                ]}
+              />
+              <Button variant="outline" onClick={() => editorFileHook.saveFile()}>
+                <Icon icon="mdi:content-save" width="1.4em" height="1.4em" />
+              </Button>
+              <Button variant="outline" onClick={() => setTerminalOpen(!terminalOpen())}>
+                <Icon icon="mdi:code-greater-than-or-equal" width="1.4em" height="1.4em" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Show>
   );
 }

@@ -23,6 +23,7 @@ import { AudioModule } from './audio/audio.module';
 import { SetupModule } from './setup/setup.module';
 import { ScreenRecorderModule } from './screen-recorder/screen-recorder.module';
 import { AwsModule } from './aws/aws.module';
+import { ProjectModule } from './project/project.module';
 
 import fileConfig from './config/file.config';
 
@@ -129,6 +130,7 @@ import fileConfig from './config/file.config';
      */
     ScreenRecorderModule,
     AwsModule,
+    ProjectModule,
   ],
   /**
    * Controllers defined in this module.  Controllers handle incoming requests and route them to appropriate handlers.

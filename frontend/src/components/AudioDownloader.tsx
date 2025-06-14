@@ -2,6 +2,7 @@ import { createSignal, onCleanup, onMount } from 'solid-js';
 import io from 'socket.io-client';
 import { Icon } from '@iconify-icon/solid';
 import { Button } from './ui/Button';
+import VideoJSPlayer from './VideoJSPlayer';
 
 const socket = io(`${import.meta.env.BASE_URL_API}`);
 
@@ -23,7 +24,7 @@ export default function AudioDownloader() {
    *
    * @type {[() => string, (v: string) => string]} - A tuple containing the getter and setter functions for the format signal.
    */
-  const [format, setFormat] = createSignal('mp3');
+  const [format, setFormat] = createSignal('mp4');
   /**
    * `provider` is a SolidJS signal that stores the name of the media provider (e.g., youtube, bilibili).
    *
@@ -54,6 +55,7 @@ export default function AudioDownloader() {
    * @type {[() => string, (v: string) => string]} - A tuple containing the getter and setter functions for the file path signal.
    */
   const [filePath, setFilePath] = createSignal('');
+  const [filename, setFilename] = createSignal('');
   /**
    * `error` is a SolidJS signal that stores any error message that occurred during the download process.
    *
@@ -89,6 +91,10 @@ export default function AudioDownloader() {
    * @returns {void}
    */
   onMount(() => {
+    socket.on('download_ready', (data) => {
+      const fPath = `${import.meta.env.BASE_URL_API}/api/media/${encodeURIComponent(data.filePath.split('/').pop())}`;
+      //setFilePath(fPath);
+    });
     /**
      * Listens for 'download_progress' events from the server.
      * Updates the progress signal and sets loading to false when progress reaches 100%.
@@ -97,6 +103,7 @@ export default function AudioDownloader() {
      * @param {number} data.progress - The download progress as a percentage.
      */
     socket.on('download_progress', (data) => {
+      console.log(data, 'download_progress data');
       setProgress(data.progress);
       if (data.progress >= 100) {
         setIsLoading(false);
@@ -111,6 +118,7 @@ export default function AudioDownloader() {
      * @param {string} data.filePath - The path to the downloaded file.
      */
     socket.on('download_complete', (data) => {
+      setFilename(data.filename);
       setFilePath(data.filePath);
     });
 
@@ -197,9 +205,31 @@ export default function AudioDownloader() {
       )}
 
       {filePath() && (
-        <div class="mt-4 text-green-600">
-          ✅ Download complete: <code>{filePath()}</code>
-        </div>
+        <>
+          <div class="mt-4 text-green-600">
+            ✅ Download complete: <code>{filePath()}</code>
+          </div>
+
+          {format().startsWith('mp4') || format().startsWith('webm') || format().startsWith('flv') ? (
+            <VideoJSPlayer
+              options={{
+                sources: [
+                  {
+                    src: `${import.meta.env.BASE_URL_API}/api/media/${filename()}`,
+                    type: 'video/mp4',
+                  },
+                ],
+              }}
+              //src={`${import.meta.env.BASE_URL_API}/api/media/${filename()}`}
+              //type={`video/${format() === 'mp4' ? 'mp4' : format()}`}
+            />
+          ) : (
+            <audio controls class="mt-4 w-full">
+              <source src={`${import.meta.env.BASE_URL_API}/api/media/${filename()}`} type={`audio/${format()}`} />
+              Your browser does not support the audio element.
+            </audio>
+          )}
+        </>
       )}
 
       {error() && <div class="mt-4 text-red-600">❌ Error: {error()}</div>}

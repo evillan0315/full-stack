@@ -4,7 +4,8 @@ import { OutputFormat } from '../output-format.enum';
 
 export class AnalyzeCodeDto {
   @ApiProperty({
-    description: 'The code snippet to analyze for issues, improvements, or best practices',
+    description:
+      'The code snippet to analyze for issues, improvements, or best practices',
     example: `let total = 0; for (let i = 0; i < items.length; i++) { total += items[i]; }`,
   })
   @IsNotEmpty()
@@ -34,4 +35,3 @@ export class AnalyzeCodeDto {
   })
   output?: OutputFormat;
 }
-

@@ -1,10 +1,10 @@
 // File: /media/eddie/Data/projects/nestJS/nest-modules/full-stack/frontend/src/components/TerminalShell.tsx
 
 import { createSignal, onCleanup, onMount } from 'solid-js';
-import { Terminal } from 'xterm';
+import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { io, Socket } from 'socket.io-client';
-import 'xterm/css/xterm.css';
+//import 'xterm/css/xterm.css';
 
 /**
  * Defines the properties for the TerminalShell component.
@@ -43,7 +43,7 @@ export default function TerminalShell(props: TerminalShellProps) {
   /**
    * A signal holding the current working directory. It's updated by the backend.
    */
-  const [cwd, setCwd] = createSignal<string | null>(null);
+  const [cwd, setCwd] = createSignal<string | null>('~');
 
   /**
    * An array to store the command history for up/down arrow navigation.
@@ -62,7 +62,7 @@ export default function TerminalShell(props: TerminalShellProps) {
    * Writes the current working directory prompt to the terminal.
    */
   const prompt = () => {
-    term()?.write(`\x1b[1;32m${cwd() || ''}\x1b[0m \n$ `);
+    term()?.write(`\x1b[1;32m${cwd()}\x1b[0m $ `);
   };
 
   /**
@@ -182,7 +182,7 @@ export default function TerminalShell(props: TerminalShellProps) {
     });
     socketInstance.on('outputInfo', (msg: { cwd: string }) => {
       setCwd(msg.cwd);
-      prompt();
+      //prompt();
     });
     socketInstance.on('output', (msg: string) => {
       termInstance.writeln(msg);

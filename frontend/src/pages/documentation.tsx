@@ -14,7 +14,7 @@ export default function GenerateDocumentationPage() {
   const [loading, setLoading] = createSignal(false);
   const [content, setContent] = createSignal('');
   const [error, setError] = createSignal('');
-  const topicOptions = ['','React', 'SolidJS', 'NestJS', 'Vue', 'Angular'];
+  const topicOptions = ['', 'React', 'SolidJS', 'NestJS', 'Vue', 'Angular'];
 
   const languageOptions = [
     { code: '', label: '' },
@@ -33,7 +33,7 @@ export default function GenerateDocumentationPage() {
         language: language(),
         topic: topic(),
         isComment: false,
-        output: ''
+        output: '',
       });
       if (!response.data) throw new Error('Failed to generate documentation');
 
@@ -77,7 +77,7 @@ export default function GenerateDocumentationPage() {
             error={() => (error() ? 'Failed to generate documentation.' : '')}
             generatedContent={content() ?? ''}
           />
-          
+
           {/* Sidebar Info */}
           <div class="w-full md:w-1/4 space-y-4">
             <div class="p-4 border rounded-lg bg-gray-800/10 border-gray-500/30">

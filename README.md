@@ -1,8 +1,9 @@
-# Authentication Module
+# Project Board  
 
 A robust and secure authentication module for **NestJS**, using **Prisma ORM**, **JWT authentication** via **HTTP-only cookies**, 
-and full **Swagger API documentation**. Includes **email verification**, a **Nest CLI scaffolding tool**, and OAuth placeholders for future use.
----
+and full **Swagger API documentation**. Includes **email verification**, a **Nest CLI scaffolding tool**, and OAuth placeholders for future use.  
+---  
+## 🔐 New Features
 * ✅ JWT-based auth via HTTP-only cookies and optional Bearer header
 * ✅ User registration and login
 * ✅ Email verification with JWT token links
@@ -10,22 +11,16 @@ and full **Swagger API documentation**. Includes **email verification**, a **Nes
 * ✅ Swagger support with cookie + bearer authentication
 * ✅ CLI tool to scaffold modules with service/controller/dto
 * 🚧 Future support for Google and GitHub OAuth
----
-## 🔐 Features
-
 * ✅ User registration and login
 * ✅ Password hashing with `bcrypt`
 * ✅ JWT authentication via:
-
   * Secure **HTTP-only cookies** (primary)
   * Authorization **Bearer header** (fallback)
 * ✅ Email verification flow:
-
   * Verification email with JWT link on registration
   * Endpoint for verifying tokens
   * Resend verification feature
 * ✅ OAuth2 login support:
-
   * Google OAuth2 (via Passport.js)
   * GitHub OAuth2 (via Passport.js)
   * Automatically issues JWT and sets it as a cookie
@@ -46,10 +41,9 @@ and full **Swagger API documentation**. Includes **email verification**, a **Nes
 - [OAuth2](https://oauth.net/2/) (Google, GitHub — planned)
 
 ---
-
 ## 🚀 Getting Started
 
-### 1. Clone and install
+### 1. Clone and
 
 ```bash
 git clone https://github.com/evillan0315/auth-module.git
@@ -317,8 +311,5 @@ Made with love by [Eddie Villanueva](https://github.com/evillan0315)
 
 ---
 
-## 📄 License
-
-MIT License — © Eddie Villanueva
 
 

@@ -2,7 +2,9 @@ import { createSignal, createEffect, onCleanup, For } from 'solid-js';
 import { useAuth } from '../contexts/AuthContext';
 import FeatureCard from '../components/FeatureCard';
 import Hero from '../components/Hero';
-
+import { theme } from '../stores/theme';
+import TypewriterCodeWrapper from '../components/CodeWriter';
+import { getThemeExtension } from '../utils/editorTheme';
 const ttsFeatures = [
   {
     icon: 'mdi:text-to-speech',
@@ -173,7 +175,154 @@ const pricingPlans = [
     features: ['Custom solutions', 'Dedicated support', 'Onboarding assistance'],
   },
 ];
+const codeWriter = `import {
+  createEffect,
+  onMount,
+  onCleanup,
+  Show,
+} from 'solid-js';
+import { Icon } from '@iconify-icon/solid';
+import { useStore } from '@nanostores/solid';
+import { editorOpenTabs } from '../stores/editorContent';
+import { theme } from '../stores/theme';
+import { useEditorFile } from '../hooks/useEditorFile';
+import { undoEdit, redoEdit } from '../utils/editorUndoRedo';
+import { getThemeExtension } from '../utils/editorTheme';
+import { detectLanguage } from '../utils/editorLanguage';
+import { EditorView, basicSetup } from 'codemirror';
+import { Compartment, EditorState } from '@codemirror/state';
+import Typewriter from './Typewriter';
 
+type EditorComponentProps = {
+  content?: string;
+  filePath: string;
+  onSave?: () => void;
+  onChange?: (content: string) => void;
+  onLoadContent?: (content: string) => void;
+};
+
+const EditorComponent = (props: EditorComponentProps) => {
+  let editorContainer: HTMLDivElement | undefined;
+  let editorView: EditorView | null = null;
+
+  const $theme = useStore(theme);
+  const $openTabs = useStore(editorOpenTabs);
+  const themeCompartment = new Compartment();
+
+  const {
+    content,
+    setContent,
+    loading,
+    loadingMessage,
+    saveFile,
+  } = useEditorFile(
+    props.filePath,
+    (loadedContent) => {
+      console.log(props.filePath, 'EditorComponent loaded');
+      if ($openTabs().includes(props.filePath)) {
+        initTypewriter(loadedContent);
+        props.onLoadContent?.(loadedContent);
+      }
+    },
+    props.onSave
+  );
+
+  const initTypewriter = (code: string) => {
+    editorView?.destroy();
+    editorView = null;
+
+    // Render the typewriter component into the container
+    if (editorContainer) {
+      editorContainer.innerHTML = ''; // Clear previous editor if any
+      const typewriterEl = document.createElement('div');
+      typewriterEl.style.height = '100%';
+      typewriterEl.style.width = '100%';
+      typewriterEl.id = 'codemirror-container';
+      editorContainer.appendChild(typewriterEl);
+
+      // Typewriter handles creating the CodeMirror instance
+      // Typewriter will create and manage its own editor view
+    }
+  };
+
+  createEffect(() => {
+    if (props.content) {
+      initTypewriter(props.content);
+    }
+
+    if (!$openTabs().includes(props.filePath)) {
+      editorView?.destroy();
+      editorView = null;
+    }
+  });
+
+  createEffect(() => {
+    if (editorView) {
+      editorView.dispatch({
+        effects: themeCompartment.reconfigure(getThemeExtension($theme())),
+      });
+    }
+  });
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      saveFile();
+    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      undoEdit();
+    } else if (
+      (e.ctrlKey || e.metaKey) &&
+      (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))
+    ) {
+      e.preventDefault();
+      redoEdit();
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    onCleanup(() => {
+      editorView?.destroy();
+      window.removeEventListener('keydown', handleKeyDown);
+    });
+  });
+
+  return (
+    <div class="bg-gray-950 h-screen flex flex-col overflow-auto relative">
+      <Show
+        when={$openTabs().includes(props.filePath)}
+        fallback={
+          <div class="flex items-center justify-center text-gray-500 h-full">
+            No file selected or file was closed.
+          </div>
+        }
+      >
+        <div ref={editorContainer!} class="h-full w-full">
+          {/* We render Typewriter here directly */}
+          <Typewriter
+            text={content() || ''}
+            typingSpeed={50}
+            deleteSpeed={30}
+            loop={false}
+            delayBeforeTyping={300}
+            delayBeforeDeleting={1000}
+          />
+        </div>
+      </Show>
+      <Show when={loading()}>
+        <div class="fixed bottom-10 right-0 z-60">
+          <div class="flex items-center justify-center text-sky-500 text-lg gap-2">
+            <Icon icon="line-md:loading-twotone-loop" /> {loadingMessage()}
+          </div>
+        </div>
+      </Show>
+    </div>
+  );
+};
+
+export default EditorComponent;
+`;
 export default function Home() {
   const { user, isAuthenticated } = useAuth(); // 🔁 Use real auth context
 
@@ -223,6 +372,8 @@ export default function Home() {
             },
           ]}
         />
+
+        <TypewriterCodeWrapper codeWriter={codeWriter} />
 
         <section class="mt-16 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
           <For each={benefits}>

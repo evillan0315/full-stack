@@ -165,6 +165,8 @@ export default function TTSForm() {
         {/* Main Content */}
         <div class="flex flex-col md:flex-row gap-6">
           <TTSFormComponent
+            audioSrc={() => audioSrc() ?? null}
+            audioBlob={() => audioBlob() ?? null}
             prompt={prompt}
             setPrompt={setPrompt}
             language={language}
@@ -180,8 +182,6 @@ export default function TTSForm() {
             handleSubmit={handleSubmit}
             loading={loading}
             error={error}
-            audioSrc={audioSrc}
-            audioBlob={audioBlob}
             downloadAudio={downloadAudio}
           />
 

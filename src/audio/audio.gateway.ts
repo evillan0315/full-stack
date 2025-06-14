@@ -35,6 +35,7 @@ export class AudioGateway implements OnGatewayConnection {
     },
   ): Promise<void> {
     const { url, format = 'webm', provider, cookieAccess } = data;
+
     console.log('Extracting from URL:', url);
     console.log('Requested format:', format);
     console.log('Provider:', provider);
@@ -59,8 +60,19 @@ export class AudioGateway implements OnGatewayConnection {
       const filePath = await this.audioService.extractAudioVideoFromYoutube(
         url,
         requestedFormat,
-        (progress: number) => {
-          this.server.emit('download_progress', { progress });
+        (info: { percent: number; downloaded?: number; total?: number }) => {
+          const { percent, downloaded, total } = info;
+
+          this.server.emit('download_progress', {
+            percent,
+            downloaded,
+            total,
+            remaining:
+              total && downloaded !== undefined ? total - downloaded : undefined,
+          });
+        },
+        (filePath: string) => {
+          this.server.emit('download_ready', { filePath });
         },
         provider,
         cookieAccess,
@@ -71,4 +83,5 @@ export class AudioGateway implements OnGatewayConnection {
       this.server.emit('download_error', { message: error.message });
     }
   }
-}
+} // <- This closing brace was missing
+

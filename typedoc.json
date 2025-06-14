@@ -1,8 +1,0 @@
-{
-  "entryPoints": ["frontend/src/components/MarkdownViewer.tsx"],
-  "out": "docs",
-  "plugin": ["typedoc-plugin-markdown"],
-  "theme": "markdown",
-  "excludePrivate": true,
-  "excludeInternal": true
-}

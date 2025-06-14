@@ -1,11 +1,11 @@
 // src/components/ReadFileForm.tsx
-import { createSignal } from "solid-js";
-import api from "../services/api";
+import { createSignal } from 'solid-js';
+import api from '../services/api';
 
 export default function ReadFileForm() {
   const [file, setFile] = createSignal<File | null>(null);
-  const [filePath, setFilePath] = createSignal("");
-  const [url, setUrl] = createSignal("");
+  const [filePath, setFilePath] = createSignal('');
+  const [url, setUrl] = createSignal('');
   const [generateBlobUrl, setGenerateBlobUrl] = createSignal(false);
   const [response, setResponse] = createSignal<any>(null);
 
@@ -13,17 +13,17 @@ export default function ReadFileForm() {
     e.preventDefault();
 
     const formData = new FormData();
-    if (file()) formData.append("file", file()!);
-    if (filePath()) formData.append("filePath", filePath());
-    if (url()) formData.append("url", url());
-    formData.append("generateBlobUrl", String(generateBlobUrl()));
+    if (file()) formData.append('file', file()!);
+    if (filePath()) formData.append('filePath', filePath());
+    if (url()) formData.append('url', url());
+    formData.append('generateBlobUrl', String(generateBlobUrl()));
 
     try {
-      const res = await api.post("/file/read", formData, {
+      const res = await api.post('/file/read', formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
-        responseType: generateBlobUrl() ? "blob" : "json",
+        responseType: generateBlobUrl() ? 'blob' : 'json',
       });
 
       if (generateBlobUrl()) {
@@ -34,7 +34,7 @@ export default function ReadFileForm() {
         setResponse(res.data);
       }
     } catch (err: any) {
-      console.error("Error reading file:", err);
+      console.error('Error reading file:', err);
       setResponse({ error: err.response?.data?.message || err.message });
     }
   };
@@ -58,12 +58,7 @@ export default function ReadFileForm() {
 
       <div>
         <label class="block font-medium">URL:</label>
-        <input
-          type="text"
-          class="border p-1 w-full"
-          value={url()}
-          onInput={(e) => setUrl(e.currentTarget.value)}
-        />
+        <input type="text" class="border p-1 w-full" value={url()} onInput={(e) => setUrl(e.currentTarget.value)} />
       </div>
 
       <div class="flex items-center space-x-2">
@@ -94,4 +89,3 @@ export default function ReadFileForm() {
     </form>
   );
 }
-

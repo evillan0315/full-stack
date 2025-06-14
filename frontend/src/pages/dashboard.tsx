@@ -4,13 +4,161 @@ import { useAuth } from '../contexts/AuthContext';
 import { SolidApexCharts } from 'solid-apexcharts';
 import { Icon } from '@iconify-icon/solid';
 import MetricCard from '../components/MetricCard';
-import PackageJsonForm from '../components/PackageJsonForm';
+import { theme } from '../stores/theme';
+import Typewriter from '../components/Typewriter';
 import { PageHeader } from '../components/ui/PageHeader';
-
+import { getThemeExtension } from '../utils/editorTheme';
 export default function Dashboard() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const codeWriter = `import {
+  createEffect,
+  onMount,
+  onCleanup,
+  Show,
+} from 'solid-js';
+import { Icon } from '@iconify-icon/solid';
+import { useStore } from '@nanostores/solid';
+import { editorOpenTabs } from '../stores/editorContent';
+import { theme } from '../stores/theme';
+import { useEditorFile } from '../hooks/useEditorFile';
+import { undoEdit, redoEdit } from '../utils/editorUndoRedo';
+import { getThemeExtension } from '../utils/editorTheme';
+import { detectLanguage } from '../utils/editorLanguage';
+import { EditorView, basicSetup } from 'codemirror';
+import { Compartment, EditorState } from '@codemirror/state';
+import Typewriter from './Typewriter';
 
+type EditorComponentProps = {
+  content?: string;
+  filePath: string;
+  onSave?: () => void;
+  onChange?: (content: string) => void;
+  onLoadContent?: (content: string) => void;
+};
+
+const EditorComponent = (props: EditorComponentProps) => {
+  let editorContainer: HTMLDivElement | undefined;
+  let editorView: EditorView | null = null;
+
+  const $theme = useStore(theme);
+  const $openTabs = useStore(editorOpenTabs);
+  const themeCompartment = new Compartment();
+
+  const {
+    content,
+    setContent,
+    loading,
+    loadingMessage,
+    saveFile,
+  } = useEditorFile(
+    props.filePath,
+    (loadedContent) => {
+      console.log(props.filePath, 'EditorComponent loaded');
+      if ($openTabs().includes(props.filePath)) {
+        initTypewriter(loadedContent);
+        props.onLoadContent?.(loadedContent);
+      }
+    },
+    props.onSave
+  );
+
+  const initTypewriter = (code: string) => {
+    editorView?.destroy();
+    editorView = null;
+
+    // Render the typewriter component into the container
+    if (editorContainer) {
+      editorContainer.innerHTML = ''; // Clear previous editor if any
+      const typewriterEl = document.createElement('div');
+      typewriterEl.style.height = '100%';
+      typewriterEl.style.width = '100%';
+      typewriterEl.id = 'codemirror-container';
+      editorContainer.appendChild(typewriterEl);
+
+      // Typewriter handles creating the CodeMirror instance
+      // Typewriter will create and manage its own editor view
+    }
+  };
+
+  createEffect(() => {
+    if (props.content) {
+      initTypewriter(props.content);
+    }
+
+    if (!$openTabs().includes(props.filePath)) {
+      editorView?.destroy();
+      editorView = null;
+    }
+  });
+
+  createEffect(() => {
+    if (editorView) {
+      editorView.dispatch({
+        effects: themeCompartment.reconfigure(getThemeExtension($theme())),
+      });
+    }
+  });
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      saveFile();
+    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      undoEdit();
+    } else if (
+      (e.ctrlKey || e.metaKey) &&
+      (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))
+    ) {
+      e.preventDefault();
+      redoEdit();
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    onCleanup(() => {
+      editorView?.destroy();
+      window.removeEventListener('keydown', handleKeyDown);
+    });
+  });
+
+  return (
+    <div class="bg-gray-950 h-screen flex flex-col overflow-auto relative">
+      <Show
+        when={$openTabs().includes(props.filePath)}
+        fallback={
+          <div class="flex items-center justify-center text-gray-500 h-full">
+            No file selected or file was closed.
+          </div>
+        }
+      >
+        <div ref={editorContainer!} class="h-full w-full">
+          {/* We render Typewriter here directly */}
+          <Typewriter
+            text={content() || ''}
+            typingSpeed={50}
+            deleteSpeed={30}
+            loop={false}
+            delayBeforeTyping={300}
+            delayBeforeDeleting={1000}
+          />
+        </div>
+      </Show>
+      <Show when={loading()}>
+        <div class="fixed bottom-10 right-0 z-60">
+          <div class="flex items-center justify-center text-sky-500 text-lg gap-2">
+            <Icon icon="line-md:loading-twotone-loop" /> {loadingMessage()}
+          </div>
+        </div>
+      </Show>
+    </div>
+  );
+};
+
+export default EditorComponent;
+`;
   const [metrics] = createSignal([
     { label: 'Users Online', value: 23, icon: 'mdi:account' },
     { label: 'Server Load', value: '47%', icon: 'mdi:server' },
@@ -73,7 +221,41 @@ export default function Dashboard() {
               )}
             </For>
           </div>
-          <PackageJsonForm />
+          <div class="typewriter-code-wrapper h-auto max-w-4xl mx-auto flex items-center my-10 border rounded-xl relative">
+            <div class="absolute top-4 left-8">
+              <span class="flex items-center justify-center gap-3">
+                <Icon
+                  icon="mdi:circle"
+                  width="1em"
+                  height="1em"
+                  class="text-gray-950 shadow-sky-500 rounded-full shadow-lg"
+                />
+                <Icon
+                  icon="mdi:circle"
+                  width="1em"
+                  height="1em"
+                  class="text-sky-700 bg-sky-700 border border-gray-800 shadow-sky-500 rounded-full shadow-lg"
+                />
+                <Icon
+                  icon="mdi:circle"
+                  width="1em"
+                  height="1em"
+                  class="text-red-500 bg-red-500 border border-gray-600 shadow-sky-500 rounded-full shadow-lg"
+                />
+              </span>
+            </div>
+            <div class="screen w-full border h-[320px] overflow-auto my-16 mx-16 p-1 rounded-xl animate-shadowPulse transition-shadow duration-500 hover:shadow-[15px_15px_30px_rgba(0,128,255,0.5)] animate-shadowGradient">
+              <Typewriter
+                text={codeWriter}
+                typingSpeed={1}
+                deleteSpeed={0}
+                loop={true}
+                delayBeforeTyping={1000}
+                delayBeforeDeleting={500}
+                themeExtension={getThemeExtension(theme.get())}
+              />
+            </div>
+          </div>
           {/* Applications Section */}
           <div class="grid grid-cols-1 px-4 mt-4">
             <h2 class="leading-0 uppercase tracking-widest text-xl mt-6 mb-10">

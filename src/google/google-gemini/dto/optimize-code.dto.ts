@@ -34,4 +34,3 @@ export class OptimizeCodeDto {
   })
   output?: OutputFormat;
 }
-

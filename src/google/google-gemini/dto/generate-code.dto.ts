@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString, IsIn } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { OutputFormat } from '../output-format.enum'; 
+import { OutputFormat } from '../output-format.enum';
 
 export class GenerateCodeDto {
   @ApiProperty({
@@ -43,4 +43,3 @@ export class GenerateCodeDto {
   })
   output?: OutputFormat;
 }
-

@@ -13,24 +13,39 @@ export class GoogleGeminiController {
   constructor(private readonly geminiService: GoogleGeminiService) {}
   @Post('optimize-code')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Optimize the given code for performance or readability' })
-  @ApiResponse({ status: 200, description: 'Optimized code returned successfully' })
+  @ApiOperation({
+    summary: 'Optimize the given code for performance or readability',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Optimized code returned successfully',
+  })
   async optimizeCode(@Body() dto: OptimizeCodeDto): Promise<string> {
     return this.geminiService.optimizeCode(dto);
   }
 
   @Post('analyze-code')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Analyze the given code for issues and improvements' })
-  @ApiResponse({ status: 200, description: 'Code analysis returned successfully' })
+  @ApiOperation({
+    summary: 'Analyze the given code for issues and improvements',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Code analysis returned successfully',
+  })
   async analyzeCode(@Body() dto: AnalyzeCodeDto): Promise<string> {
     return this.geminiService.analyzeCode(dto);
   }
 
   @Post('repair-code')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Repair syntax or logical errors in the given code' })
-  @ApiResponse({ status: 200, description: 'Repaired code returned successfully' })
+  @ApiOperation({
+    summary: 'Repair syntax or logical errors in the given code',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Repaired code returned successfully',
+  })
   async repairCode(@Body() dto: RepairCodeDto): Promise<string> {
     return this.geminiService.repairCode(dto);
   }
@@ -56,7 +71,7 @@ export class GoogleGeminiController {
   async generateCode(@Body() dto: GenerateCodeDto): Promise<string> {
     return this.geminiService.generateCode(dto);
   }
-  
+
   @Post('generate-doc')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

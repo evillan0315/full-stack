@@ -12,9 +12,7 @@ export default function GeneratePage() {
 
   // Shared state
   const [prompt, setPrompt] = createSignal(
-    generationType() === 'code'
-      ? 'Create a SolidJS component that displays a user profile card.'
-      : '',
+    generationType() === 'code' ? 'Create a SolidJS component that displays a user profile card.' : '',
   );
 
   const [topic, setTopic] = createSignal('SolidJS');
@@ -57,9 +55,7 @@ export default function GeneratePage() {
       }
 
       if (!response.data) throw new Error('No content generated');
-      setContent(
-        typeof response.data === 'string' ? response.data : JSON.stringify(response.data, null, 2),
-      );
+      setContent(typeof response.data === 'string' ? response.data : JSON.stringify(response.data, null, 2));
     } catch (err: any) {
       setError(err.message || 'Unexpected error');
     } finally {
@@ -166,8 +162,8 @@ export default function GeneratePage() {
 
               <h4 class="font-medium mt-4">🛠 Supported Technologies</h4>
               <p>
-                Currently supports documentation generation for TypeScript, JavaScript, Python, and
-                Java in frameworks like React, NestJS, Vue, and more.
+                Currently supports documentation generation for TypeScript, JavaScript, Python, and Java in frameworks
+                like React, NestJS, Vue, and more.
               </p>
             </div>
           </div>

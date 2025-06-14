@@ -3,6 +3,7 @@
 /node_modules
 /build
 /downloads
+/cookies
 # Logs
 logs
 *.log

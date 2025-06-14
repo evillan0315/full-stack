@@ -16,11 +16,11 @@ interface SignInSuccessCallbackPayload {
   /**
    * The access token received from the backend after successful Google authentication.
    */
-  accessTOken: string;
+  accessToken: string;
   /**
    * The user information retrieved from the backend.
    */
-  user: {
+  user?: {
     /**
      * The unique identifier of the user.
      */
@@ -97,7 +97,7 @@ export default function SignInWithGoogle(props: SignInWithGoogleProps) {
       const userImage = params.get('userImage');
       if (token && userId && userEmail) {
         const user = { id: userId, email: userEmail, name: userName, image: userImage, role: userRole || undefined };
-        const payload: SignInSuccessCallbackPayload = { accessTOken: token, user };
+        const payload: SignInSuccessCallbackPayload = { accessToken: token };
 
         // Save to localStorage
         localStorage.setItem('token', token);

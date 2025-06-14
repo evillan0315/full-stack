@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import FileManager from '../../components/FileManager';
+import FileManager from '../../components/file/FileManager';
 
 const LeftSidebar = () => {
   const [isOpen, setIsOpen] = createSignal(true);

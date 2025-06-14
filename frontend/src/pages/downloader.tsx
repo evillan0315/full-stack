@@ -1,6 +1,6 @@
 import AudioDownloader from '../components/AudioDownloader';
 import { Icon } from '@iconify-icon/solid';
-import { FileGallery } from '../components/FileGallery';
+
 import { PageHeader } from '../components/ui/PageHeader';
 
 export default function Downloader() {

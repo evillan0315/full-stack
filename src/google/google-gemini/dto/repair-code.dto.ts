@@ -4,7 +4,8 @@ import { OutputFormat } from '../output-format.enum';
 
 export class RepairCodeDto {
   @ApiProperty({
-    description: 'The code snippet to repair by fixing syntax or logical errors',
+    description:
+      'The code snippet to repair by fixing syntax or logical errors',
     example: `functon greet() { console.log("Hello") }`, // Intentionally erroneous
   })
   @IsNotEmpty()
@@ -34,4 +35,3 @@ export class RepairCodeDto {
   })
   output?: OutputFormat;
 }
-

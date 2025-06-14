@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "project-board",
-      script: "npx vite --host", // run compiled output directly
+      script: "npx vite dev --host", // run compiled output directly
       instances: 1,
       exec_mode: "fork",          // or "cluster" for load-balanced multi-core
       watch: false,
