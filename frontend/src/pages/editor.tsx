@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import GridResizer from '../components/GridResizer';
 import TerminalDrawer from '../components/TerminalDrawer';
 import { EditorStatusBar } from '../components/editor/EditorStatusBar';
+import EditorBottomNav from '../components/editor/EditorBottomNav';
 
 import {
   editorOriginalContent,
@@ -70,13 +71,20 @@ export default function Editor() {
     setLeft(percentage);
   };
 
-  const loadFile = (path: string) => {
+  /*const loadFile = (path: string) => {
     if (!path) return;
 
     editorFilePath.set(path);
     editorFileHook.fetchFile(path);
-  };
+  };*/
+  const loadFile = (path: string) => {
+    if (!path) return;
 
+    const currentPath = editorFilePath.get();
+    const unsavedMap = editorUnsaved.get();
+    editorFilePath.set(path);
+    editorFileHook.fetchFile(path);
+  };
   const handleTabClick = (path: string) => {
     if (path !== editorFilePath.get()) {
       loadFile(path);
@@ -123,11 +131,10 @@ export default function Editor() {
       >
         <FileManagerContainer left={left} loadFile={loadFile} />
         <GridResizer ref={(el) => (resizerRef = el)} isHorizontal={false} onResize={changeLeft} />
-        
+
         <div class="flex min-h-0 min-w-0 flex-col" style={`flex: ${1 - left()}`}>
-        
           <FileTabs />
-          
+
           <EditorComponent
             //content={editorContent.get()}
             //filePath={editorFilePath.get()}
@@ -168,41 +175,7 @@ export default function Editor() {
 
           <div class="editor-footer flex items-center justify-between border-t px-6">
             <EditorStatusBar />
-
-            <div class="flex items-center justify-between gap-4 py-2">
-              <DropdownMenu
-                variant="outline"
-                icon="mdi:code"
-                items={[
-                  { label: 'Format Code', icon: 'mdi:format-align-right', onClick: () => showToast('Format', 'info') },
-                  { label: 'Remove Comments', icon: 'mdi:code', onClick: () => showToast('Remove comments', 'info') },
-                ]}
-              />
-              <DropdownMenu
-                icon="mdi:wand"
-                variant="outline"
-                items={[
-                  { label: 'Inline Documentation', icon: 'mdi:code', onClick: () => showToast('Doc', 'info') },
-                  {
-                    label: 'Optimize Code',
-                    icon: 'mdi:code-block-braces',
-                    onClick: () => showToast('Optimize', 'info'),
-                  },
-                  {
-                    label: 'Analyze Code',
-                    icon: 'mdi:code-block-parentheses',
-                    onClick: () => showToast('Analyze', 'info'),
-                  },
-                  { label: 'Repair Code', icon: 'mdi:code-tags-check', onClick: () => showToast('Repair', 'info') },
-                ]}
-              />
-              <Button variant="outline" onClick={() => editorFileHook.saveFile()}>
-                <Icon icon="mdi:content-save" width="1.4em" height="1.4em" />
-              </Button>
-              <Button variant="outline" onClick={() => setTerminalOpen(!terminalOpen())}>
-                <Icon icon="mdi:code-greater-than-or-equal" width="1.4em" height="1.4em" />
-              </Button>
-            </div>
+            <EditorBottomNav setTerminalOpen={setTerminalOpen} />
           </div>
         </div>
       </div>

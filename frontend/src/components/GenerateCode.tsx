@@ -26,7 +26,7 @@ const outputFormats = ['markdown', 'html', 'json', 'text'];
 
 export default function GenerateCode(props: GenerateCodeProps): JSX.Element {
   return (
-    <div class="md:w-3/4 space-y-4 rounded-lg border p-6 bg-gray-800/10 border-gray-500/30">
+    <div class="space-y-4 rounded-lg border p-6 bg-gray-800/10 border-gray-500/30">
       <label class="block mb-1 text-lg font-medium">Prompt</label>
       <textarea
         rows={4}

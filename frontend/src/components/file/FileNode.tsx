@@ -3,6 +3,7 @@ import { createMemo, Show, For, onMount } from 'solid-js';
 import { Icon } from '@iconify-icon/solid';
 import api from '../../services/api';
 import type { FileItem } from '../../types/types';
+import Tooltip from '../../components/ui/Tooltip';
 
 import { useStore } from '@nanostores/solid';
 import { editorFilePath, editorOpenTabs, editorUnsaved } from '../../stores/editorContent';
@@ -95,24 +96,6 @@ const FileNode = (props: FileNodeProps) => {
     }
   };
 
-  /*const handleClick = () => {
-    if (props.file.isDirectory) {
-      toggle();
-    } else {
-      const currentPath = props.file.path;
-
-      editorFilePath.set(currentPath);
-
-      // Functional update for safety and performance
-      editorOpenTabs.set((prev = []) => {
-        const tabs = Array.isArray(prev) ? prev : [];
-        return tabs.includes(currentPath) ? tabs : [...tabs, currentPath];
-      });
-
-      props.onSelect(currentPath, props.file.isDirectory);
-    }
-  };*/
-
   const handleRename = async () => {
     const trimmed = state.newName.trim();
     if (!trimmed || trimmed === props.file.name) {
@@ -162,7 +145,16 @@ const FileNode = (props: FileNodeProps) => {
       >
         <Icon width="20" height="20" icon={currentIcon()} />
 
-        <Show when={state.editing} fallback={<span class="truncate max-w-[220px]">{props.file.name}</span>}>
+        <Show
+          when={state.editing}
+          fallback={
+            <>
+              <Tooltip html={`<h4>${props.file.name}</h4><p>${props.file.size}</p>`} position="top" offset={2}>
+                <span class="truncate max-w-[220px]">{props.file.name}</span>
+              </Tooltip>
+            </>
+          }
+        >
           <input
             class="rounded px-1 text-sm flex-grow"
             value={state.newName}

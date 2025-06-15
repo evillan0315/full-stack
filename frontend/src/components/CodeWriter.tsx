@@ -43,9 +43,9 @@ const TypewriterCodeWrapper: Component<TypewriterCodeWrapperProps> = (props) => 
       <div class="screen w-full overflow-auto border h-[320px] my-16 mx-16 p-1 rounded-xl animate-shadowPulse transition-shadow duration-500 hover:shadow-[15px_15px_30px_rgba(0,128,255,0.5)] animate-shadowGradient">
         <Typewriter
           text={props.codeWriter}
-          typingSpeed={1}
-          deleteSpeed={0}
-          loop={true}
+          typingSpeed={1000}
+          deleteSpeed={50}
+          loop={false}
           delayBeforeTyping={1000}
           delayBeforeDeleting={500}
           themeExtension={getThemeExtension(theme.get())}

@@ -38,6 +38,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <Toaster />
+
       <AuthProvider>
         <Router
           root={(props) => (

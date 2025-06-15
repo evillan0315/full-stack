@@ -1,4 +1,4 @@
-import { createEffect, onMount, onCleanup, type JSX } from 'solid-js';
+import { createEffect, onMount, onCleanup, type JSX, Show } from 'solid-js';
 import { EditorState, Compartment } from '@codemirror/state';
 import { EditorView, basicSetup } from 'codemirror';
 import { useStore } from '@nanostores/solid';
@@ -117,20 +117,19 @@ const EditorComponent = (props: EditorComponentProps): JSX.Element => {
   });
 
   return (
-  <Show
-      when={$filePath}
+    <Show
+      when={$filePath().trim() !== ''}
       fallback={
         <div class="flex-1 flex items-center justify-center text-gray-500 text-sm">
           No file open. Select a file from the explorer.
         </div>
       }
     >
-    <div class="h-screen flex flex-col overflow-auto relative">
-      <div ref={(el) => (editorContainer = el)} class="h-full w-full" />
-    </div>
+      <div class="h-screen flex flex-col overflow-auto relative">
+        <div ref={(el) => (editorContainer = el)} class="h-full w-full" />
+      </div>
     </Show>
   );
 };
 
 export default EditorComponent;
-

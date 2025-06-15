@@ -1,9 +1,10 @@
 import { createSignal, onMount, createEffect, type JSX } from 'solid-js';
 import { EditorView, keymap, highlightActiveLine, drawSelection } from '@codemirror/view';
 import { useStore } from '@nanostores/solid';
-import { theme } from '../stores/theme';
+
 import { EditorState, Compartment } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
+import { theme } from '../stores/theme';
 import { getThemeExtension } from '../utils/editorTheme';
 import { history } from '@codemirror/commands';
 
@@ -20,7 +21,7 @@ interface TypewriterProps {
 function Typewriter(props: TypewriterProps): JSX.Element {
   const {
     text,
-    typingSpeed = 50,
+    typingSpeed = 500,
     deleteSpeed = 30,
     loop = false,
     delayBeforeTyping = 300,
@@ -126,8 +127,8 @@ function Typewriter(props: TypewriterProps): JSX.Element {
 
       const transaction = editorView()!.state.update({
         changes: { from: 0, to: editorView()!.state.doc.length, insert: currentText() },
-        selection: { anchor: currentText().length },
-        scrollIntoView: true,
+        //selection: { anchor: currentText().length },
+        //scrollIntoView: true,
       });
       editorView()!.dispatch(transaction);
     }

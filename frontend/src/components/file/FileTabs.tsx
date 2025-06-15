@@ -31,6 +31,11 @@ export default function FileTabs() {
     editorOpenTabs.set(remaining);
 
     if ($filePath() === closedPath) {
+      const r = remaining.length ? remaining[remaining.length - 1] : '';
+      console.log(r, 'tab close');
+      if (r.trim() === '') {
+        alert('Empty');
+      }
       editorFilePath.set(remaining.length ? remaining[remaining.length - 1] : '');
     }
 

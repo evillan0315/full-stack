@@ -17,7 +17,7 @@ export const EditorStatusBar = () => {
   const status = createMemo(() => {
     const path = $filePath();
     if (!path) return 'No file';
-    return $unsaved()[path] ? 'Unsaved Changes' : 'Saved';
+    return $unsaved()[path] ? 'Unsaved Changes' : 'No changes.';
   });
 
   return (
@@ -26,10 +26,7 @@ export const EditorStatusBar = () => {
         File: {fileName() || 'No file open'}
       </div>
       <div>Language: {$language() || 'N/A'}</div>
-      <div class={status() === 'Unsaved Changes' ? 'text-red-500' : ''}>
-        Status: {status()}
-      </div>
+      <div class={status() === 'Unsaved Changes' ? 'text-red-500' : ''}>Status: {status()}</div>
     </div>
   );
 };
-

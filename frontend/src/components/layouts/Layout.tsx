@@ -5,6 +5,7 @@ import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
 import ContentLayout from './content/ContentLayout';
 import type { MenuItem } from './types';
+//import NavigationGuard from '../NavigationGuard';
 
 interface LayoutProps {
   title: string;

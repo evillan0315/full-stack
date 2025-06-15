@@ -22,6 +22,7 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
   const [error, setError] = createSignal('');
   const [directoryFiles, setDirectoryFiles] = createSignal<FileItem[]>([]);
   const [currentDirectory, setCurrentDirectory] = createSignal('');
+  const [terminalOpen, setTerminalOpen] = createSignal(false);
 
   let latestRequestId = 0;
 
@@ -59,7 +60,7 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
       const lang = response.data?.language || '';
       setLanguage(lang);
       editorLanguage.set(lang);
-      console.log('Before set editorOpenTabs:', editorOpenTabs.get());
+
       const prev = editorOpenTabs.get();
       const safePrev = Array.isArray(prev) ? prev : [];
       const newTabs = safePrev.includes(path) ? safePrev : [...safePrev, path];
@@ -102,14 +103,17 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
   };
 
   const saveFile = async () => {
-    if (!currentFilePath()) return;
+    if (!editorFilePath.get()) {
+      showToast('No file path specified', 'error');
+      return;
+    }
 
     setSaving(true);
     try {
       const formData = new FormData();
-      formData.append('filePath', currentFilePath());
-      formData.append('content', content());
-
+      formData.append('filePath', editorFilePath.get());
+      formData.append('content', editorContent.get());
+      console.log(editorFilePath.get(), editorContent.get());
       const response = await api.post('/file/write', formData);
       if (!response.data.success) throw new Error('Failed to save file');
 
@@ -123,7 +127,31 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
       setSaving(false);
     }
   };
+  const formatCode = async () => {
+    const code = editorContent.get();
+    const lang = editorLanguage.get() || 'javascript'; // fallback
+    try {
+      showToast('Formatting code...', 'info');
+      console.log(code, lang);
+      const response = await api.post('/utils/format', {
+        code,
+        language: lang.toLowerCase(),
+      });
 
+      const formatted = response.data;
+      if (!formatted) throw new Error('No formatted output');
+
+      setContent(formatted);
+      editorContent.set(formatted);
+      showToast('Code formatted successfully.', 'success');
+    } catch (err) {
+      const msg = (err as any).response?.data?.message || (err as Error).message;
+      showToast(`Error formatting code: ${msg}`, 'error');
+    }
+  };
+  const toggleTerminal = () => {
+    setTerminalOpen(!terminalOpen());
+  };
   onCleanup(() => {
     // Invalidate all pending requests
     latestRequestId++;
@@ -131,6 +159,7 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
 
   return {
     currentFilePath,
+    setCurrentFilePath,
     content,
     setContent,
     language,
@@ -143,5 +172,8 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
     fetchFile,
     fetchDirectory,
     saveFile,
+    toggleTerminal,
+    terminalOpen,
+    formatCode,
   };
 }
