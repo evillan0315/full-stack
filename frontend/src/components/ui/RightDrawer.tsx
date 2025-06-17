@@ -57,6 +57,7 @@ type RightDrawerProps = {
   isOpen: boolean;
   onClose: () => void;
   children: JSX.Element;
+  title?: string;
 };
 
 export default function RightDrawer(props: RightDrawerProps): JSX.Element {
@@ -96,7 +97,7 @@ export default function RightDrawer(props: RightDrawerProps): JSX.Element {
           }}
         >
           <div class="flex justify-between items-center border-b border-gray-700 p-4">
-            <span class="text-lg font-semibold">Generate Code</span>
+            <span class="text-lg font-semibold">{props.title || 'Generate'}</span>
             <button onClick={props.onClose}>
               <Icon icon="mdi:close" width="1.5em" height="1.5em" />
             </button>

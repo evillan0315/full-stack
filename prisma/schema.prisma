@@ -1,34 +1,37 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model User {
-  id            String          @id @default(uuid())
-  email         String          @unique
-  emailVerified DateTime?
-  image         String?
-  name          String?
-  phone_number  String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime?       @updatedAt
-  deletedAt     DateTime?
-  role          Role?
-  Account       Account[]
-  Database      Database[]
-  Documentation Documentation[]
-  File          File[]
-  Folder        Folder[]
-  Form          Form[]
-  Module        Module[]
-  Organization  Organization[]
-  password      Password?
-  Project       Project[]
-  Schema        Schema[]
-  Session       Session[]
-  Submission    Submission[]
+  id             String          @id @default(uuid())
+  email          String          @unique
+  emailVerified  DateTime?
+  image          String?
+  name           String?
+  phone_number   String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime?       @updatedAt
+  deletedAt      DateTime?
+  role           Role?
+  Account        Account[]
+  Database       Database[]
+  Documentation  Documentation[]
+  File           File[]
+  Folder         Folder[]
+  Form           Form[]
+  Module         Module[]
+  Organization   Organization[]
+  password       Password?
+  Project        Project[]
+  Schema         Schema[]
+  Session        Session[]
+  Submission     Submission[]
+  geminiRequests GeminiRequest[]
 }
 
 model Password {
@@ -115,6 +118,45 @@ model Project {
   updatedAt   DateTime @updatedAt
   createdById String
   createdBy   User     @relation(fields: [createdById], references: [id])
+}
+
+model GeminiRequest {
+  id                String           @id @default(uuid())
+  userId            String
+  user              User             @relation(fields: [userId], references: [id])
+  conversationId    String? // New: To link requests in a conversation
+  modelUsed         String
+  prompt            String
+  systemInstruction String?
+  requestType       RequestType
+  imageUrl          String?
+  imageData         String?          @db.Text
+  fileMimeType      String?
+  fileData          String?          @db.Text
+  createdAt         DateTime         @default(now())
+  geminiResponses   GeminiResponse[]
+
+  @@index([userId])
+  @@index([conversationId]) // Add index for conversationId for efficient lookups
+}
+
+model GeminiResponse {
+  id            String        @id @default(uuid())
+  requestId     String
+  request       GeminiRequest @relation(fields: [requestId], references: [id])
+  responseText  String        @db.Text
+  finishReason  String?
+  safetyRatings Json?
+  tokenCount    Int?
+  createdAt     DateTime      @default(now())
+
+  @@index([requestId])
+}
+
+enum RequestType {
+  TEXT_ONLY
+  TEXT_WITH_IMAGE
+  TEXT_WITH_FILE
 }
 
 model Organization {

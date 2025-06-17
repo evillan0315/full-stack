@@ -24,7 +24,7 @@ const positionMap = {
 
 export default function Loading({
   position = 'center',
-  size = 'large',
+  size = 'medium',
   type = 'spinner',
   text,
   backdrop = false,

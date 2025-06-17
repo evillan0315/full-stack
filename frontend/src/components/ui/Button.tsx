@@ -1,45 +1,80 @@
-import { splitProps } from 'solid-js';
-import type { JSX } from 'solid-js';
+import { splitProps, Show, createEffect, type JSX } from 'solid-js';
+import { Icon } from '@iconify-icon/solid';
 
 type ButtonProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'error' | 'info' | 'warning' | 'success';
   active?: boolean;
   selected?: boolean;
   size?: 'sm' | 'md' | 'lg' | 'xl';
+  icon?: string | JSX.Element;
+  loading?: boolean;
 };
 
 export function Button(props: ButtonProps) {
-  const [local, others] = splitProps(props, ['class', 'disabled', 'children', 'variant', 'active', 'selected', 'size']);
+  const [local, others] = splitProps(props, [
+    'class',
+    'disabled',
+    'children',
+    'variant',
+    'active',
+    'selected',
+    'size',
+    'icon',
+    'loading',
+    'aria-label',
+  ]);
 
-  const resolveButtonClasses = (variant?: string): string => {
-    switch (variant) {
+  const hasLabel = !!local.children;
+  const isIconOnly = !!local.icon && !hasLabel;
+
+  // ARIA enforcement
+  createEffect(() => {
+    if (isIconOnly && !local['aria-label']) {
+      console.warn('Accessibility warning: Icon-only button should have an aria-label for screen readers.');
+    }
+  });
+
+  const resolveButtonClasses = (): string => {
+    if (isIconOnly && !local.variant) {
+      return 'text-gray-700 hover:text-gray-900';
+    }
+
+    switch (local.variant) {
       case 'primary':
-        return 'bg-sky-500 text-gray-950';
+        return 'bg-sky-500 text-gray-950 hover:bg-sky-600';
       case 'secondary':
-        return 'bg-sky-100 text-slate-950';
+        return 'bg-gray-600/10 text-sky-500 hover:bg-gray-700/30';
       case 'outline':
-        return 'bg-gray-950/10 border border-gray-500/30 outline outline-gray-500/30 outline-offset-1 hover:outline-2';
+        return 'outline outline-gray-500/30 outline-offset-1 hover:outline-2';
+      case 'error':
+        return 'bg-red-600 text-white hover:bg-red-700';
+      case 'info':
+        return 'bg-blue-500 text-white hover:bg-blue-600';
+      case 'warning':
+        return 'bg-orange-400 text-gray-900 hover:bg-orange-500';
+      case 'success':
+        return 'bg-green-500 text-white hover:bg-green-600';
       default:
-        return '';
+        return isIconOnly ? 'text-sky-600 hover:text-sky-700' : 'hover:text-sky-600';
     }
   };
 
-  const resolveSizeClasses = (size?: string): string => {
-    switch (size) {
+  const resolveSizeClasses = (): string => {
+    switch (local.size) {
       case 'sm':
-        return 'text-sm p-1 shadow-sm rounded-sm';
+        return 'text-sm px-2 py-1 shadow-sm rounded-sm';
       case 'md':
-        return 'text-base p-2 shadow rounded-md';
+        return 'text-base px-3 py-1.5 shadow rounded-md';
       case 'lg':
-        return 'text-lg p-3 shadow-md rounded-lg';
+        return 'text-lg px-4 py-2 shadow-md rounded-lg';
       case 'xl':
-        return 'text-xl p-4 shadow-lg rounded-full';
+        return 'text-xl px-5 py-3 shadow-lg rounded-full';
       default:
-        return 'text-sm p-1 shadow-sm rounded-sm';
+        return 'text-sm px-2 py-1 shadow-sm rounded-sm';
     }
   };
 
-  const stateClasses = () => {
+  const stateClasses = (): string => {
     const classes: string[] = [];
 
     if (local.active) {
@@ -50,7 +85,7 @@ export function Button(props: ButtonProps) {
       classes.push('bg-sky-600 text-white');
     }
 
-    if (local.disabled) {
+    if (local.disabled || local.loading) {
       classes.push('opacity-50 cursor-not-allowed');
     }
 
@@ -59,11 +94,19 @@ export function Button(props: ButtonProps) {
 
   return (
     <button
-      class={`${resolveButtonClasses(local.variant)} ${resolveSizeClasses(local.size)} ${stateClasses()} cursor-pointer inline-flex items-center justify-between gap-2 transition font-medium ${local.class || ''}`}
-      disabled={local.disabled}
+      class={`inline-flex items-center justify-center gap-2 cursor-pointer transition
+        ${resolveButtonClasses()} ${resolveSizeClasses()} ${stateClasses()} ${local.class || ''}`}
+      disabled={local.disabled || local.loading}
+      aria-label={local['aria-label']}
       {...others}
     >
-      {local.children}
+      <Show when={local.loading}>
+        <Icon icon="svg-spinners:180-ring-with-bg" class="animate-spin h-4 w-4" />
+      </Show>
+      <Show when={!local.loading && local.icon}>
+        {typeof local.icon === 'string' ? <Icon icon={local.icon} class="inline-block" /> : local.icon}
+      </Show>
+      <Show when={!local.loading}>{local.children}</Show>
     </button>
   );
 }

@@ -12,13 +12,9 @@ interface ContentLayoutProps {
 export default function ContentLayout({ content, header, classNames = '' }: ContentLayoutProps) {
   return (
     <div class={`flex flex-1 ${classNames}`}>
-      {header &&
-        (typeof header === 'object' && 'title' in header ? (
-          <ContentHeader title={header.title} subTitle={header.subTitle} />
-        ) : (
-          header
-        ))}
-      <Content content={content} />
+      <LeftSidebar />
+      <Content />
+      <RightSidebar />
     </div>
   );
 }

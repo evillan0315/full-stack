@@ -8,8 +8,18 @@ interface DropdownItem {
   onClick: () => void;
 }
 
+interface DropdownHeader {
+  label: string;
+}
+
+interface DropdownDivider {
+  type: 'divider';
+}
+
+type DropdownMenuItem = DropdownItem | DropdownHeader | DropdownDivider;
+
 interface DropdownMenuProps {
-  items: DropdownItem[];
+  items: DropdownMenuItem[];
   label?: string;
   icon: string | IconifyIcon;
   iconSize?: string | number;
@@ -54,27 +64,42 @@ const DropdownMenu: Component<DropdownMenuProps> = (props) => {
 
   return (
     <div class="relative inline-block text-left" ref={containerRef}>
-      <Button variant={props.variant} size={props.size} onClick={toggleDropdown}>
-        <Icon icon={props.icon} width={props.iconSize || '1.4em'} height={props.iconSize || '1.4em'} />
+      <Button title={'dropdown menu'} variant={props.variant} size={props.size} onClick={toggleDropdown}>
+        <Icon icon={props.icon} />
         {props.label}
       </Button>
 
       <Show when={isOpen()}>
-        <div class="dropdown-menu absolute bottom-full mb-6 right-0 border shadow-md rounded z-50">
+        <div class="dropdown-menu absolute top-full mb-6 right-0 border shadow-md rounded z-50">
           <ul class={resolveTextSizeClass(props.size)}>
             <For each={props.items}>
-              {(item) => (
-                <li
-                  class="flex items-center justify-start gap-2 px-4 py-2 hover:bg-gray-500/10 cursor-pointer"
-                  onClick={() => {
-                    item.onClick();
-                    setIsOpen(false);
-                  }}
-                >
-                  <Icon icon={item.icon} width={props.iconSize || '1.4em'} height={props.iconSize || '1.4em'} />
-                  {item.label}
-                </li>
-              )}
+              {(item) => {
+                if ('type' in item && item.type === 'divider') {
+                  return <li class="border-b my-2" />;
+                } else if ('label' in item && 'onClick' in item && 'icon' in item) {
+                  const dropdownItem = item as DropdownItem;
+                  return (
+                    <li
+                      class="flex items-center justify-start gap-2 px-4 py-2 hover:bg-gray-500/10 cursor-pointer"
+                      onClick={() => {
+                        dropdownItem.onClick();
+                        setIsOpen(false);
+                      }}
+                    >
+                      <Icon
+                        icon={dropdownItem.icon}
+                        width={props.iconSize || '1.4em'}
+                        height={props.iconSize || '1.4em'}
+                      />
+                      {dropdownItem.label}
+                    </li>
+                  );
+                } else if ('label' in item) {
+                  const dropdownHeader = item as DropdownHeader;
+                  return <li class="px-4 py-2 font-semibold text-gray-600">{dropdownHeader.label}</li>;
+                }
+                return null;
+              }}
             </For>
           </ul>
         </div>

@@ -1,48 +1,57 @@
-import { For, onMount, onCleanup } from 'solid-js';
+import { For, onMount, onCleanup, type JSX } from 'solid-js';
 import { Icon } from '@iconify-icon/solid';
 import { useStore } from '@nanostores/solid';
-import { editorFilePath, editorOpenTabs, editorUnsaved } from '../../stores/editorContent';
+import { editorFilePath, editorOpenTabs, editorUnsaved, editorContent } from '../../stores/editorContent';
 import FileTabItem from './FileTabItem';
 
-export default function FileTabs() {
+import { Button } from '../ui/Button';
+import { confirm } from '../../services/modalService';
+import { confirmDiscardIfUnsaved } from '../../utils/editorUnsaved';
+
+export default function FileTabs(): JSX.Element {
   let scrollContainer: HTMLDivElement | undefined;
 
   const $openTabs = useStore(editorOpenTabs);
   const $filePath = useStore(editorFilePath);
+  const $content = useStore(editorContent);
   const $unsaved = useStore(editorUnsaved);
 
   const scrollBy = (amount: number) => {
     scrollContainer?.scrollBy({ left: amount, behavior: 'smooth' });
   };
 
-  const handleTabClick = (path: string) => {
-    editorFilePath.set(path);
-    document.dispatchEvent(new CustomEvent('editor-load-file', { detail: { path } }));
-  };
 
-  const handleTabClose = (closedPath: string) => {
-    if ($unsaved()[closedPath]) {
-      const confirmClose = confirm(`You have unsaved changes in "${closedPath}". Close anyway?`);
-      if (!confirmClose) return;
-    }
 
-    const tabs = Array.isArray($openTabs()) ? $openTabs() : [];
-    const remaining = tabs.filter((t) => t !== closedPath);
-    editorOpenTabs.set(remaining);
+  const handleTabClick = async (path: string) => {
+  if ($filePath() === path) return;
 
-    if ($filePath() === closedPath) {
-      const r = remaining.length ? remaining[remaining.length - 1] : '';
-      console.log(r, 'tab close');
-      if (r.trim() === '') {
-        alert('Empty');
-      }
-      editorFilePath.set(remaining.length ? remaining[remaining.length - 1] : '');
-    }
+  const ok = await confirmDiscardIfUnsaved($filePath());
+  if (!ok) return;
 
-    const updatedUnsaved = { ...$unsaved() };
-    delete updatedUnsaved[closedPath];
-    editorUnsaved.set(updatedUnsaved);
-  };
+  editorFilePath.set(path);
+  document.dispatchEvent(new CustomEvent('editor-load-file', { detail: { path } }));
+};
+
+const handleTabClose = async (closedPath: string) => {
+  const ok = await confirmDiscardIfUnsaved(closedPath);
+  if (!ok) return;
+
+  // Proceed with closing
+  const tabs = Array.isArray($openTabs()) ? $openTabs() : [];
+  const remaining = tabs.filter((t) => t !== closedPath);
+  editorOpenTabs.set(remaining);
+
+  if ($filePath() === closedPath) {
+    const r = remaining.length ? remaining[remaining.length - 1] : '';
+    if (r.trim() === '') editorContent.set('');
+    editorFilePath.set(r);
+  }
+
+  const updatedUnsaved = { ...$unsaved() };
+  delete updatedUnsaved[closedPath];
+  editorUnsaved.set(updatedUnsaved);
+};
+
 
   const handleKeyDown = (e: KeyboardEvent) => {
     const tabs = Array.isArray($openTabs()) ? $openTabs() : [];
@@ -66,42 +75,51 @@ export default function FileTabs() {
   });
 
   return (
-    <div class="flex items-center border-b border-gray-500/30">
-      <button
-        class="px-2 hover:bg-gray-700 disabled:opacity-50"
-        onClick={() => scrollBy(-150)}
-        aria-label="Scroll Left"
-      >
-        <Icon icon="mdi:chevron-left" class="text-xl" />
-      </button>
+    <>
+      <div id="tabsContainer" class="flex px-0 overflow-auto items-center justify-center px-2">
+        {Array.isArray($openTabs()) && $openTabs().length > 1 ? (
+          <>
+            <Button icon="mdi:chevron-left" variant="outline" size="sm" class="mx-1" onClick={() => scrollBy(-150)} />
+          </>
+        ) : (
+          ''
+        )}
 
-      <div
-        ref={(el) => (scrollContainer = el)}
-        class="flex overflow-x-auto scrollbar-hide flex-1"
-        style={{ 'scroll-behavior': 'smooth' }}
-      >
-        <For
-          each={Array.isArray($openTabs()) ? $openTabs().filter((tab) => typeof tab === 'string' && tab.trim()) : []}
+        <div
+          ref={(el) => (scrollContainer = el)}
+          class="flex overflow-x-auto scrollbar-hide flex-1"
+          style={{ 'scroll-behavior': 'smooth' }}
         >
-          {(tabPath) => (
-            <FileTabItem
-              path={tabPath}
-              active={$filePath() === tabPath}
-              unsaved={!!$unsaved()[tabPath]}
-              onClick={() => handleTabClick(tabPath)}
-              onClose={() => handleTabClose(tabPath)}
-            />
-          )}
-        </For>
-      </div>
+          <For
+            each={Array.isArray($openTabs()) ? $openTabs().filter((tab) => typeof tab === 'string' && tab.trim()) : []}
+          >
+            {(tabPath) => (
+              <FileTabItem
+                path={tabPath}
+                active={$filePath() === tabPath}
+                unsaved={!!$unsaved()[tabPath]}
+                onClick={() => handleTabClick(tabPath)}
+                onClose={() => handleTabClose(tabPath)}
+              />
+            )}
+          </For>
+        </div>
 
-      <button
-        class="px-2 hover:bg-gray-700 disabled:opacity-50"
-        onClick={() => scrollBy(150)}
-        aria-label="Scroll Right"
-      >
-        <Icon icon="mdi:chevron-right" class="text-xl" />
-      </button>
-    </div>
+        {Array.isArray($openTabs()) && $openTabs().length > 1 ? (
+          <>
+            <Button
+              variant="outline"
+              icon="mdi:chevron-right"
+              size="sm"
+              class="mx-1"
+              //disabled={`${Array.isArray($openTabs()) && $openTabs().length > 1 ? false : true }`}
+              onClick={() => scrollBy(150)}
+            />
+          </>
+        ) : (
+          ''
+        )}
+      </div>
+    </>
   );
 }

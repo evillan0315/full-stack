@@ -48,7 +48,8 @@ export class AudioController {
     },
   })
   async extract(
-    @Body() body: {
+    @Body()
+    body: {
       url: string;
       provider?: string;
       cookieAccess?: boolean;
@@ -81,4 +82,3 @@ export class AudioController {
     return { filePath };
   }
 }
-

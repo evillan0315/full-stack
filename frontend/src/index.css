@@ -8,6 +8,7 @@
 
   html.dark body {
     @apply bg-gray-950;
+    @apply text-gray-100;
   }
   
   .border {
@@ -15,16 +16,41 @@
   }
   
   @media (prefers-color-scheme: dark) {
-    html.dark .border {
+    
+    html .border, html .border-t, html .border-b, html .border-r, html .border-l {
+      @apply border-gray-300;
+    }
+    html.dark .border, html.dark .border-t, html.dark .border-b, html.dark .border-r, html.dark .border-l {
       @apply border-gray-800;
     }
+    html .footer-wrapper, html .editor-top-header, html .file-manager-header, html.dark .terminal-wrapper {
+      @apply bg-gray-50;
+      @apply border-gray-300;
+    }
+    html.dark .footer-wrapper, html.dark .editor-top-header, html.dark .file-manager-header, html.dark .terminal-wrapper  {
+      @apply bg-gray-900;
+      @apply border-gray-800;
+    }
+    html .resizer {
+      @apply bg-gray-300 hover:bg-sky-600;
+    }
+    html.dark .resizer {
+      @apply bg-gray-800 hover:bg-sky-600;
+    }
     html #context-menu {
-      @apply bg-gray-200;
+      @apply bg-gray-100;
+      @apply border border-gray-200;
+    }
+    html #context-menu li {
+      @apply hover:bg-gray-200;
     }
     html.dark #context-menu {
-      @apply bg-gray-800;
+      @apply bg-gray-900;
+      @apply border border-gray-800;
     }
-    
+    html.dark #context-menu li {
+      @apply hover:bg-gray-800;
+    }
     html .dropdown-menu {
       @apply bg-gray-100;
     }
@@ -81,18 +107,61 @@
       @apply rounded-lg;
       @apply outline outline-sky-600;
     }
+    html.dark .context-menu-file {
+      @apply border-gray-900;
+      @apply text-gray-200;
+    }
+    
+    html .dialog-modal {
+      @apply bg-gray-500/70;
+    }
+    html .dialog-modal .dialog-modal-body {
+      @apply border-gray-200;
+      @apply shadow-xs shadow-gray-500;
+      @apply bg-gray-100;
+      @apply text-gray-900;
+    }
+    html .dialog-modal .dialog-modal-body button {
+      @apply border border-gray-400;
+      @apply shadow-xs shadow-gray-400;
+      @apply mx-2 px-4 py-2;
+    }
+    html .dialog-modal .dialog-modal-body focus:input {
+      @apply border border-gray-800;
+    }
+    html.dark .dialog-modal {
+      @apply bg-gray-700/70;
+    }
+    html.dark .dialog-modal .dialog-modal-body {
+      @apply border border-gray-500;
+      @apply shadow-xs shadow-gray-600;
+      @apply bg-gray-950;
+      @apply text-gray-100;
+    }
+    html.dark .dialog-modal .dialog-modal-body button {
+      @apply border border-gray-700;
+      @apply shadow-xs shadow-gray-950;
+      @apply mx-2 px-4 py-2;
+    }
+    html.dark .dialog-modal .dialog-modal-body input {
+      @apply border border-gray-600 text-sm px-4 py-1;
+    }
+    html .dialog-modal .dialog-modal-body input {
+      @apply border border-gray-600 text-sm px-4 py-1;
+    }
+    html .dialog-modal .dialog-modal-body input:focus,
+html .dialog-modal .dialog-modal-body textarea:focus,
+html .dialog-modal .dialog-modal-body select:focus {
+  @apply border-sky-800 ring-1 ring-offset-2 ring-sky-700 shadow-md rounded;
+}
 
-
+html.dark .dialog-modal .dialog-modal-body input:focus,
+html.dark .dialog-modal .dialog-modal-body textarea:focus,
+html.dark .dialog-modal .dialog-modal-body select:focus {
+  @apply border-sky-800 ring-1 ring-offset-1 ring-sky-700 shadow-md rounded bg-sky-600;
+}
   }
   
-  .fade-container {
-  transition: opacity 0.3s ease-in-out;
-  opacity: 1;
-}
-
-.fade-container.fade-in {
-  opacity: 0.4;
-}
 
   
 }

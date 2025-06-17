@@ -8,6 +8,8 @@ import { theme } from '../stores/theme';
 import Typewriter from '../components/Typewriter';
 import { PageHeader } from '../components/ui/PageHeader';
 import { getThemeExtension } from '../utils/editorTheme';
+import SwaggerBuilder from '../components/SwaggerBuilder';
+
 export default function Dashboard() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -206,7 +208,7 @@ export default EditorComponent;
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4  mt-4">
             <For each={metrics()}>{(metric) => <MetricCard {...metric} />}</For>
           </div>
-
+          <SwaggerBuilder />
           {/* Recent Entries */}
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-4 mt-4">
             <For each={entries()}>

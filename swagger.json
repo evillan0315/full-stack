@@ -16,151 +16,6 @@
         ]
       }
     },
-    "/dashboard": {
-      "get": {
-        "operationId": "AppController_getDashboard",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Dashboard rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render protected dashboard page",
-        "tags": [
-          "App"
-        ]
-      }
-    },
-    "/profile": {
-      "get": {
-        "operationId": "AppController_getProfile",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Profile rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render protected profile page",
-        "tags": [
-          "App"
-        ]
-      }
-    },
-    "/terminal": {
-      "get": {
-        "operationId": "AppController_getTerminal",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Terminal rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render protected terminal page",
-        "tags": [
-          "App"
-        ]
-      }
-    },
-    "/settings": {
-      "get": {
-        "operationId": "AppController_getSettings",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Settings rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render protected settings page",
-        "tags": [
-          "App"
-        ]
-      }
-    },
-    "/tts": {
-      "get": {
-        "operationId": "AppController_getTTS",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "TTS rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render protected TTS page",
-        "tags": [
-          "App"
-        ]
-      }
-    },
     "/login": {
       "get": {
         "operationId": "AppController_getLogin",
@@ -765,104 +620,6 @@
         ]
       }
     },
-    "/user": {
-      "get": {
-        "operationId": "ViewsController_getLists",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "List user view rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render user lists view",
-        "tags": [
-          "Views"
-        ]
-      }
-    },
-    "/user/create": {
-      "get": {
-        "operationId": "ViewsController_getCreateForm",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Create user form rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render user creation form",
-        "tags": [
-          "Views"
-        ]
-      },
-      "post": {
-        "operationId": "ViewsController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "User created successfully"
-          },
-          "400": {
-            "description": "Invalid input data"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Handle user creation form submission",
-        "tags": [
-          "Views"
-        ]
-      }
-    },
     "/api/file/list": {
       "get": {
         "operationId": "FileController_getFiles",
@@ -1242,231 +999,6 @@
         "summary": "Delete a file or folder",
         "tags": [
           "File & Folder"
-        ]
-      }
-    },
-    "/file/lists": {
-      "get": {
-        "description": "Displays a list of files and folders from a specified directory.",
-        "operationId": "ViewsController_getLists",
-        "parameters": [
-          {
-            "name": "directory",
-            "required": false,
-            "in": "query",
-            "description": "Optional: Path to the directory to list (defaults to current working directory).",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "recursive",
-            "required": false,
-            "in": "query",
-            "description": "Optional: If true, lists files recursively (defaults to false).",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "File list view rendered successfully"
-          },
-          "400": {
-            "description": "Invalid directory or parameters"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          },
-          "500": {
-            "description": "Failed to retrieve file listings"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render file system listings view",
-        "tags": [
-          "File Views"
-        ]
-      }
-    },
-    "/file/create": {
-      "get": {
-        "description": "Displays a form for creating new files or folders.",
-        "operationId": "ViewsController_getCreateForm",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Create file/folder form rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render file or folder creation form",
-        "tags": [
-          "File Views"
-        ]
-      },
-      "post": {
-        "operationId": "ViewsController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateFileDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "File or folder created successfully, redirects to list view."
-          },
-          "400": {
-            "description": "Invalid input data or creation failed."
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Handle file or folder creation form submission",
-        "tags": [
-          "File Views"
-        ]
-      }
-    },
-    "/file/view": {
-      "get": {
-        "description": "Displays the content of a specified file. Only for text-based files.",
-        "operationId": "ViewsController_viewFile",
-        "parameters": [
-          {
-            "name": "filePath",
-            "required": true,
-            "in": "query",
-            "description": "The absolute path to the file to view.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "File content view rendered successfully."
-          },
-          "400": {
-            "description": "File path not provided or file not found."
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          },
-          "500": {
-            "description": "Failed to read file content."
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render file content view",
-        "tags": [
-          "File Views"
-        ]
-      }
-    },
-    "/file/download": {
-      "get": {
-        "description": "Allows an authenticated administrator to download a specified file.",
-        "operationId": "ViewsController_downloadFile",
-        "parameters": [
-          {
-            "name": "filePath",
-            "required": true,
-            "in": "query",
-            "description": "The absolute path to the file to download.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "File successfully downloaded.",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "File path not provided or file not found."
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          },
-          "500": {
-            "description": "Failed to read file for download."
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Download a file",
-        "tags": [
-          "File Views"
         ]
       }
     },
@@ -2333,17 +1865,337 @@
         ]
       }
     },
-    "/api/screen/capture": {
+    "/api/utils/json-yaml/to-yaml": {
+      "post": {
+        "description": "Converts a JSON object to YAML format. Optionally saves the result to a file if `save=true` is provided.",
+        "operationId": "JsonYamlController_convertJsonToYaml",
+        "parameters": [
+          {
+            "name": "save",
+            "required": false,
+            "in": "query",
+            "description": "Whether to save the result to a file",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonToYamlDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Converted YAML output",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonToYamlResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Convert JSON to YAML",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/json-yaml/to-json": {
+      "post": {
+        "description": "Converts a YAML string to JSON format. Optionally saves the result to a file if `save=true` is provided.",
+        "operationId": "JsonYamlController_convertYamlToJson",
+        "parameters": [
+          {
+            "name": "save",
+            "required": false,
+            "in": "query",
+            "description": "Whether to save the result to a file",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/YamlToJsonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Converted JSON output",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YamlToJsonResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Convert YAML to JSON",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/json-yaml/upload-json": {
+      "post": {
+        "description": "Accepts a JSON file upload, converts its content to YAML, and optionally saves the output file.",
+        "operationId": "JsonYamlController_uploadJson",
+        "parameters": [
+          {
+            "name": "save",
+            "required": false,
+            "in": "query",
+            "description": "Whether to save the result to a file",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "filename",
+            "required": false,
+            "in": "query",
+            "description": "Custom YAML filename (with .yaml)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Converted YAML output from uploaded JSON file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonToYamlResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload JSON file and convert to YAML",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/api/utils/json-yaml/upload-yaml": {
+      "post": {
+        "description": "Accepts a YAML file upload, converts its content to JSON, and optionally saves the output file.",
+        "operationId": "JsonYamlController_uploadYaml",
+        "parameters": [
+          {
+            "name": "save",
+            "required": false,
+            "in": "query",
+            "description": "Whether to save the result to a file",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "filename",
+            "required": false,
+            "in": "query",
+            "description": "Custom JSON filename (with .json)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Converted JSON output from uploaded YAML file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YamlToJsonResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload YAML file and convert to JSON",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
+    "/json-dto/endpoints": {
       "get": {
-        "operationId": "ScreenCaptureController_capture",
+        "operationId": "JsonDtoController_getEndpoints",
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "List of endpoints with their details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JsonDtoEndpointDto"
+                  }
+                }
+              }
+            }
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all JSON DTO endpoints with responses",
         "tags": [
-          "ScreenCapture"
+          "Json DTO Inspector"
+        ]
+      }
+    },
+    "/json-dto/list": {
+      "get": {
+        "operationId": "JsonDtoController_listDtos",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of DTO names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all available DTOs",
+        "tags": [
+          "Json DTO Inspector"
+        ]
+      }
+    },
+    "/json-dto/schema": {
+      "get": {
+        "operationId": "JsonDtoController_getSchema",
+        "parameters": [
+          {
+            "name": "dto",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON schema of the selected DTO",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonDtoSchemaResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get JSON schema of a selected DTO",
+        "tags": [
+          "Json DTO Inspector"
         ]
       }
     },
@@ -3069,104 +2921,6 @@
         ]
       }
     },
-    "/folder": {
-      "get": {
-        "operationId": "ViewsController_getLists",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "List folder view rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render folder lists view",
-        "tags": [
-          "Views"
-        ]
-      }
-    },
-    "/folder/create": {
-      "get": {
-        "operationId": "ViewsController_getCreateForm",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Create folder form rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render folder creation form",
-        "tags": [
-          "Views"
-        ]
-      },
-      "post": {
-        "operationId": "ViewsController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateFolderDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Folder created successfully"
-          },
-          "400": {
-            "description": "Invalid input data"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Handle folder creation form submission",
-        "tags": [
-          "Views"
-        ]
-      }
-    },
     "/api/google-gemini/optimize-code": {
       "post": {
         "operationId": "GoogleGeminiController_optimizeCode",
@@ -3461,6 +3215,128 @@
         ]
       }
     },
+    "/api/gemini/file/generate-text": {
+      "post": {
+        "operationId": "GoogleGeminiFileController_generateText",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateTextDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Generated text content.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Generate text from a simple text prompt.",
+        "tags": [
+          "Gemini AI"
+        ]
+      }
+    },
+    "/api/gemini/file/generate-image-base64": {
+      "post": {
+        "operationId": "GoogleGeminiFileController_generateTextWithBase64Image",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateImageBase64Dto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Generated text content based on the image and text prompt.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Generate text from a prompt with an embedded Base64 image.",
+        "tags": [
+          "Gemini AI"
+        ]
+      }
+    },
+    "/api/gemini/file/generate-file": {
+      "post": {
+        "operationId": "GoogleGeminiFileController_generateTextWithFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Prompt text and the file to be analyzed.",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "The text prompt for Gemini.",
+                    "example": "Analyze this SQL schema and suggest improvements."
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The file to attach (e.g., .sql, .txt, .csv)."
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Generated text content based on the file and text prompt.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Generate text from a prompt with an uploaded file (e.g., .sql, .txt).",
+        "tags": [
+          "Gemini AI"
+        ]
+      }
+    },
     "/api/schema": {
       "post": {
         "operationId": "SchemaController_create",
@@ -3750,104 +3626,6 @@
         ]
       }
     },
-    "/schema": {
-      "get": {
-        "operationId": "ViewsController_getLists",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "List schema view rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render schema lists view",
-        "tags": [
-          "Views"
-        ]
-      }
-    },
-    "/schema/create": {
-      "get": {
-        "operationId": "ViewsController_getCreateForm",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Create schema form rendered"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Render schema creation form",
-        "tags": [
-          "Views"
-        ]
-      },
-      "post": {
-        "operationId": "ViewsController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateSchemaDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Schema created successfully"
-          },
-          "400": {
-            "description": "Invalid input data"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - insufficient role"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Handle schema creation form submission",
-        "tags": [
-          "Views"
-        ]
-      }
-    },
     "/api/log": {
       "post": {
         "operationId": "LogController_create",
@@ -4083,62 +3861,6 @@
         ]
       }
     },
-    "/log": {
-      "get": {
-        "operationId": "ViewsController_getLists",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "List log view rendered"
-          }
-        },
-        "summary": "Render log lists view",
-        "tags": [
-          "Views"
-        ]
-      }
-    },
-    "/log/create": {
-      "get": {
-        "operationId": "ViewsController_getCreateForm",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Create log form rendered"
-          }
-        },
-        "summary": "Render log creation form",
-        "tags": [
-          "Views"
-        ]
-      },
-      "post": {
-        "operationId": "ViewsController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateLogDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Log created successfully"
-          },
-          "400": {
-            "description": "Invalid input data"
-          }
-        },
-        "summary": "Handle log creation form submission",
-        "tags": [
-          "Views"
-        ]
-      }
-    },
     "/audio/extract": {
       "post": {
         "operationId": "AudioController_extract",
@@ -4235,7 +3957,29 @@
         ]
       }
     },
-    "/api/record/start": {
+    "/api/screen/capture": {
+      "get": {
+        "operationId": "ScreenRecorderController_capture",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Screen captured successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureScreenResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Takes a screenshot of the current screen.",
+        "tags": [
+          "Screen Recorder/Capture"
+        ]
+      }
+    },
+    "/api/screen/record-start": {
       "get": {
         "operationId": "ScreenRecorderController_start",
         "parameters": [
@@ -4263,11 +4007,11 @@
         },
         "summary": "Start screen recording",
         "tags": [
-          "Screen Recorder"
+          "Screen Recorder/Capture"
         ]
       }
     },
-    "/api/record/stop": {
+    "/api/screen/record-stop": {
       "get": {
         "operationId": "ScreenRecorderController_stop",
         "parameters": [],
@@ -4285,7 +4029,7 @@
         },
         "summary": "Stop screen recording",
         "tags": [
-          "Screen Recorder"
+          "Screen Recorder/Capture"
         ]
       }
     },
@@ -5399,31 +5143,199 @@
         ]
       }
     },
-    "/project": {
+    "/api/transpile": {
       "post": {
-        "operationId": "ProjectController_create",
+        "operationId": "TranspilerController_transpile",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateProjectDto"
+                "$ref": "#/components/schemas/TranspilerRequestDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranspilerResponseDto"
+                }
+              }
+            }
           }
         },
+        "summary": "Transpile raw code string.",
         "tags": [
-          "Project"
+          "Transpiler"
         ]
-      },
+      }
+    },
+    "/api/transpile/file": {
+      "post": {
+        "operationId": "TranspilerController_transpileFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "options": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully transpiled uploaded file.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranspilerResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Transpile an uploaded file (React, SolidJS, TS).",
+        "tags": [
+          "Transpiler"
+        ]
+      }
+    },
+    "/api/transpile/files": {
+      "post": {
+        "operationId": "TranspilerController_transpileFiles",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "options": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully transpiled uploaded files.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "filename": {
+                            "type": "string"
+                          },
+                          "code": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Transpile multiple uploaded files.",
+        "tags": [
+          "Transpiler"
+        ]
+      }
+    },
+    "/api/transpile/directory": {
+      "post": {
+        "operationId": "TranspilerController_transpileDirectory",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "archive": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "options": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully transpiled files from the directory archive.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "filename": {
+                            "type": "string"
+                          },
+                          "code": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Transpile all valid files inside a ZIP archive (directory).",
+        "tags": [
+          "Transpiler"
+        ]
+      }
+    },
+    "/feature/action-a": {
       "get": {
-        "operationId": "ProjectController_findAll",
+        "operationId": "FeatureController_getActionA",
         "parameters": [],
         "responses": {
           "200": {
@@ -5431,37 +5343,30 @@
           }
         },
         "tags": [
-          "Project"
+          "Feature"
         ]
       }
     },
-    "/project/{id}": {
+    "/feature/action-b": {
       "get": {
-        "operationId": "ProjectController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "operationId": "FeatureController_getActionB",
+        "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
         },
         "tags": [
-          "Project"
+          "Feature"
         ]
-      },
-      "patch": {
-        "operationId": "ProjectController_update",
+      }
+    },
+    "/feature/status/{moduleName}": {
+      "get": {
+        "operationId": "FeatureController_getModuleStatus",
         "parameters": [
           {
-            "name": "id",
+            "name": "moduleName",
             "required": true,
             "in": "path",
             "schema": {
@@ -5469,30 +5374,22 @@
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateProjectDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": ""
           }
         },
         "tags": [
-          "Project"
+          "Feature"
         ]
-      },
-      "delete": {
-        "operationId": "ProjectController_remove",
+      }
+    },
+    "/feature/enable/{moduleName}": {
+      "get": {
+        "operationId": "FeatureController_enableModule",
         "parameters": [
           {
-            "name": "id",
+            "name": "moduleName",
             "required": true,
             "in": "path",
             "schema": {
@@ -5506,13 +5403,73 @@
           }
         },
         "tags": [
-          "Project"
+          "Feature"
+        ]
+      }
+    },
+    "/feature/disable/{moduleName}": {
+      "get": {
+        "operationId": "FeatureController_disableModule",
+        "parameters": [
+          {
+            "name": "moduleName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Feature"
+        ]
+      }
+    },
+    "/feature/toggle/{moduleName}": {
+      "get": {
+        "operationId": "FeatureController_toggleModule",
+        "parameters": [
+          {
+            "name": "moduleName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Feature"
+        ]
+      }
+    },
+    "/feature/all-statuses": {
+      "get": {
+        "operationId": "FeatureController_getAllStatuses",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Feature"
         ]
       }
     }
   },
   "info": {
-    "title": "Auth API",
+    "title": "API Server",
     "description": "Authentication and Role Protected APIs",
     "version": "1.0",
     "contact": {}
@@ -5529,12 +5486,14 @@
       "bearer": {
         "scheme": "bearer",
         "bearerFormat": "JWT",
+        "description": "Enter JWT token in the format: Bearer <token>",
         "type": "http"
       },
       "cookie": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "jwt"
+        "name": "jwt",
+        "description": "JWT stored in cookie (for web clients)"
       }
     },
     "schemas": {
@@ -5794,6 +5753,216 @@
         },
         "required": [
           "content"
+        ]
+      },
+      "JsonToYamlDto": {
+        "type": "object",
+        "properties": {
+          "json": {
+            "type": "object",
+            "description": "The JSON object to convert",
+            "example": {
+              "name": "John Doe",
+              "age": 30,
+              "skills": [
+                "NestJS",
+                "SolidJS"
+              ]
+            }
+          },
+          "filename": {
+            "type": "string",
+            "description": "Optional filename (with .yaml extension)",
+            "example": "custom-file.yaml"
+          }
+        },
+        "required": [
+          "json"
+        ]
+      },
+      "JsonToYamlResponseDto": {
+        "type": "object",
+        "properties": {
+          "yaml": {
+            "type": "string",
+            "description": "The converted YAML output as a string",
+            "example": "name: John Doe\nage: 30\nskills:\n  - NestJS\n  - SolidJS\n"
+          },
+          "filePath": {
+            "type": "string",
+            "description": "Path to the saved YAML file (if saved)",
+            "example": "output/output.yaml"
+          }
+        },
+        "required": [
+          "yaml"
+        ]
+      },
+      "YamlToJsonDto": {
+        "type": "object",
+        "properties": {
+          "yaml": {
+            "type": "string",
+            "description": "The YAML string to convert",
+            "example": "name: John Doe\nage: 30\nskills:\n  - NestJS\n  - SolidJS\n"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Optional filename (with .json extension)",
+            "example": "custom-file.json"
+          }
+        },
+        "required": [
+          "yaml"
+        ]
+      },
+      "YamlToJsonResponseDto": {
+        "type": "object",
+        "properties": {
+          "json": {
+            "type": "object",
+            "description": "The converted JSON output",
+            "example": {
+              "name": "John Doe",
+              "age": 30,
+              "skills": [
+                "NestJS",
+                "SolidJS"
+              ]
+            }
+          },
+          "filePath": {
+            "type": "string",
+            "description": "Path to the saved JSON file (if saved)",
+            "example": "output/output.json"
+          }
+        },
+        "required": [
+          "json"
+        ]
+      },
+      "JsonDtoService": {
+        "type": "object",
+        "properties": {}
+      },
+      "JsonDtoExplorerService": {
+        "type": "object",
+        "properties": {}
+      },
+      "JsonDtoSchemaResponseDto": {
+        "type": "object",
+        "properties": {
+          "schema": {
+            "type": "object",
+            "description": "Generated JSON schema of the specified DTO",
+            "additionalProperties": {
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "schema"
+        ]
+      },
+      "JsonDtoEndpointQueryParamDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the query parameter",
+            "example": "dto"
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether this query parameter is required",
+            "example": false
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the query parameter",
+            "example": "Type of DTO to fetch the schema for"
+          }
+        },
+        "required": [
+          "name",
+          "required",
+          "description"
+        ]
+      },
+      "JsonDtoEndpointResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "number",
+            "description": "HTTP status code",
+            "example": 200
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the response",
+            "example": "Successful response with DTO schema"
+          },
+          "schema": {
+            "type": "object",
+            "description": "Schema or type of the response payload",
+            "additionalProperties": true,
+            "example": {
+              "schema": {
+                "property1": {
+                  "type": "string"
+                },
+                "property2": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "status",
+          "description",
+          "schema"
+        ]
+      },
+      "JsonDtoEndpointDto": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method for the endpoint",
+            "example": "GET"
+          },
+          "path": {
+            "type": "string",
+            "description": "Full URL path of the endpoint",
+            "example": "/json-dto/custom"
+          },
+          "queryParams": {
+            "description": "List of query parameters accepted by the endpoint",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JsonDtoEndpointQueryParamDto"
+            }
+          },
+          "description": {
+            "type": "string",
+            "description": "Short description of the endpoint",
+            "example": "Returns the JSON schema for a selected DTO"
+          },
+          "responses": {
+            "description": "List of possible responses for the endpoint",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JsonDtoEndpointResponseDto"
+            }
+          }
+        },
+        "required": [
+          "method",
+          "path",
+          "queryParams",
+          "description",
+          "responses"
         ]
       },
       "ColumnDto": {
@@ -6289,6 +6458,44 @@
           "speakers"
         ]
       },
+      "GenerateTextDto": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "The prompt text to send to the Gemini model.",
+            "example": "Write a short story about a brave knight."
+          }
+        },
+        "required": [
+          "prompt"
+        ]
+      },
+      "GenerateImageBase64Dto": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "The prompt text to send to the Gemini model, accompanying the image.",
+            "example": "Describe this image."
+          },
+          "base64Image": {
+            "type": "string",
+            "description": "Base64 encoded image data (e.g., \"data:image/jpeg;base64,...\").",
+            "example": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD/2wBDAAY..."
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "MIME type of the image (e.g., \"image/jpeg\", \"image/png\").",
+            "example": "image/jpeg"
+          }
+        },
+        "required": [
+          "prompt",
+          "base64Image",
+          "mimeType"
+        ]
+      },
       "CreateSchemaDto": {
         "type": "object",
         "properties": {
@@ -6409,6 +6616,10 @@
           }
         }
       },
+      "CaptureScreenResponse": {
+        "type": "object",
+        "properties": {}
+      },
       "StartRecordingResponse": {
         "type": "object",
         "properties": {}
@@ -6518,13 +6729,69 @@
         "type": "object",
         "properties": {}
       },
-      "CreateProjectDto": {
+      "TranspilerOptionsDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "loader": {
+            "type": "string",
+            "enum": [
+              "tsx",
+              "ts",
+              "jsx",
+              "js"
+            ],
+            "description": "The loader type for the code."
+          },
+          "target": {
+            "type": "string",
+            "enum": [
+              "es2017",
+              "es2018",
+              "esnext"
+            ],
+            "description": "Target JavaScript version."
+          },
+          "solid": {
+            "type": "boolean",
+            "description": "Indicates if the code is SolidJS."
+          },
+          "react": {
+            "type": "boolean",
+            "description": "Indicates if the code is React."
+          }
+        }
       },
-      "UpdateProjectDto": {
+      "TranspilerRequestDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Source code to transpile."
+          },
+          "options": {
+            "description": "Transpilation options.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TranspilerOptionsDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "TranspilerResponseDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Transpiled JavaScript code."
+          }
+        },
+        "required": [
+          "code"
+        ]
       }
     }
   }

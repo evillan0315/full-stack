@@ -1,4 +1,4 @@
-import { createEffect, onMount, onCleanup, type JSX, Show } from 'solid-js';
+import { createEffect, onMount, onCleanup, type JSX, Show, createMemo } from 'solid-js';
 import { EditorState, Compartment } from '@codemirror/state';
 import { EditorView, basicSetup } from 'codemirror';
 import { useStore } from '@nanostores/solid';
@@ -8,7 +8,7 @@ import { detectLanguage } from '../../utils/editorLanguage';
 import { getThemeExtension } from '../../utils/editorTheme';
 import { undoEdit, redoEdit } from '../../utils/editorUndoRedo';
 import { editorContent, editorFilePath } from '../../stores/editorContent';
-
+import MarkdownViewer from '../MarkdownViewer';
 type EditorComponentProps = {
   onSave?: () => void;
   onChange?: (content: string) => void;
@@ -25,36 +25,44 @@ const EditorComponent = (props: EditorComponentProps): JSX.Element => {
   const themeCompartment = new Compartment();
   const langCompartment = new Compartment();
 
-  // Initialize editor
+  const initEditor = (code: string) => {
+    if (editorView) editorView.destroy();
+
+    const state = EditorState.create({
+      doc: code,
+      extensions: [
+        basicSetup,
+        langCompartment.of(detectLanguage($filePath())),
+        themeCompartment.of(getThemeExtension($theme())),
+        EditorView.lineWrapping,
+        EditorView.updateListener.of((v) => {
+          if (v.docChanged) {
+            const newCode = v.state.doc.toString();
+            editorContent.set(newCode);
+            props.onChange?.(newCode);
+          }
+        }),
+      ],
+    });
+
+    editorView = new EditorView({
+      state,
+      parent: editorContainer!,
+    });
+  };
+
   createEffect(() => {
     if (editorContainer && !editorView) {
-      editorView = new EditorView({
-        state: EditorState.create({
-          doc: $content(),
-          extensions: [
-            basicSetup,
-            langCompartment.of(detectLanguage($filePath())),
-            themeCompartment.of(getThemeExtension($theme())),
-            EditorView.lineWrapping,
-            EditorView.updateListener.of((v) => {
-              if (v.docChanged) {
-                const newCode = v.state.doc.toString();
-                editorContent.set(newCode);
-                props.onChange?.(newCode);
-              }
-            }),
-          ],
-        }),
-        parent: editorContainer,
-      });
+      initEditor($content());
     }
   });
 
-  // Update content dynamically
   createEffect(() => {
     if (editorView) {
       const current = editorView.state.doc.toString();
+      //console.log(current, 'current content editorComponent')
       if (current !== $content()) {
+        //console.log($content(), 'if current content is not equal to stored editor content')
         editorView.dispatch({
           changes: { from: 0, to: current.length, insert: $content() },
         });
@@ -62,7 +70,6 @@ const EditorComponent = (props: EditorComponentProps): JSX.Element => {
     }
   });
 
-  // Clear content when no file is open
   createEffect(() => {
     if (editorView && !$filePath()) {
       editorView.dispatch({
@@ -71,7 +78,6 @@ const EditorComponent = (props: EditorComponentProps): JSX.Element => {
     }
   });
 
-  // Update language dynamically
   createEffect(() => {
     if (editorView) {
       editorView.dispatch({
@@ -80,7 +86,6 @@ const EditorComponent = (props: EditorComponentProps): JSX.Element => {
     }
   });
 
-  // Update theme dynamically
   createEffect(() => {
     if (editorView) {
       editorView.dispatch({
@@ -89,7 +94,6 @@ const EditorComponent = (props: EditorComponentProps): JSX.Element => {
     }
   });
 
-  // Handle shortcuts
   const handleKeyDown = (e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
       e.preventDefault();
@@ -115,21 +119,12 @@ const EditorComponent = (props: EditorComponentProps): JSX.Element => {
     editorView = null;
     window.removeEventListener('keydown', handleKeyDown);
   });
+  const isMarkdown = createMemo(() => {
+    const filePath = $filePath();
+    return filePath ? filePath.endsWith('.md') : false;
+  });
 
-  return (
-    <Show
-      when={$filePath().trim() !== ''}
-      fallback={
-        <div class="flex-1 flex items-center justify-center text-gray-500 text-sm">
-          No file open. Select a file from the explorer.
-        </div>
-      }
-    >
-      <div class="h-screen flex flex-col overflow-auto relative">
-        <div ref={(el) => (editorContainer = el)} class="h-full w-full" />
-      </div>
-    </Show>
-  );
+  return <div id="editor" ref={(el) => (editorContainer = el)} class={`h-full`} />;
 };
 
 export default EditorComponent;

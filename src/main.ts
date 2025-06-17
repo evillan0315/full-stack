@@ -65,17 +65,32 @@ async function bootstrap() {
   });
   if (swaggerEnabled && NODE_ENV !== 'production') {
     const swaggerConfig = new DocumentBuilder()
-      .setTitle('Auth API')
+      .setTitle('API Server')
       .setDescription('Authentication and Role Protected APIs')
       .setVersion('1.0')
       .addTag('Auth')
-      .addBearerAuth()
-      .addCookieAuth('jwt')
+      .addBearerAuth(
+        {
+          description: 'Enter JWT token in the format: Bearer <token>',
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+        'bearer', // name for the security scheme
+      )
+      .addCookieAuth('jwt', {
+        type: 'apiKey',
+        in: 'cookie',
+        name: 'jwt',
+        description: 'JWT stored in cookie (for web clients)',
+      })
       .build();
 
     const document = SwaggerModule.createDocument(app, swaggerConfig);
-    // ✅ Optionally write the swagger spec to file
+
+    // Optionally write the spec to file
     writeFileSync('./swagger.json', JSON.stringify(document, null, 2));
+
     SwaggerModule.setup('api', app, document);
     console.log('🥞 Swagger is enabled at /api');
   } else {

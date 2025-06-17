@@ -1,0 +1,24 @@
+{
+  "featureModules": [
+    { "name": "AuthModule", "enabled": true },
+    { "name": "MailModule", "enabled": true },
+    { "name": "PrismaModule", "enabled": true },
+    { "name": "UserModule", "enabled": true },
+    { "name": "FileModule", "enabled": false },
+    { "name": "UtilsModule", "enabled": true },
+    { "name": "DatabaseModule", "enabled": false },
+    { "name": "TerminalModule", "enabled": true },
+    { "name": "FolderModule", "enabled": false },
+    { "name": "GoogleModule", "enabled": false },
+    { "name": "SchemaModule", "enabled": false },
+    { "name": "LogModule", "enabled": false },
+    { "name": "AudioModule", "enabled": false },
+    { "name": "SetupModule", "enabled": false },
+    { "name": "ScreenRecorderModule", "enabled": true },
+    { "name": "AwsModule", "enabled": false },
+    { "name": "TranspilerModule", "enabled": true },
+    { "name": "CodeModule", "enabled": false },
+    { "name": "ModuleControlModule", "enabled": true },
+    { "name": "FeatureModule", "enabled": true }
+  ]
+}

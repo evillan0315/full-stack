@@ -4,6 +4,7 @@ import { Router, Route } from '@solidjs/router';
 import { Suspense } from 'solid-js';
 
 import Layout from './components/layouts/Layout';
+import Header from './components/layouts/Header';
 import Loading from './components/Loading';
 import './app.css';
 
@@ -21,8 +22,10 @@ import Editor from './pages/editor';
 import TTSForm from './pages/tts';
 import Downloader from './pages/downloader';
 import Dashboard from './pages/dashboard';
+import Builder from './pages/builder';
 
 import GeneratePage from './pages/generate';
+import { Modal } from './services/modalService';
 
 import Home from './pages/home';
 
@@ -38,7 +41,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <Toaster />
-
+      <Modal />
       <AuthProvider>
         <Router
           root={(props) => (
@@ -52,6 +55,10 @@ export default function App() {
             <Layout
               title={company.name}
               menus={menus}
+              header={Header}
+              leftFooter={true}
+              middleFooter={true}
+              rightFooter={true}
               content={
                 /**
                  * Wraps the route content with a Suspense component to handle loading states.
@@ -112,6 +119,14 @@ export default function App() {
             component={() => (
               <ProtectedRoute>
                 <Editor />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/builder"
+            component={() => (
+              <ProtectedRoute>
+                <Builder />
               </ProtectedRoute>
             )}
           />

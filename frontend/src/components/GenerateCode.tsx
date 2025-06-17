@@ -73,13 +73,13 @@ export default function GenerateCode(props: GenerateCodeProps): JSX.Element {
         class="px-4 py-3 w-full text-xl mt-2 mb-6 gap-4 disabled:bg-gray-200"
         onClick={() => props.handleSubmit(props.output())}
         variant="secondary"
-        disabled={props.loading()}
+        disabled={props.loading}
       >
         <Icon icon="mdi:file-document-outline" width="2.2em" height="2.2em" />
-        {props.loading() ? 'Generating Code...' : 'Generate Code'}
+        {props.loading ? 'Generating Code...' : 'Generate Code'}
       </Button>
 
-      <Show when={props.error()}>
+      <Show when={props.error}>
         <p class="text-red-500">{props.error()}</p>
       </Show>
 

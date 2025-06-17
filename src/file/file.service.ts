@@ -1,24 +1,26 @@
 import {
   Injectable,
   Inject,
-  ForbiddenException, // Keep if still used elsewhere for user permissions
+  ForbiddenException,
   BadRequestException,
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  OnModuleInit, // Import OnModuleInit lifecycle hook
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import axios from 'axios';
+import * as fs from 'fs/promises';
 import * as fsExtra from 'fs-extra';
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import { Readable } from 'stream'; // Keep if still used
-import { lookup as mimeLookup } from 'mime-types'; // Keep for mimeType lookup
-import { get as httpGet } from 'http'; // Keep for proxyImage
-import { get as httpsGet } from 'https'; // Keep for proxyImage
-import { URL } from 'url'; // Keep for proxyImage
 
+import * as path from 'path';
+import { Readable } from 'stream';
+import { lookup as mimeLookup } from 'mime-types';
+import { get as httpGet } from 'http';
+import { get as httpsGet } from 'https';
+import { URL } from 'url';
+import { ModuleControlService } from '../module-control/module-control.service'; // Import ModuleControlService
 import { CreateFileDto } from './dto/create-file.dto';
 import { ReadFileResponseDto } from './dto/read-file-response.dto';
 import { ReadFileDto } from './dto/read-file.dto';
@@ -26,21 +28,21 @@ import { CreateJwtUserDto } from '../auth/dto/auth.dto';
 
 import { REQUEST } from '@nestjs/core';
 import { Request, Response } from 'express';
-// Removed 'extname' from here as 'path.extname' is already available via 'path' import
 
 // Import UtilsService
-import { UtilsService } from '../utils/utils.service'; // Adjust path as necessary
+import { UtilsService } from '../utils/utils.service';
 
 @Injectable()
-export class FileService {
-  private readonly logger = new Logger(FileService.name); // Initialize logger
+export class FileService implements OnModuleInit { // Implement OnModuleInit
+  private readonly logger = new Logger(FileService.name);
   private readonly maxFileSize: number;
   private readonly allowedMimeTypes: string[];
   private readonly allowedExtensions: string[];
 
   constructor(
+    private readonly moduleControlService: ModuleControlService, // Inject ModuleControlService
     private readonly configService: ConfigService,
-    private readonly utilsService: UtilsService, // Inject UtilsService
+    private readonly utilsService: UtilsService,
     @Inject('EXCLUDED_FOLDERS') private readonly EXCLUDED_FOLDERS: string[],
     @Inject(REQUEST)
     private readonly request: Request & { user?: CreateJwtUserDto },
@@ -52,8 +54,21 @@ export class FileService {
     this.allowedExtensions =
       this.configService.get<string[]>('file.allowedExtensions') ?? [];
 
-    // Optional: Add a check to ensure configuration values are valid if they're not provided via defaults
     this.ensureConfigurationIsValid();
+  }
+
+  // Use OnModuleInit to check the module status after all dependencies are initialized
+  onModuleInit() {
+    // Optionally, you could log a warning or take action if FileModule is disabled on startup
+    if (!this.moduleControlService.isModuleEnabled('FileModule')) {
+      this.logger.warn('FileModule is currently disabled via ModuleControlService. File operations will be restricted.');
+    }
+  }
+
+  private ensureFileModuleEnabled(): void {
+    if (!this.moduleControlService.isModuleEnabled('FileModule')) {
+      throw new ForbiddenException('File module is currently disabled. Cannot perform file operations.');
+    }
   }
 
   private ensureConfigurationIsValid(): void {
@@ -96,12 +111,14 @@ export class FileService {
   }
 
   private validateUploadedFile(file: Express.Multer.File): void {
+    // Ensure file module is enabled before proceeding with specific file validation
+    this.ensureFileModuleEnabled();
+
     if (file.size > this.maxFileSize) {
       throw new BadRequestException(
         `Uploaded file "${file.originalname}" exceeds size limit (${this.formatBytes(this.maxFileSize)}).`,
       );
     }
-    // Normalize MIME type before checking
     const normalizedMimeType = file.mimetype.split(';')[0].toLowerCase();
     if (!this.allowedMimeTypes.includes(normalizedMimeType)) {
       throw new BadRequestException(
@@ -111,6 +128,9 @@ export class FileService {
   }
 
   private validateFileExtension(filePath: string): void {
+    // Ensure file module is enabled before proceeding with specific file validation
+    this.ensureFileModuleEnabled();
+
     const ext = path.extname(filePath).toLowerCase();
     if (ext && !this.allowedExtensions.includes(ext)) {
       throw new BadRequestException(
@@ -120,12 +140,15 @@ export class FileService {
   }
 
   private extractFilename(pathOrUrl: string): string {
-    return path.basename(pathOrUrl) || 'file'; // Use path.basename for better handling
+    return path.basename(pathOrUrl) || 'file';
   }
 
   private async resolveFromLocalPath(
     filePath: string,
   ): Promise<{ buffer: Buffer; filename: string; filePath: string }> {
+    // Ensure file module is enabled
+    this.ensureFileModuleEnabled();
+
     try {
       const buffer = await fs.readFile(filePath);
       return { buffer, filename: this.extractFilename(filePath), filePath };
@@ -143,11 +166,13 @@ export class FileService {
   private async resolveFromUrl(
     url: string,
   ): Promise<{ buffer: Buffer; filename: string; filePath: string }> {
+    // Ensure file module is enabled
+    this.ensureFileModuleEnabled();
+
     try {
       const res = await axios.get(url, { responseType: 'arraybuffer' });
       const contentType = res.headers['content-type'];
 
-      // Normalize MIME type from URL response
       const normalizedContentType = contentType?.split(';')[0].toLowerCase();
 
       if (
@@ -161,7 +186,7 @@ export class FileService {
 
       return {
         buffer: Buffer.from(res.data),
-        filename: this.extractFilename(new URL(url).pathname), // Extract filename from URL pathname
+        filename: this.extractFilename(new URL(url).pathname),
         filePath: url,
       };
     } catch (error) {
@@ -183,25 +208,26 @@ export class FileService {
     file?: Express.Multer.File,
     body?: ReadFileDto,
   ): Promise<{ buffer: Buffer; filename: string; filePath: string }> {
+    this.ensureFileModuleEnabled(); // Global check for resolveFile
+
     if (file?.buffer) {
-      this.validateUploadedFile(file);
+      this.validateUploadedFile(file); // This will also call ensureFileModuleEnabled()
       return {
         buffer: file.buffer,
         filename: file.originalname || 'file',
-        filePath: '', // No specific filePath for an uploaded file from multer
+        filePath: '',
       };
     }
 
     if (body?.filePath) {
-      this.validateFileExtension(body.filePath);
-      return this.resolveFromLocalPath(body.filePath);
+      this.validateFileExtension(body.filePath); // This will also call ensureFileModuleEnabled()
+      return this.resolveFromLocalPath(body.filePath); // This will also call ensureFileModuleEnabled()
     }
 
     if (body?.url) {
-      // Validate extension for URL if it has one and is in allowedExtensions
       const urlFilename = this.extractFilename(new URL(body.url).pathname);
-      this.validateFileExtension(urlFilename); // Validate URL extension too
-      return this.resolveFromUrl(body.url);
+      this.validateFileExtension(urlFilename); // This will also call ensureFileModuleEnabled()
+      return this.resolveFromUrl(body.url); // This will also call ensureFileModuleEnabled()
     }
 
     throw new BadRequestException('Please provide a file, filePath, or url.');
@@ -214,12 +240,20 @@ export class FileService {
     directory: string = '',
     recursive = false,
   ): Promise<any[]> {
-    // Explicitly define return type as any[]
-    //const dir = directory || process.cwd();
+    this.ensureFileModuleEnabled(); // Check if file module is enabled
+
     const dir = path.resolve(process.cwd(), directory);
+    const blockedPaths = ['/proc', '/sys', '/dev'];
+
+    if (blockedPaths.some((blocked) => dir.startsWith(blocked))) {
+      this.logger.warn(`Skipped restricted directory: ${dir}`);
+      return [];
+    }
+
     if (!(await fsExtra.pathExists(dir))) {
       throw new BadRequestException(`Directory not found: ${dir}`);
     }
+
     if (!(await fsExtra.lstat(dir)).isDirectory()) {
       throw new BadRequestException(`Path is not a directory: ${dir}`);
     }
@@ -231,34 +265,40 @@ export class FileService {
           .filter((entry) => !this.EXCLUDED_FOLDERS.includes(entry))
           .map(async (entry) => {
             const fullPath = path.join(dir, entry);
-            const stat = await fs.lstat(fullPath);
-            const isDir = stat.isDirectory();
-            const filename = entry; // For files, entry is the filename
-            let mimeType = mimeLookup(filename) || 'application/octet-stream';
+            try {
+              const stat = await fs.lstat(fullPath);
+              const isDir = stat.isDirectory();
+              const filename = entry;
+              let mimeType = mimeLookup(filename) || 'application/octet-stream';
+              let lang = this.utilsService.detectLanguage(filename, mimeType);
 
-            // Fix incorrect MIME type for .mp4 files
-            if (mimeType === 'application/mp4') {
-              mimeType = 'video/mp4';
-            }
+              if (mimeType.startsWith('image/')) {
+                lang = 'image';
+              }
 
-            let lang = this.utilsService.detectLanguage(filename, mimeType); // Use utilsService.detectLanguage
-            if (mimeType.startsWith('image/')) {
-              lang = 'image';
+              return {
+                name: entry,
+                path: fullPath,
+                isDirectory: isDir,
+                type: isDir ? 'folder' : 'file',
+                lang: isDir ? undefined : lang,
+                mimeType: isDir ? undefined : mimeType,
+                size: isDir ? undefined : stat.size,
+                createdAt: isDir ? undefined : stat.birthtime,
+                updatedAt: isDir ? undefined : stat.mtime,
+                children:
+                  isDir && recursive
+                    ? await this.getFilesByDirectory(fullPath, true)
+                    : [],
+              };
+            } catch (entryError) {
+              this.logger.warn(
+                `Skipped "${fullPath}" due to error: ${entryError.message}`,
+              );
+              return null;
             }
-            return {
-              name: entry,
-              path: fullPath,
-              isDirectory: isDir,
-              type: isDir ? 'folder' : 'file',
-              lang: isDir ? undefined : lang,
-              mimeType: isDir ? undefined : mimeType,
-              children:
-                isDir && recursive
-                  ? await this.getFilesByDirectory(fullPath, true)
-                  : undefined,
-            };
           }),
-      );
+      ).then((results) => results.filter((item) => item !== null));
     } catch (error) {
       this.logger.error(
         `Failed to list directory contents for "${dir}": ${error.message}`,
@@ -271,16 +311,16 @@ export class FileService {
   }
 
   async getFileContent(filePath: string): Promise<string> {
-    const absolutePath = path.resolve(filePath); // Ensure absolute path for security and consistency
+    this.ensureFileModuleEnabled(); // Check if file module is enabled
+
+    const absolutePath = path.resolve(filePath);
 
     try {
-      // Check if the path exists and is a file
       const stats = await fs.stat(absolutePath);
       if (!stats.isFile()) {
         throw new Error(`Path '${filePath}' is not a file.`);
       }
 
-      // Read the file content
       const content = await fs.readFile(absolutePath, { encoding: 'utf8' });
       return content;
     } catch (error) {
@@ -298,10 +338,11 @@ export class FileService {
    * Throws an error if the path does not exist or is not a file.
    */
   async getFileReadStream(filePath: string): Promise<Readable> {
-    const absolutePath = path.resolve(filePath); // Ensure absolute path for security
+    this.ensureFileModuleEnabled(); // Check if file module is enabled
+
+    const absolutePath = path.resolve(filePath);
 
     try {
-      // Use fs.stat from 'fs/promises' to check if the path exists and is a file
       const stats = await fs.stat(absolutePath);
       if (!stats.isFile()) {
         throw new BadRequestException(
@@ -309,14 +350,11 @@ export class FileService {
         );
       }
 
-      // Use fsExtra.createReadStream() as fs-extra re-exports Node.js's fs methods
-      // and often includes graceful-fs for better handling of file descriptor limits.
       return fsExtra.createReadStream(absolutePath);
     } catch (error) {
       if (error.code === 'ENOENT') {
         throw new NotFoundException(`File not found at path: ${filePath}`);
       }
-      // Re-throw other errors to be handled by the controller
       throw new Error(
         `Error preparing file for download '${filePath}': ${error.message}`,
       );
@@ -331,9 +369,10 @@ export class FileService {
     generateBlobUrl = false,
     filePath?: string,
   ): ReadFileResponseDto {
+    // This method is a utility for formatting, no need to gate it directly.
+    // The calling method (e.g., resolveFile or controller) should already have checked.
     const mimeType = mimeLookup(filename) || 'application/octet-stream';
-    const lang = this.utilsService.detectLanguage(filename, mimeType); // Use utilsService.detectLanguage
-    //const fileBuffer = Buffer.from(buffer, 'base64');
+    const lang = this.utilsService.detectLanguage(filename, mimeType);
     return {
       filePath,
       filename,
@@ -352,6 +391,8 @@ export class FileService {
     files: { buffer: Buffer; filename: string; filePath?: string }[],
     generateBlobUrl?: boolean,
   ): Promise<ReadFileResponseDto[]> {
+    this.ensureFileModuleEnabled(); // Check if file module is enabled
+
     return files.map(
       (file) =>
         this.readFile(
@@ -359,7 +400,7 @@ export class FileService {
           file.filename,
           generateBlobUrl,
           file.filePath,
-        ), // Pass filePath
+        ),
     );
   }
 
@@ -367,6 +408,8 @@ export class FileService {
    * Proxies an image from a given URL and pipes it to the response.
    */
   async proxyImage(url: string, res: Response): Promise<void> {
+    this.ensureFileModuleEnabled(); // Check if file module is enabled
+
     if (!url) throw new BadRequestException('Missing image URL');
 
     let parsedUrl: URL;
@@ -393,7 +436,6 @@ export class FileService {
           if (contentType) {
             res.setHeader('Content-Type', contentType);
           } else {
-            // Fallback to a common image type if header is missing
             this.logger.warn(
               `No Content-Type header for URL: ${url}. Defaulting to image/jpeg.`,
             );
@@ -429,15 +471,16 @@ export class FileService {
   async createLocalFileOrFolder(
     dto: CreateFileDto,
   ): Promise<{ success: boolean; message: string }> {
+    this.ensureFileModuleEnabled(); // Check if file module is enabled
+
     const { filePath, isDirectory, content } = dto;
-    const resolvedPath = path.resolve(filePath); // Resolve to an absolute path for consistency
+    const resolvedPath = path.resolve(filePath);
 
     try {
       if (isDirectory) {
         await fs.mkdir(resolvedPath, { recursive: true });
         return { success: true, message: `Folder created at ${resolvedPath}` };
       } else {
-        // Validate file extension for new file creation
         this.validateFileExtension(resolvedPath);
         const finalContent: string =
           content?.trim() === '' || content == null ? ' ' : content;
@@ -463,8 +506,9 @@ export class FileService {
     filePath: string,
     content: string,
   ): Promise<{ success: boolean; message: string }> {
+    this.ensureFileModuleEnabled(); // Check if file module is enabled
+
     try {
-      // Validate file extension before writing
       this.validateFileExtension(filePath);
       const directory = path.dirname(filePath);
       await fs.mkdir(directory, { recursive: true });
@@ -487,11 +531,13 @@ export class FileService {
   async deleteLocalFile(
     filePath: string,
   ): Promise<{ success: boolean; message: string }> {
+    this.ensureFileModuleEnabled(); // Check if file module is enabled
+
     try {
       if (!(await fsExtra.pathExists(filePath))) {
         throw new BadRequestException(`Path not found: ${filePath}`);
       }
-      await fsExtra.remove(filePath); // `fs-extra`'s remove works for both files and directories
+      await fsExtra.remove(filePath);
       return { success: true, message: `Successfully deleted: ${filePath}` };
     } catch (error) {
       this.logger.error(
@@ -506,7 +552,6 @@ export class FileService {
 
   /**
    * Helper to format bytes into a human-readable string.
-   * This method was moved from FileValidationService to be reused.
    */
   private formatBytes(bytes: number, decimals = 2): string {
     if (bytes === 0) return '0 Bytes';
@@ -520,3 +565,4 @@ export class FileService {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 }
+

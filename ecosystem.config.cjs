@@ -2,12 +2,12 @@ module.exports = {
   apps: [
     {
       name: "api-server",
-      script: "dist/src/main.js", // run compiled output directly
+      script: "dist/src/main.js",
       instances: 1,
-      exec_mode: "fork",          // or "cluster" for load-balanced multi-core
+      exec_mode: "fork",
       watch: false,
-      autorestart: true,          // ensure restart on crash
-      max_memory_restart: "1G",   // restart on memory overflow
+      autorestart: true,
+      max_memory_restart: "1G",
       env: {
         NODE_ENV: "development",
         PORT: 5000

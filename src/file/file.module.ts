@@ -2,15 +2,15 @@ import { Module } from '@nestjs/common';
 import { FileService } from './file.service';
 import { FileLanguageService } from './file-language.service';
 import { FileController } from './file.controller';
-import { ViewsController } from './views/views.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UtilsModule } from '../utils/utils.module';
 import { ConfigModule } from '@nestjs/config';
 import { FileValidationService } from '../common/services/file-validation.service';
+import { ModuleControlModule } from '../module-control/module-control.module';
 
 @Module({
-  imports: [PrismaModule, UtilsModule, ConfigModule],
-  controllers: [FileController, ViewsController],
+  imports: [PrismaModule, UtilsModule, ConfigModule, ModuleControlModule],
+  controllers: [FileController],
   providers: [
     FileService,
     FileLanguageService,

@@ -68,7 +68,9 @@ export class AudioGateway implements OnGatewayConnection {
             downloaded,
             total,
             remaining:
-              total && downloaded !== undefined ? total - downloaded : undefined,
+              total && downloaded !== undefined
+                ? total - downloaded
+                : undefined,
           });
         },
         (filePath: string) => {
@@ -84,4 +86,3 @@ export class AudioGateway implements OnGatewayConnection {
     }
   }
 } // <- This closing brace was missing
-

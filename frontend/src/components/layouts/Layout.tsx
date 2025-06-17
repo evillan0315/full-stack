@@ -1,46 +1,45 @@
-import { type JSX, Show } from 'solid-js';
+import { type Component, createSignal, onMount, onCleanup, Show } from 'solid-js';
 import Header from './Header';
-import Footer from './Footer';
+import { Footer } from './Footer';
 import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
-import ContentLayout from './content/ContentLayout';
+import CommandPalette from './CommandPalette';
+import { createConfirmModal } from '../ui/ConfirmModal';
+import ModalSettings from './ModalSettings';
 import type { MenuItem } from './types';
-//import NavigationGuard from '../NavigationGuard';
 
 interface LayoutProps {
   title: string;
   menus: MenuItem[];
   content: JSX.Element;
+  header?: JSX.Element;
+  stickyHeader?: boolean;
   leftSidebar?: boolean;
   rightSidebar?: boolean;
-  footer?: boolean;
+  leftFooter?: boolean;
+  rightFooter?: boolean;
+  middleFooter?: boolean;
 }
 
 export default function Layout({
   title,
   menus,
   content,
+  header,
+  stickyHeader = false,
   leftSidebar = false,
   rightSidebar = false,
-  footer = true,
+  leftFooter = true,
+  middleFooter = false,
+  rightFooter = false,
 }: LayoutProps) {
   return (
-    <div class="flex flex-col h-[calc(100vh)] overflow-hidden">
-      <Header />
-
-      <div class="flex flex-1 overflow-auto">
-        <Show when={leftSidebar}>
-          <LeftSidebar />
-        </Show>
-        <ContentLayout content={content} />
-        <Show when={rightSidebar}>
-          <RightSidebar />
-        </Show>
-      </div>
-
-      <Show when={footer}>
-        <Footer links={menus} />
-      </Show>
+    <div class="flex flex-col h-screen">
+      <Show when={header}>{header}</Show>
+      {content}
+      <Footer left={leftFooter} middle={middleFooter} right={rightFooter} />
+      <CommandPalette />
+      <ModalSettings />
     </div>
   );
 }

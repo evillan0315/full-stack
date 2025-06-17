@@ -16,8 +16,8 @@ type GenerateDocumentationProps = {
   language: () => string;
   setLanguage: (val: string) => void;
   languageOptions: { code: string; label: string }[];
-  isComment: () => boolean;
-  setIsComment: (val: boolean) => void;
+  isComment?: () => boolean;
+  setIsComment?: (val: boolean) => void;
   handleSubmit: (format: string) => void;
   loading: () => boolean;
   error: () => string;
@@ -30,7 +30,7 @@ export default function GenerateDocumentation(props: GenerateDocumentationProps)
   const [saveDoc, setSaveDoc] = createSignal(false);
 
   return (
-    <div class="md:w-3/4 space-y-4 rounded-lg border p-6 bg-gray-800/10 border-gray-500/30">
+    <div class="space-y-4 rounded-lg border p-6 bg-gray-800/10 border-gray-500/30">
       <label class="block mb-1 text-lg font-medium">Prompt</label>
       <textarea
         rows={4}
@@ -40,7 +40,11 @@ export default function GenerateDocumentation(props: GenerateDocumentationProps)
         onInput={(e) => props.setPrompt(e.currentTarget.value)}
       />
       <div class="flex items-center justify-between gap-2 mt-1">
-        <ToggleSwitch label="Inline Comments" checked={props.isComment()} onChange={props.setIsComment} />
+        <ToggleSwitch
+          label="Inline Comments"
+          checked={props.isComment ? props.isComment : false}
+          onChange={props.setIsComment}
+        />
         <ToggleSwitch label="Save Doc" checked={saveDoc()} onChange={setSaveDoc} />
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -81,14 +85,14 @@ export default function GenerateDocumentation(props: GenerateDocumentationProps)
         class="px-4 py-3 w-full text-xl mt-2 mb-6 gap-4 disabled:bg-gray-200"
         onClick={() => props.handleSubmit(props.output())}
         variant="secondary"
-        disabled={props.loading()}
+        disabled={props.loading}
       >
         <Icon icon="mdi:file-document-outline" width="2.2em" height="2.2em" />
-        {props.loading() ? 'Generating Documentation...' : 'Generate Documentation'}
+        {props.loading ? 'Generating Documentation...' : 'Generate Documentation'}
       </Button>
 
-      <Show when={props.error()}>
-        <p class="text-red-500">{props.error()}</p>
+      <Show when={props.error}>
+        <p class="text-red-500">{props.error}</p>
       </Show>
 
       <Show when={props.generatedContent}>

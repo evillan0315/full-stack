@@ -149,9 +149,9 @@ const FileNode = (props: FileNodeProps) => {
           when={state.editing}
           fallback={
             <>
-              <Tooltip html={`<h4>${props.file.name}</h4><p>${props.file.size}</p>`} position="top" offset={2}>
-                <span class="truncate max-w-[220px]">{props.file.name}</span>
-              </Tooltip>
+              <div title={props.file.path} class="truncate max-w-[150px] block">
+                {props.file.name}
+              </div>
             </>
           }
         >
@@ -167,7 +167,14 @@ const FileNode = (props: FileNodeProps) => {
         </Show>
 
         {props.file.isDirectory && (
-          <Icon icon={state.open ? 'mdi:chevron-down' : 'mdi:chevron-right'} class="w-4 h-4 text-gray-500 ml-auto" />
+          <Icon
+            icon={state.open ? 'mdi:chevron-down' : 'mdi:chevron-right'}
+            class="w-4 h-4 text-gray-500 ml-auto cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggle();
+            }}
+          />
         )}
       </div>
 

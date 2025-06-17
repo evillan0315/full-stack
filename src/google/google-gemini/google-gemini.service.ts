@@ -280,7 +280,31 @@ export class GoogleGeminiService {
         break;
       case OutputFormat.Text:
       default:
-        formatText = `Respond with plain ${language || 'text'} code only.`;
+        formatText = `Respond with plain ${language || 'typescript'} code only.
+
+    Include a commented src target directory where the code would be saved.
+
+    Include a commented title and description for the code at the top.
+
+    Use TailwindCSS for styling, design, and layout.
+
+    Apply the following color scheme:
+
+        Dark mode: bg-gray-950, text-gray-100, bg-sky-600 (secondary)
+
+        Light mode: bg-gray-100, text-gray-900, bg-sky-950 (secondary)
+
+    Provide a commented example usage in markdown at the bottom. This should include:
+
+        A clear title
+
+        A short description of how to implement the generated code
+
+    All notes, explanations, and documentation should appear only in comments below the code block in markdown.
+
+    Do not include any inline comments or notes inside the ${language} code itself.
+
+    Ensure the code is clean, minimal, and production-ready.`;
         break;
     }
 

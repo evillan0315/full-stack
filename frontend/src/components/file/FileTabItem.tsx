@@ -1,38 +1,44 @@
+import { createMemo, type JSX } from 'solid-js';
 import { Icon } from '@iconify-icon/solid';
+import { useStore } from '@nanostores/solid';
+import { editorUnsaved } from '../../stores/editorContent';
 
-type FileTabItemProps = {
+interface FileTabItemProps {
   path: string;
-  active: boolean;
-  unsaved: boolean;
-  onClick: () => void;
-  onClose: () => void;
-};
+  active?: boolean;
+  onClick?: (path: string) => void;
+  onClose?: (path: string) => void;
+}
 
-/**
- * TabItem displays a single file tab with optional unsaved indicator.
- */
-export default function FileTabItem(props: FileTabItemProps) {
-  const fileName = props.path.split('/').pop() || 'Untitled';
+export default function FileTabItem(props: FileTabItemProps): JSX.Element {
+  const $unsaved = useStore(editorUnsaved);
+  console.log(editorUnsaved.get());
+  const fileName = createMemo(() => props.path.split('/').pop() || '');
+  const hasUnsaved = createMemo(() => !!$unsaved()[props.path]);
 
   return (
     <div
-      class={`px-4 py-1 cursor-pointer flex items-center gap-2 border-r border-gray-500/30 whitespace-nowrap ${
-        props.active ? 'bg-gray-800/10 font-semibold' : 'bg-gray-700/10 hover:bg-gray-900/30'
+      class={`cursor-pointer flex items-center gap-2 text-sm font-light ${
+        props.active
+          ? 'text-sky-600 hover:bg-gray-900/40 font-semibold border-b border-sky-600'
+          : 'hover:bg-gray-900/80'
       }`}
-      onClick={props.onClick}
     >
-      <span class="truncate max-w-[150px] flex items-center gap-1">
-        {fileName}
-        {props.unsaved && <Icon icon="mdi:asterisk" class="text-red-500" width="0.7em" height="0.7em" />}
-      </span>
-      <Icon
-        icon="mdi:close"
-        class="text-sm hover:text-red-500"
-        onClick={(e) => {
-          e.stopPropagation();
-          props.onClose();
-        }}
-      />
+      <div class="px-4 py-3 flex items-center gap-2" onClick={() => props.onClick?.(props.path)}>
+        <div class="truncate max-w-[100px]" title={props.path}>
+          {fileName()}
+          {hasUnsaved() && <span class="ml-1 text-info-600">*</span>}
+        </div>
+        <Icon
+          title={`Close ${fileName()}`}
+          icon="mdi:close"
+          class="text-red-600 hover:text-red-500"
+          onClick={(e) => {
+            e.stopPropagation();
+            props.onClose?.(props.path);
+          }}
+        />
+      </div>
     </div>
   );
 }

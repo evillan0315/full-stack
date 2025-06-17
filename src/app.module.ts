@@ -1,6 +1,7 @@
 // File: /media/eddie/Data/projects/nestJS/nest-modules/full-stack/src/app.module.ts
 
 import { Module } from '@nestjs/common';
+import * as path from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
@@ -23,9 +24,14 @@ import { AudioModule } from './audio/audio.module';
 import { SetupModule } from './setup/setup.module';
 import { ScreenRecorderModule } from './screen-recorder/screen-recorder.module';
 import { AwsModule } from './aws/aws.module';
-import { ProjectModule } from './project/project.module';
+import { TranspilerModule } from './transpiler/transpiler.module';
+import { CodeModule } from './code/code.module';
+import { FeatureModule } from './feature/feature.module';
+import { ModuleControlModule } from './module-control/module-control.module';
 
 import fileConfig from './config/file.config';
+
+
 
 /**
  * The root module of the NestJS application.
@@ -34,7 +40,25 @@ import fileConfig from './config/file.config';
  * It also configures global settings like static file serving and configuration loading.
  */
 @Module({
+
+ 
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: ['.env'],
+      // Load configuration from the JSON file
+      // __dirname is the directory of the current file (src/app.module.ts)
+      // path.resolve moves up one directory (to project root) then into 'config'
+      load: [
+        fileConfig, 
+        () => require(path.resolve(process.cwd(), 'src/config/feature-modules.json'))
+        // Dynamically load feature-modules.json
+        // Use path.join for cross-platform compatibility
+       ],
+      isGlobal: true, // Makes ConfigService available globally
+      // If you also use .env files, you can add them:
+      // envFilePath: ['.env'],
+    }),
+    ModuleControlModule, 
     /**
      * Authentication module for handling user authentication and authorization.
      */
@@ -106,10 +130,7 @@ import fileConfig from './config/file.config';
      * `isGlobal: true` makes this module available throughout the application without needing to import it in other modules.
      * `load: [fileConfig]` loads the file configuration from './config/file.config'.
      */
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [fileConfig],
-    }),
+    
 
     /**
      * Module for serving static files (e.g., images, CSS, JavaScript).
@@ -130,7 +151,9 @@ import fileConfig from './config/file.config';
      */
     ScreenRecorderModule,
     AwsModule,
-    ProjectModule,
+    TranspilerModule,
+    CodeModule,
+    FeatureModule,
   ],
   /**
    * Controllers defined in this module.  Controllers handle incoming requests and route them to appropriate handlers.

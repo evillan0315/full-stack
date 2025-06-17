@@ -1,20 +1,20 @@
-import { createSignal } from 'solid-js';
-import FileManager from '../../components/file/FileManager';
+import { onMount, onCleanup } from 'solid-js';
+import { useNavigate } from '@solidjs/router';
+import { useAuth } from '../../contexts/AuthContext';
 
-const LeftSidebar = () => {
-  const [isOpen, setIsOpen] = createSignal(true);
+export default function LeftSidebar() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  onMount(() => {
+    if (!isAuthenticated()) {
+      navigate('/login', { replace: true });
+    }
+  });
 
   return (
-    <aside
-      class={`transition-all duration-300 ${
-        isOpen() ? 'w-80' : 'w-0'
-      } flex flex-shrink-0 py-4 flex flex-col justify-between items-center border-r dark:border-gray-800/50`}
-    >
-      {/*<button class="mx-4 hover:text-gray-400" onClick={() => setIsOpen(!isOpen())}>
-        isOpen() ? '>' : '<' 
-      </button>*/}
-    </aside>
+    <div id="leftSidebar" class="flex flex-col border-r border-gray-700 transition-all duration-200 overflow-hidden">
+      <div class="w-1 cursor-ew-resize bg-gray-700 hover:bg-sky-500" />
+    </div>
   );
-};
-
-export default LeftSidebar;
+}

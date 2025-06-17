@@ -7,10 +7,10 @@ import DropdownMenu from '../components/ui/DropdownMenu';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import GridResizer from '../components/GridResizer';
-import TerminalDrawer from '../components/TerminalDrawer';
+import TerminalShell from '../components/TerminalShell';
 import { EditorStatusBar } from '../components/editor/EditorStatusBar';
-import EditorBottomNav from '../components/editor/EditorBottomNav';
-
+import { EditorBottomNav } from '../components/editor/EditorBottomNav';
+import EditorLayout from '../components/layouts/editor/EditorLayout';
 import {
   editorOriginalContent,
   editorFilePath,
@@ -22,163 +22,16 @@ import { showToast } from '../stores/toast';
 
 import FileTabs from '../components/file/FileTabs';
 import { useEditorFile } from '../hooks/useEditorFile';
-import EditorComponent from '../components/editor/EditorComponent';
+import EditorContainer from '../components/editor/EditorContainer';
 import FileManagerContainer from '../components/file/FileManagerContainer';
 
 export default function Editor() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [terminalOpen, setTerminalOpen] = createSignal(false);
-  const [left, setLeft] = createSignal(0.225);
-
-  let gridRef: HTMLDivElement | undefined;
-  let resizerRef: HTMLDivElement | undefined;
-
-  // ✅ Initialize useEditorFile ONCE at the component level
-  const editorFileHook = useEditorFile(
-    (loadedContent) => {
-      editorContent.set(loadedContent);
-
-      // Update original content so isDirty becomes false
-      editorOriginalContent.set(loadedContent);
-
-      const prev = editorUnsaved.get();
-      editorUnsaved.set({
-        ...prev,
-        [editorFilePath.get()]: false,
-      });
-      //showToast(`Loaded ${editorFilePath.get()}`, 'success');
-    },
-    () => {
-      // After save, original content matches saved content
-      editorOriginalContent.set(editorContent.get());
-
-      const prev = editorUnsaved.get();
-      editorUnsaved.set({
-        ...prev,
-        [editorFilePath.get()]: false,
-      });
-      //showToast(`Saved ${editorFilePath.get()}`, 'success');
-    },
-  );
-
-  const changeLeft = (clientX: number) => {
-    if (!gridRef || !resizerRef) return;
-    const rect = gridRef.getBoundingClientRect();
-    const position = clientX - rect.left - resizerRef.offsetWidth / 2;
-    const size = rect.width - resizerRef.offsetWidth;
-    const percentage = Math.min(Math.max(position / size, 0.1), 0.75);
-    setLeft(percentage);
-  };
-
-  /*const loadFile = (path: string) => {
-    if (!path) return;
-
-    editorFilePath.set(path);
-    editorFileHook.fetchFile(path);
-  };*/
-  const loadFile = (path: string) => {
-    if (!path) return;
-
-    const currentPath = editorFilePath.get();
-    const unsavedMap = editorUnsaved.get();
-    editorFilePath.set(path);
-    editorFileHook.fetchFile(path);
-  };
-  const handleTabClick = (path: string) => {
-    if (path !== editorFilePath.get()) {
-      loadFile(path);
-    }
-  };
-
-  const handleTabClose = (closedPath: string) => {
-    const remainingTabs = editorOpenTabs.get().filter((t) => t !== closedPath);
-    editorOpenTabs.set(remainingTabs);
-
-    if (editorFilePath.get() === closedPath) {
-      if (remainingTabs.length > 0) {
-        loadFile(remainingTabs[remainingTabs.length - 1]);
-      } else {
-        editorFilePath.set('');
-        editorContent.set('');
-      }
-    }
-  };
-  onMount(() => {
-    document.addEventListener('editor-load-file', (e: Event) => {
-      const path = (e as CustomEvent).detail.path;
-      loadFile(path);
-    });
-
-    if (!isAuthenticated()) {
-      navigate('/login', { replace: true });
-      return;
-    }
-
-    const initial = editorFilePath.get();
-    loadFile(initial);
-  });
-
-  onCleanup(() => {
-    document.removeEventListener('editor-load-file', () => {});
-  });
 
   return (
-    <Show when={isAuthenticated()} fallback={<div>Please Login</div>}>
-      <div
-        ref={(el) => (gridRef = el)}
-        class="flex h-[calc(100vh-5rem)] min-h-0 flex-1 flex-col font-sans dark md:flex-row"
-      >
-        <FileManagerContainer left={left} loadFile={loadFile} />
-        <GridResizer ref={(el) => (resizerRef = el)} isHorizontal={false} onResize={changeLeft} />
-
-        <div class="flex min-h-0 min-w-0 flex-col" style={`flex: ${1 - left()}`}>
-          <FileTabs />
-
-          <EditorComponent
-            //content={editorContent.get()}
-            //filePath={editorFilePath.get()}
-            onSave={() => {
-              editorFileHook.saveFile();
-
-              // Update the original content so isDirty recomputes to false
-              editorOriginalContent.set(editorContent.get());
-              const prev = editorUnsaved.get();
-              editorUnsaved.set({
-                ...prev,
-                [editorFilePath.get()]: false,
-              });
-            }}
-            onChange={(content) => {
-              editorFileHook.setContent(content);
-              editorContent.set(content);
-
-              const prev = editorUnsaved.get();
-              editorUnsaved.set({
-                ...prev,
-                [editorFilePath.get()]: true,
-              });
-            }}
-          />
-
-          <Show when={terminalOpen()}>
-            <TerminalDrawer
-              isOpen={terminalOpen()}
-              setIsOpen={setTerminalOpen}
-              position="bottom"
-              size="200px"
-              fontSize={12}
-              resizable
-              draggable={false}
-            />
-          </Show>
-
-          <div class="editor-footer flex items-center justify-between border-t px-6">
-            <EditorStatusBar />
-            <EditorBottomNav setTerminalOpen={setTerminalOpen} />
-          </div>
-        </div>
-      </div>
-    </Show>
+    <>
+      <EditorLayout leftSidebar={true} rightSidebar={false} content={<EditorContainer />} />
+    </>
   );
 }

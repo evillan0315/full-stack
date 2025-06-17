@@ -10,7 +10,11 @@ import {
   editorHistory,
   editorFuture,
   editorOpenTabs,
+  editorUnsaved,
 } from '../stores/editorContent';
+
+import { confirmDiscardIfUnsaved } from '../utils/editorUnsaved';
+
 
 export function useEditorFile(onLoadContent?: (content: string) => void, onSave?: () => void) {
   const [content, setContent] = createSignal('');
@@ -22,19 +26,22 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
   const [error, setError] = createSignal('');
   const [directoryFiles, setDirectoryFiles] = createSignal<FileItem[]>([]);
   const [currentDirectory, setCurrentDirectory] = createSignal('');
-  const [terminalOpen, setTerminalOpen] = createSignal(false);
+
 
   let latestRequestId = 0;
 
   const fetchFile = async (path: string): Promise<void> => {
     if (!path) return;
-
+    if (!confirmDiscardIfUnsaved(path)) return;
     const requestId = ++latestRequestId;
     setLoading(true);
     setLoadingMessage(`Loading ${path}...`);
-    //showToast(`Loading ${path}...`, 'info');
 
     try {
+      if (path === editorFilePath.get()) {
+        console.log(editorFilePath.get(), editorUnsaved.get());
+      }
+
       const formData = new FormData();
       formData.append('filePath', path);
       const response = await api.post('/file/read', formData);
@@ -47,7 +54,6 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
       const code = response.data?.content;
       if (code === undefined || code === null) throw new Error('Empty file content');
 
-      // Update signals + stores
       setContent(code);
       editorContent.set(code);
       editorOriginalContent.set(code);
@@ -65,9 +71,8 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
       const safePrev = Array.isArray(prev) ? prev : [];
       const newTabs = safePrev.includes(path) ? safePrev : [...safePrev, path];
       editorOpenTabs.set(newTabs);
-
+      
       onLoadContent?.(code);
-      //showToast(`Loaded ${path}`, 'success');
     } catch (err) {
       const msg = (err as any).response?.data?.message || (err as Error).message;
       setError(msg);
@@ -83,10 +88,9 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
   const fetchDirectory = async (dirPath: string) => {
     setLoading(true);
     setLoadingMessage(`Loading directory ${dirPath}...`);
-    //showToast(`Loading directory ${dirPath}...`, 'info');
 
     try {
-      const query = `?directory=${encodeURIComponent(dirPath || './')}&recursive=true`;
+      const query = `?directory=${encodeURIComponent(dirPath || './')}`;
       const response = await api.get(`/file/list${query}`);
       if (!Array.isArray(response.data)) throw new Error('Invalid data format');
 
@@ -113,12 +117,19 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
       const formData = new FormData();
       formData.append('filePath', editorFilePath.get());
       formData.append('content', editorContent.get());
-      console.log(editorFilePath.get(), editorContent.get());
+
       const response = await api.post('/file/write', formData);
       if (!response.data.success) throw new Error('Failed to save file');
 
       editorOriginalContent.set(content());
       showToast('File saved successfully.', 'success');
+      // ✅ Clear unsaved state for this file
+    const currentPath = editorFilePath.get();
+    const currentUnsaved = editorUnsaved.get();
+    editorUnsaved.set({
+      ...currentUnsaved,
+      [currentPath]: false,
+    });
       onSave?.();
     } catch (err) {
       const msg = (err as any).response?.data?.message || (err as Error).message;
@@ -129,7 +140,7 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
   };
   const formatCode = async () => {
     const code = editorContent.get();
-    const lang = editorLanguage.get() || 'javascript'; // fallback
+    const lang = editorLanguage.get() || 'javascript';
     try {
       showToast('Formatting code...', 'info');
       console.log(code, lang);
@@ -149,11 +160,8 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
       showToast(`Error formatting code: ${msg}`, 'error');
     }
   };
-  const toggleTerminal = () => {
-    setTerminalOpen(!terminalOpen());
-  };
+
   onCleanup(() => {
-    // Invalidate all pending requests
     latestRequestId++;
   });
 
@@ -172,8 +180,6 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
     fetchFile,
     fetchDirectory,
     saveFile,
-    toggleTerminal,
-    terminalOpen,
     formatCode,
   };
 }

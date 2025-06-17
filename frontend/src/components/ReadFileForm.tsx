@@ -1,6 +1,8 @@
 // src/components/ReadFileForm.tsx
 import { createSignal } from 'solid-js';
 import api from '../services/api';
+import { createModalService } from './CreateModalService';
+const { Modal, confirm, alert, prompt } = createModalService();
 
 export default function ReadFileForm() {
   const [file, setFile] = createSignal<File | null>(null);
@@ -40,52 +42,55 @@ export default function ReadFileForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} class="space-y-4 p-4 border rounded">
-      <div>
-        <label class="block font-medium">Upload File:</label>
-        <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-      </div>
-
-      <div>
-        <label class="block font-medium">File Path:</label>
-        <input
-          type="text"
-          class="border p-1 w-full"
-          value={filePath()}
-          onInput={(e) => setFilePath(e.currentTarget.value)}
-        />
-      </div>
-
-      <div>
-        <label class="block font-medium">URL:</label>
-        <input type="text" class="border p-1 w-full" value={url()} onInput={(e) => setUrl(e.currentTarget.value)} />
-      </div>
-
-      <div class="flex items-center space-x-2">
-        <input
-          type="checkbox"
-          checked={generateBlobUrl()}
-          onChange={(e) => setGenerateBlobUrl(e.currentTarget.checked)}
-        />
-        <label>Return as blob URL</label>
-      </div>
-
-      <button type="submit" class="px-4 py-2 rounded">
-        Read File
-      </button>
-
-      {response() && (
-        <div class="mt-4">
-          <h3 class="font-semibold">Response:</h3>
-          {response().blobUrl ? (
-            <a href={response().blobUrl} download="output" target="_blank" class="underline">
-              Download Blob
-            </a>
-          ) : (
-            <pre class="bg-gray-100 p-2 text-sm overflow-auto">{JSON.stringify(response(), null, 2)}</pre>
-          )}
+    <>
+      <form onSubmit={handleSubmit} class="space-y-4 p-4 border rounded">
+        <div>
+          <label class="block font-medium">Upload File:</label>
+          <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
         </div>
-      )}
-    </form>
+
+        <div>
+          <label class="block font-medium">File Path:</label>
+          <input
+            type="text"
+            class="border p-1 w-full"
+            value={filePath()}
+            onInput={(e) => setFilePath(e.currentTarget.value)}
+          />
+        </div>
+
+        <div>
+          <label class="block font-medium">URL:</label>
+          <input type="text" class="border p-1 w-full" value={url()} onInput={(e) => setUrl(e.currentTarget.value)} />
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={generateBlobUrl()}
+            onChange={(e) => setGenerateBlobUrl(e.currentTarget.checked)}
+          />
+          <label>Return as blob URL</label>
+        </div>
+
+        <button type="submit" class="px-4 py-2 rounded">
+          Read File
+        </button>
+
+        {response() && (
+          <div class="mt-4">
+            <h3 class="font-semibold">Response:</h3>
+            {response().blobUrl ? (
+              <a href={response().blobUrl} download="output" target="_blank" class="underline">
+                Download Blob
+              </a>
+            ) : (
+              <pre class="bg-gray-100 p-2 text-sm overflow-auto">{JSON.stringify(response(), null, 2)}</pre>
+            )}
+          </div>
+        )}
+      </form>
+      <Modal />
+    </>
   );
 }

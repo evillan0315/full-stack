@@ -1,16 +1,43 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
+import * as screenshot from 'screenshot-desktop';
 import { join } from 'path';
+import { writeFile } from 'fs/promises';
 
 @Injectable()
 export class ScreenRecorderService {
   private readonly logger = new Logger(ScreenRecorderService.name);
   private recordingProcess: ChildProcessWithoutNullStreams | null = null;
 
+  /**
+   * Takes a screenshot of the current screen.
+   * @param filepath Optional file path. Defaults to ./screenshots/screen-{timestamp}.png
+   * @returns Path to the saved screenshot file.
+   */
+  captureScreen(filepath?: string): string {
+    const outputPath =
+      filepath ||
+      join(
+        process.cwd(),
+        'downloads',
+        'screenshots',
+        `captured-${Date.now()}.png`,
+      );
+    const img = screenshot({ format: 'png' });
+    writeFile(outputPath, img);
+    this.logger.log(`Screenshot saved to ${outputPath}`);
+    return outputPath;
+  }
+
   startRecording(filename?: string): string {
     const outputFile =
       filename ||
-      join(process.cwd(), 'recordings', `recording-${Date.now()}.mp4`);
+      join(
+        process.cwd(),
+        'downloads',
+        'recordings',
+        `recorded-${Date.now()}.mp4`,
+      );
 
     // Get the appropriate ffmpeg args based on the platform
     const ffmpegArgs = this.getFfmpegArgs(outputFile);
