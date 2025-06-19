@@ -1,5 +1,10 @@
-
 // src/hooks/useCodeMirror.ts
+import { createEffect, onCleanup } from 'solid-js';
+import { EditorState, Compartment } from '@codemirror/state';
+import { EditorView, basicSetup } from 'codemirror';
+import { useStore } from '@nanostores/solid';
+import { detectLanguage } from '../utils/editorLanguage';
+import { getThemeExtension } from '../utils/editorTheme';
 export function useCodeMirror(
   getContainer: () => HTMLDivElement | undefined,
   $content: () => string,
@@ -51,7 +56,6 @@ export function useCodeMirror(
     if (editorView) {
       const current = editorView.state.doc.toString();
       const incoming = $content();
-      console.log(incoming, current);
       if (current !== incoming) {
         editorView.dispatch({
           changes: { from: 0, to: current.length, insert: incoming },

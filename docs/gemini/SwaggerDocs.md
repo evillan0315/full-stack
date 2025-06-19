@@ -1,0 +1,170 @@
+
+
+**README.md**
+
+```markdown
+# Your Awesome Tool
+
+## Overview
+
+Your Awesome Tool is a versatile platform providing a suite of tools for developers, system administrators, and anyone working with code, files, data, and cloud infrastructure. It offers a central hub for tasks such as code transformation, file manipulation, database management, and AWS resource management.
+
+## Key Features
+
+*   **Code Transformation:** Transpile code between different frameworks (React, SolidJS), format code, convert between JSON, YAML, and more.
+*   **File & Folder Management:**  List, read, create, write, delete, and search files and folders. Read content from local, URL or uploaded files.
+*   **Utilities:**  A collection of helpful utilities for parsing, formatting, and manipulating data.
+*   **Database Management:**  Connect to, create, and manage databases (PostgreSQL, MySQL, MongoDB).  Execute raw SQL queries.
+*   **Cloud (AWS) Management:** Manage AWS resources like EC2 instances, RDS databases, and view billing information.
+*   **AI Powered Tools:** Uses Gemini AI to do things such as code analysis, optimization, repair, documentation, text-to-speech, and generate images from text.
+*	**Logs:** Provides comprehensive logging
+
+## Getting Started
+
+1.  **Setup:** After cloning, if a `.env` file doesn't exist, the application will redirect you to the `/setup` page.
+2.  **Configuration:** The setup page will guide you through configuring the required environment variables (e.g., API keys, database connection strings).
+3.  **Authentication:** After configuration, you'll need to log in to access protected features.
+4.  **Explore:**  Dive into the various tools and APIs available through the application's interface.
+
+## Endpoints (Based on Swagger Definition)
+
+### Authentication
+
+*   `/login`: Render the login page.
+*   `/api/auth/login`: Log in using email and password.
+*   `/api/auth/register`: Register a new user.
+*   `/api/auth/github`: Initiate GitHub OAuth2 login.
+*   `/api/auth/github/callback`: Handle GitHub OAuth2 callback.
+*   `/api/auth/google`: Initiate Google OAuth2 login.
+*   `/api/auth/google/callback`: Handle Google OAuth2 callback.
+*   `/api/auth/logout`: Log out user
+
+### User Management
+
+*   `/api/user`: Create, retrieve, update, and delete user records (requires authentication and appropriate roles).
+*   `/api/user/paginated`: Retrieve paginated user records.
+
+### File & Folder Management
+
+*   `/api/file/list`: List files and folders in a directory.
+*   `/api/file/read`: Read file content from an uploaded file, local path, or URL.
+*   `/api/file/read-many`:  Upload and read content from multiple files.
+*   `/api/file/create`: Create a new file or folder.
+*   `/api/file/write`: Write content to a file at a specified path.
+*   `/api/file/delete`: Delete a file or folder.
+*   `/api/file/search`: Recursively search for files by name.
+
+### Utilities
+
+*   `/api/utils/format`: Format source code using Prettier.
+*   `/api/utils/json-to-env`: Convert JSON to .env format.
+*   `/api/utils/env-to-json`: Convert .env to JSON format.
+*   `/api/utils/extract-title`: Extract the first H1/H2 title from Markdown.
+*   `/api/utils/to-json`: Convert Markdown to JSON AST
+*   `/api/utils/to-markdown`: Convert JSON AST to Markdown
+*   `/api/utils/to-html`: Convert Markdown to HTML
+*   `/api/encoding/base64/encode`: Encode code to Base64.
+*   `/api/encoding/base64/decode`: Decode code from Base64.
+*   `/api/utils/json-yaml/to-yaml`: Convert JSON to YAML.
+*   `/api/utils/json-yaml/to-json`: Convert YAML to JSON.
+
+### Database Management
+
+*   `/api/database/tables`: List all tables and their columns.
+*   `/api/database/create-table`: Create a new table.
+*   `/api/database/execute`: Execute raw SQL queries.
+
+### AWS Management
+
+*   `/api/aws/rds`: List, create, modify, stop, start, reboot, and delete PostgreSQL RDS instances.
+*   `/api/aws/ec2`: List, start, stop, and terminate EC2 instances.
+*   `/api/aws/billing/cost-usage`: Get AWS Cost and Usage.
+*   `/api/aws/billing/budgets`: Get AWS Budget details.
+*   `/api/aws/dynamodb/store-command`: Store command to DynamoDB.
+*   `/api/aws/dynamodb/stored-commands`: Get stored command from DynamoDB.
+
+### Google Gemini
+
+*   `/api/google-gemini/optimize-code`: Optimize the given code for performance or readability
+*   `/api/google-gemini/analyze-code`: Analyze the given code for issues and improvements
+*   `/api/google-gemini/repair-code`: Repair syntax or logical errors in the given code
+*   `/api/google-gemini/generate-code`: Generate code using Google Gemini.
+*   `/api/google-gemini/generate-doc`:  Generate documentation from code snippet using Google Gemini.
+*	`/api/google-gemini-image/caption`: Generate image caption from URL
+*	`/api/google-gemini-image/caption-url`: Generate a caption for an image URL
+*	`/api/google-gemini-image/caption-file`: Generate a caption for a local image file
+*	`/api/google-tts/generate`: Generate TTS audio with multiple speakers using Google Gemini
+
+### Logs
+*	`/api/log`: Create, read, update, and delete Log records (requires authentication and appropriate roles).
+
+## Security
+
+*   Most API endpoints require authentication via a JWT (JSON Web Token).
+*   The JWT should be included in the `Authorization` header as `Bearer <token>`.
+*   Some endpoints may also require specific roles (e.g., `ADMIN`) for access.
+
+## Contributing
+
+[Instructions on how to contribute to the project]
+
+## License
+
+[License information]
+```
+
+**Homepage Marketing Content**
+
+*   **Headline:** "Unleash Your Development Power with Our Comprehensive Toolset"
+*   **Subheadline:** "All-in-one platform for code transformation, file management, database administration, and cloud resource management."
+*   **Call to Action:** "Get Started Free" or "Explore Our Features"
+*   **Key Selling Points (with Icons):**
+    *   **Code Like a Pro:** Format, transpile, and analyze your code effortlessly.
+    *   **Master Your Files:** Manage files and folders with ease, locally or remotely.
+    *   **Database Domination:** Create, manage, and query databases.
+    *   **Cloud Control:**  Manage your AWS resources from a single interface.
+    *	**AI Powered Tools:** Use Gemini AI to do things such as code analysis, optimization, repair, documentation, text-to-speech, and generate images from text.
+
+**Default Page Marketing Content (After Initial Load)**
+
+*   **Headline:** Welcome to Your Awesome Tool!
+*   **Body:** "Configure your environment to start using the app. Edit `.env` to set up the required environment variables."
+*   **Button:** "Go to Setup" (linking to `/setup`)
+
+**Marketing Copy for Specific Features**
+
+*   **Code Transformation:**
+    *   "Instantly transpile your React components to SolidJS, or vice versa.  Supports TypeScript, JSX, and more!"
+*   **File Search:**
+    *   "Quickly locate files by name, extension, and directory with our powerful file search tool."
+*   **Database Management:**
+    *   "Connect to your PostgreSQL, MySQL, or MongoDB database and execute SQL queries with ease."
+*   **AWS Resource Management:**
+    *   "Manage your EC2 instances and RDS databases directly from our platform. View billing information and optimize your cloud spending."
+*   **.env Management**
+    *  "Generate .env file with automatic update functionality.
+*   **Google Gemini File Generation:**
+    *   "AI powered tool that can generate new code or documentation."
+*   **Screen Capture/Record:**
+    *   "Capture your screen with ease"
+*   **Audio Extraction**
+    *   "Download music from your favorite website."
+*   **Transpiler**
+    *   "Transpile a directory"
+
+**Additional Marketing Ideas**
+
+*   **Target Audience:** Developers, DevOps engineers, system administrators, data scientists.
+*   **Value Proposition:** Save time, improve efficiency, and simplify complex tasks with our all-in-one platform.
+*   **Testimonials:**  Include quotes from satisfied users.
+*   **Pricing:**  Clearly outline pricing plans (if applicable).
+*   **Blog/Content Marketing:**  Create articles and tutorials on topics related to the tool's features.
+*   **Social Media:**  Promote the tool on relevant social media channels.
+
+**Important Considerations:**
+
+*   **Clarity:**  Ensure all marketing copy is clear, concise, and easy to understand.
+*   **Target Audience:** Tailor the messaging to the specific needs and interests of your target audience.
+*   **Visual Appeal:** Use high-quality images and videos to showcase the tool's features.
+*   **SEO:**  Optimize your website and content for search engines to attract organic traffic.
+*   **Security:** Emphasize the security measures in place to protect user data.

@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { GoogleOAuthService } from '../google-oauth/google-oauth.service';
+
 import { firstValueFrom } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { GenerateDocDto } from './dto/generate-doc.dto';
@@ -15,10 +15,7 @@ import { OutputFormat } from './output-format.enum';
 export class GoogleGeminiService {
   private readonly apiEndpoint: string;
 
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly googleOAuthService: GoogleOAuthService,
-  ) {
+  constructor(private readonly httpService: HttpService) {
     this.apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GOOGLE_GEMINI_MODEL}:generateContent?key=${process.env.GOOGLE_GEMINI_API_KEY}`;
   }
 

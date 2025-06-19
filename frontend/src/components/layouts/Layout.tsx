@@ -5,7 +5,7 @@ import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
 import CommandPalette from './CommandPalette';
 import { createConfirmModal } from '../ui/ConfirmModal';
-import ModalSettings from './ModalSettings';
+import ModalSettings from './modal//ModalSettings';
 import type { MenuItem } from './types';
 
 interface LayoutProps {
@@ -34,7 +34,7 @@ export default function Layout({
   rightFooter = false,
 }: LayoutProps) {
   return (
-    <div class="flex flex-col h-screen">
+    <div class="flex flex-col h-full w-full">
       <Show when={header}>{header}</Show>
       {content}
       <Footer left={leftFooter} middle={middleFooter} right={rightFooter} />

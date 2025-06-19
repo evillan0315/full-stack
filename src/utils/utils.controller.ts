@@ -41,6 +41,32 @@ import { FormatCodeDto } from './dto/format-code.dto';
 export class UtilsController {
   constructor(private readonly utilsService: UtilsService) {}
 
+  @Get('get-directory')
+  @ApiOperation({
+    summary: 'Get directory from file path',
+    description: 'Returns the directory part of the provided file path.',
+  })
+  @ApiQuery({
+    name: 'filePath',
+    type: String,
+    description: 'Absolute or relative file path to extract the directory from',
+    example: '/home/eddie/projects/app/src/index.ts',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Directory extracted successfully.',
+    schema: { example: '/home/eddie/projects/app/src' },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request: filePath is missing or invalid.',
+  })
+  getDirectory(@Query('filePath') filePath: string): string {
+    if (!filePath) {
+      throw new Error('filePath query parameter is required');
+    }
+    return this.utilsService.getDirectory(filePath);
+  }
   /**
    * Parses a semicolon-delimited key=value string from query param `mapString`
    * and returns a parsed object.

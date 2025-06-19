@@ -27,6 +27,10 @@ export async function handleGenerateCode() {
   // Placeholder for documentation generation logic
   showToast('Code generation not implemented.', 'info');
 }
+export function saveFile() {
+  const editor = useEditorFile();
+  editor.saveFile();
+}
 export function formatCode() {
   const editor = useEditorFile();
   editor.formatCode();
@@ -69,4 +73,3 @@ export const sharedDrawerProps = {
   generatedContent: '',
   isComment: false,
 };
-

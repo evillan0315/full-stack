@@ -16,14 +16,14 @@ export const MiddleFooter = (props: MiddleFooterProps): JSX.Element => {
   const handleScreenRecordToggle = async () => {
     try {
       if (!isRecording()) {
-        const response = await api.get(`/record/start?filename=./downloads/recorded-screen-${Date.now()}.mp4`);
+        const response = await api.get(`/screen/record-start?filename=./downloads/recorded-screen-${Date.now()}.mp4`);
         const path = response.data?.path;
         if (!path) throw new Error('Invalid start response');
         setRecordingPath(path);
         setIsRecording(true);
         showToast(`🟢 Recording started`, 'info');
       } else {
-        await api.get('/record/stop');
+        await api.get('/screen/record-stop');
         setIsRecording(false);
         const file = recordingPath().split('/').pop() || '';
         const url = `${import.meta.env.BASE_URL_API}/api/media/${encodeURIComponent(file)}`;

@@ -1,7 +1,10 @@
-import { createSignal, onCleanup } from 'solid-js';
-import api from '../services/api';
+import { createSignal, createMemo, onCleanup } from 'solid-js';
+
+import { useStore } from '@nanostores/solid';
 import { showToast } from '../stores/toast';
+import api from '../services/api';
 import type { FileItem } from '../types/types';
+
 import {
   editorContent,
   editorFilePath,
@@ -11,10 +14,12 @@ import {
   editorFuture,
   editorOpenTabs,
   editorUnsaved,
+  editorCurrentDirectory,
+  editorOpenedDirectories,
+  editorFilesDirectories,
 } from '../stores/editorContent';
 
 import { confirmDiscardIfUnsaved } from '../utils/editorUnsaved';
-
 
 export function useEditorFile(onLoadContent?: (content: string) => void, onSave?: () => void) {
   const [content, setContent] = createSignal('');
@@ -25,23 +30,26 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
   const [saving, setSaving] = createSignal(false);
   const [error, setError] = createSignal('');
   const [directoryFiles, setDirectoryFiles] = createSignal<FileItem[]>([]);
-  const [currentDirectory, setCurrentDirectory] = createSignal('');
 
+  const $editorCurrentDirectory = useStore(editorCurrentDirectory);
+  const $editorOpenedDirectories = useStore(editorOpenedDirectories);
 
   let latestRequestId = 0;
 
   const fetchFile = async (path: string): Promise<void> => {
     if (!path) return;
-    if (!confirmDiscardIfUnsaved(path)) return;
+
+    const canProceed = await confirmDiscardIfUnsaved(editorFilePath.get());
+    if (!canProceed) {
+      showToast('File load cancelled.', 'info');
+      return;
+    }
+
     const requestId = ++latestRequestId;
     setLoading(true);
     setLoadingMessage(`Loading ${path}...`);
 
     try {
-      if (path === editorFilePath.get()) {
-        console.log(editorFilePath.get(), editorUnsaved.get());
-      }
-
       const formData = new FormData();
       formData.append('filePath', path);
       const response = await api.post('/file/read', formData);
@@ -71,7 +79,7 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
       const safePrev = Array.isArray(prev) ? prev : [];
       const newTabs = safePrev.includes(path) ? safePrev : [...safePrev, path];
       editorOpenTabs.set(newTabs);
-      
+
       onLoadContent?.(code);
     } catch (err) {
       const msg = (err as any).response?.data?.message || (err as Error).message;
@@ -88,14 +96,14 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
   const fetchDirectory = async (dirPath: string) => {
     setLoading(true);
     setLoadingMessage(`Loading directory ${dirPath}...`);
-
     try {
-      const query = `?directory=${encodeURIComponent(dirPath || './')}`;
+      const query = `?directory=${encodeURIComponent(dirPath || '/')}`;
       const response = await api.get(`/file/list${query}`);
       if (!Array.isArray(response.data)) throw new Error('Invalid data format');
+      console.log(response.data, dirPath);
 
-      setDirectoryFiles(response.data);
-      setCurrentDirectory(dirPath);
+      editorFilesDirectories.set(response.data);
+      editorCurrentDirectory.set(dirPath);
     } catch (err) {
       const msg = (err as any).response?.data?.message || (err as Error).message;
       setError(msg);
@@ -121,15 +129,15 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
       const response = await api.post('/file/write', formData);
       if (!response.data.success) throw new Error('Failed to save file');
 
-      editorOriginalContent.set(content());
+      editorOriginalContent.set(editorContent.get());
       showToast('File saved successfully.', 'success');
-      // ✅ Clear unsaved state for this file
-    const currentPath = editorFilePath.get();
-    const currentUnsaved = editorUnsaved.get();
-    editorUnsaved.set({
-      ...currentUnsaved,
-      [currentPath]: false,
-    });
+
+      const currentPath = editorFilePath.get();
+      const currentUnsaved = editorUnsaved.get();
+      editorUnsaved.set({
+        ...currentUnsaved,
+        [currentPath]: false,
+      });
       onSave?.();
     } catch (err) {
       const msg = (err as any).response?.data?.message || (err as Error).message;
@@ -138,6 +146,7 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
       setSaving(false);
     }
   };
+
   const formatCode = async () => {
     const code = editorContent.get();
     const lang = editorLanguage.get() || 'javascript';
@@ -161,6 +170,80 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
     }
   };
 
+  const createFile = async (directory: string, fileName: string, content?: string) => {
+    const filePath = `${directory}/${fileName}`;
+    setLoading(true);
+    setLoadingMessage(`Creating file ${fileName}...`);
+    
+    try {
+      await api.post('/file/create', { filePath, isDirectory: false, content: content || '' });
+      showToast(`File '${fileName}' created.`, 'success');
+    await fetchDirectory(directory);
+    await fetchFile(filePath);
+      
+    } catch (error) {
+      const msg = (error as any).response?.data?.message || (error as Error).message;
+      showToast(`Error creating file: ${msg}`, 'error');
+      setError(msg);
+      throw error;
+    } finally {
+      setLoading(false);
+      setLoadingMessage('');
+    }
+  };
+
+  const createFolder = async (directory: string, folderName: string) => {
+    const folderPath = `${directory}/${folderName}`;
+    setLoading(true);
+    setLoadingMessage(`Creating folder ${folderName}...`);
+    try {
+      await api.post('/file/create', { filePath: folderPath, isDirectory: true });
+      showToast(`Folder '${folderName}' created.`, 'success');
+      await fetchDirectory(directory);
+    } catch (error) {
+      const msg = (error as any).response?.data?.message || (error as Error).message;
+      showToast(`Error creating folder: ${msg}`, 'error');
+      setError(msg);
+      throw error;
+    } finally {
+      setLoading(false);
+      setLoadingMessage('');
+    }
+  };
+
+  const deleteFileOrFolder = async (filePath: string) => {
+    setLoading(true);
+    setLoadingMessage(`Deleting ${filePath}...`);
+    try {
+      await api.post('/file/delete', { filePath });
+      showToast(`'${filePath}' deleted.`, 'success');
+
+      await fetchDirectory(editorCurrentDirectory.get());
+
+      if (editorFilePath.get() === filePath) {
+        editorFilePath.set('');
+        editorContent.set('');
+        editorOriginalContent.set('');
+        editorLanguage.set('');
+        editorHistory.set([]);
+        editorFuture.set([]);
+
+        editorOpenTabs.set(editorOpenTabs.get().filter((tab) => tab !== filePath));
+        const updatedUnsaved = { ...editorUnsaved.get() };
+        delete updatedUnsaved[filePath];
+        editorUnsaved.set(updatedUnsaved);
+      }
+    } catch (error) {
+      const msg = (error as any).response?.data?.message || (error as Error).message;
+      showToast(`Error deleting: ${msg}`, 'error');
+      setError(msg);
+      throw error;
+    } finally {
+      setLoading(false);
+      setLoadingMessage('');
+    }
+  };
+
   onCleanup(() => {
     latestRequestId++;
   });
@@ -175,11 +258,16 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
     loadingMessage,
     saving,
     error,
-    directoryFiles,
-    currentDirectory,
+    directoryFiles: directoryFiles,
+
+    currentDirectory: $editorCurrentDirectory,
+
     fetchFile,
     fetchDirectory,
     saveFile,
     formatCode,
+    createFile,
+    createFolder,
+    deleteFileOrFolder,
   };
 }

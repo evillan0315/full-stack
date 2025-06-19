@@ -812,4 +812,13 @@ export class UtilsService {
         .join('\n')
     );
   }
+
+  /**
+   * Returns the directory part of a file path.
+   * @param filePath Absolute or relative file path
+   * @returns Directory of the given file path
+   */
+  getDirectory(filePath: string): string {
+    return path.dirname(filePath);
+  }
 }

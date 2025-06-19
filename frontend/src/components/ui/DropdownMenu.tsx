@@ -1,56 +1,40 @@
-import { type Component, For, createSignal, Show, onCleanup, onMount } from 'solid-js';
-import { type IconifyIcon, Icon } from '@iconify-icon/solid';
+import { type Component, type JSX, For, createSignal, Show, onCleanup, onMount } from 'solid-js';
+import { Icon } from '@iconify-icon/solid';
 import { Button } from './Button';
-
-interface DropdownItem {
-  label?: string;
-  icon: string | IconifyIcon;
-  onClick: () => void;
-}
-
-interface DropdownHeader {
-  label: string;
-}
-
-interface DropdownDivider {
-  type: 'divider';
-}
+import type { DropdownItem, DropdownHeader, DropdownDivider } from '../../types/dropdown';
+import {
+  resolveVariantClasses,
+  resolveSizeClasses,
+  resolveStateClasses
+} from '../../utils/classResolver';
 
 type DropdownMenuItem = DropdownItem | DropdownHeader | DropdownDivider;
 
 interface DropdownMenuProps {
-  items: DropdownMenuItem[];
+  content?: string | JSX.Element;
   label?: string;
+  items: DropdownMenuItem[];
   icon: string | IconifyIcon;
   iconSize?: string | number;
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'sm' | 'md' | 'lg' | 'xl';
+  showButtonLabel?: boolean;
+  xPosition?: 'left' | 'right';
+  yPosition?: 'top' | 'bottom';
+  rounded?: boolean;
+  className?: string;
+  width?: number;
 }
 
 const DropdownMenu: Component<DropdownMenuProps> = (props) => {
   const [isOpen, setIsOpen] = createSignal(false);
   let containerRef: HTMLDivElement | undefined;
 
-  const toggleDropdown = () => setIsOpen((prev) => !prev);
+  const toggleDropdown = () => setIsOpen(prev => !prev);
 
   const handleClickOutside = (event: MouseEvent) => {
     if (containerRef && !containerRef.contains(event.target as Node)) {
       setIsOpen(false);
-    }
-  };
-
-  const resolveTextSizeClass = (size?: string): string => {
-    switch (size) {
-      case 'sm':
-        return 'text-sm w-48';
-      case 'md':
-        return 'text-base w-58';
-      case 'lg':
-        return 'text-lg w-75';
-      case 'xl':
-        return 'text-xl w-100';
-      default:
-        return 'text-sm w-48';
     }
   };
 
@@ -62,41 +46,80 @@ const DropdownMenu: Component<DropdownMenuProps> = (props) => {
     document.removeEventListener('click', handleClickOutside);
   });
 
+  const resolveTextSizeClass = (size?: string): string => {
+    switch (size) {
+      case 'sm': return 'text-sm';
+      case 'md': return 'text-base';
+      case 'lg': return 'text-lg';
+      case 'xl': return 'text-xl';
+      default: return 'text-sm';
+    }
+  };
+
   return (
-    <div class="relative inline-block text-left" ref={containerRef}>
-      <Button title={'dropdown menu'} variant={props.variant} size={props.size} onClick={toggleDropdown}>
-        <Icon icon={props.icon} />
-        {props.label}
-      </Button>
+    <div
+      class={`relative inline-block ${props.className || ''} ${props.xPosition === 'left' ? 'text-left' : 'text-right'} max-w-2xl`}
+      ref={containerRef}
+    >
+      {props.content ? (
+        props.content
+      ) : (
+        <Button
+          title={props.label}
+          variant={props.variant}
+          size={props.size}
+          onClick={toggleDropdown}
+          icon={props.icon}
+        >
+          {props.showButtonLabel && props.label}
+        </Button>
+      )}
 
       <Show when={isOpen()}>
-        <div class="dropdown-menu absolute top-full mb-6 right-0 border shadow-md rounded z-50">
-          <ul class={resolveTextSizeClass(props.size)}>
+        <div
+          class={`dropdown-menu absolute z-150 border shadow-${props.size ? props.size : 'sm'} 
+            ${props.rounded ? 'rounded' : ''}
+            ${props.size ? (`rounded-${props.size}`) : ''}
+            ${props.xPosition === 'left' ? 'left-0' : 'right-0'}
+            ${props.yPosition === 'bottom' ? 'bottom-0' : 'top-full'}
+            
+          `}
+          style={props.width ? `width: ${props.width}px` : ''}
+        >
+          <ul class={`${resolveTextSizeClass(props.size)} min-w-48`}>
             <For each={props.items}>
               {(item) => {
                 if ('type' in item && item.type === 'divider') {
-                  return <li class="border-b my-2" />;
-                } else if ('label' in item && 'onClick' in item && 'icon' in item) {
+                  return <li class="border-b" />;
+                }
+                if ('label' in item && 'onClick' in item && 'icon' in item) {
                   const dropdownItem = item as DropdownItem;
                   return (
                     <li
-                      class="flex items-center justify-start gap-2 px-4 py-2 hover:bg-gray-500/10 cursor-pointer"
+                      class={`${resolveTextSizeClass(props.size)} flex items-center gap-4 px-4 py-2 cursor-pointer whitespace-nowrap
+                        `}
                       onClick={() => {
                         dropdownItem.onClick();
                         setIsOpen(false);
                       }}
                     >
-                      <Icon
-                        icon={dropdownItem.icon}
-                        width={props.iconSize || '1.4em'}
-                        height={props.iconSize || '1.4em'}
-                      />
+                    
+                      <Icon icon={dropdownItem.icon} />
                       {dropdownItem.label}
                     </li>
                   );
-                } else if ('label' in item) {
+                }
+                if ('label' in item) {
                   const dropdownHeader = item as DropdownHeader;
-                  return <li class="px-4 py-2 font-semibold text-gray-600">{dropdownHeader.label}</li>;
+                  return (
+                    <li
+                      title={dropdownHeader.label}
+                      class="flex items-center gap-2 px-4 py-2 uppercase font-semibold text-gray-600 dark:text-gray-400"
+                    >
+                      {dropdownHeader.icon && <Icon icon={dropdownHeader.icon} />}
+                      {dropdownHeader.label}
+                    </li>
+                  );
                 }
                 return null;
               }}
@@ -109,3 +132,4 @@ const DropdownMenu: Component<DropdownMenuProps> = (props) => {
 };
 
 export default DropdownMenu;
+

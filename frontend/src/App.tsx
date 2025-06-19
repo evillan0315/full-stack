@@ -16,7 +16,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import Toaster from './components/Toaster';
 
-import Package from './pages/tools/package';
+import Logger from './pages/logger';
 import Login from './pages/login';
 import Editor from './pages/editor';
 import TTSForm from './pages/tts';
@@ -91,7 +91,7 @@ export default function App() {
            * @path "/tools/package"
            * @component {Package}
            */}
-          <Route path="/tools/package" component={Package} />
+          <Route path="/logger" component={Logger} />
 
           {/**
            * Defines the route for the dashboard page, protected by authentication.

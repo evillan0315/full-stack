@@ -9,6 +9,7 @@ interface EditorTopRightHeaderProps {
   toggleTerminal: (mode: 'none' | 'ai' | 'local') => void;
   // Add activeTerminal to the props, so it can be passed down to EditorActionButtons
   activeTerminal: Accessor<'none' | 'ai' | 'local'>;
+  viewMarkdown?: (content: string) => void;
 }
 
 export const EditorTopRightHeader = (props: EditorTopRightHeaderProps) => {
@@ -44,7 +45,6 @@ export const EditorTopRightHeader = (props: EditorTopRightHeaderProps) => {
         setChatDrawerOpen={setChatDrawerOpen}
         setDocDrawerOpen={setDocDrawerOpen}
         setMarkdownDrawerOpen={setMarkdownDrawerOpen}
-        docFileExists={docFileExists}
       />
       <EditorRightDrawers
         drawerOpen={drawerOpen}

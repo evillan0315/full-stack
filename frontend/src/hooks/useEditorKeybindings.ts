@@ -26,4 +26,3 @@ export function useEditorKeybindings(onSave?: () => void) {
     window.removeEventListener('keydown', handleKeyDown);
   });
 }
-

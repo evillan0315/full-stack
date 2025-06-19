@@ -1,79 +1,90 @@
-import { Show, createSignal } from 'solid-js';
+import { Show } from 'solid-js';
 import { useStore } from '@nanostores/solid';
 import CodeMirrorEditor from './CodeMirrorEditor';
 import { EditorTopRightHeader } from './EditorTopRightHeader';
 import { useGeminiTerminal } from '../../hooks/useGeminiTerminal';
-import { useTerminal } from '../../hooks/useTerminal'; // Assuming you have this hook
+import { useTerminal } from '../../hooks/useTerminal';
 import FileTabs from '../file/FileTabs';
 import TerminalShellAi from '../TerminalShellAi';
-import TerminalShell from '../TerminalShell'; // Assuming this is your local terminal component
+import TerminalShell from '../TerminalShell';
+import DeveloperConsole from '../DeveloperConsole';
 import { useEditorFile } from '../../hooks/useEditorFile';
-import { editorUnsaved } from '../../stores/editorContent'; // Only import what's used
-
-// Define an enum or union type for terminal modes for better type safety and readability
+import { editorUnsaved, editorFilePath, editorContent } from '../../stores/editorContent';
+import { Button } from '../ui/Button';
+import EditorInitialView from '../ui/EditorInitialView';
 type TerminalMode = 'none' | 'ai' | 'local';
 
+import { showLeftSidebar, showRightSidebar, activeTerminal } from '../../stores/editorLayoutStore';
 interface EditorContainerProps {
   show?: boolean;
 }
 
 export default function EditorContainer({ show = true }: EditorContainerProps) {
-  // Use a signal to control which terminal is open
-  const [activeTerminal, setActiveTerminal] = createSignal<TerminalMode>('none');
-
-  // Destructure functions from useGeminiTerminal.
-  // We no longer expect terminalOpen, setTerminalOpen, toggleTerminal from useGeminiTerminal itself
-  // as the global activeTerminal signal now controls visibility.
-  const { /* isProcessingCommand, etc. */ } = useGeminiTerminal({ prompt: "🤖 AI > " });
-
-  // Assuming you have a similar hook for your local terminal
-  const { /* properties from useLocalTerminal if needed */ } = useTerminal({ prompt: "$ " });
-
+  const $filePath = useStore(editorFilePath);
   const $unsaved = useStore(editorUnsaved);
+  const $activeTerminal = useStore(activeTerminal);
+  const $showLeftSidebar = useStore(showLeftSidebar);
+  const $showRightSidebar = useStore(showRightSidebar);
+  const {} = useGeminiTerminal({ prompt: '🤖 AI > ' });
+  const {} = useTerminal({ prompt: '$ ' });
   const { saveFile } = useEditorFile();
 
   const handleSave = async () => {
     await saveFile();
   };
 
-  // Function to toggle between terminals
   const toggleTerminal = (mode: TerminalMode) => {
-    if (activeTerminal() === mode) {
-      // If the clicked mode is already active, close it
-      setActiveTerminal('none');
+    if ($activeTerminal() === mode) {
+      activeTerminal.set('none');
     } else {
-      // Otherwise, set the new active mode
-      setActiveTerminal(mode);
+      activeTerminal.set(mode);
     }
   };
 
-  // Function to close any active terminal
   const handleCloseTerminal = () => {
-    setActiveTerminal('none');
+    activeTerminal.set('none');
   };
 
   return (
     <>
-      <div class="editor-top-header flex items-center justify-between gap-1 h-8 px-3 py-0 border-b">
-        <FileTabs />
-        {/* Pass the updated toggleTerminal and activeTerminal */}
-        <EditorTopRightHeader
-          toggleTerminal={toggleTerminal}
-          activeTerminal={activeTerminal} // Pass the Accessor directly
-          viewMarkdown={undefined} // Keep as is if not used
-        />
+      <div class="editor-top-header flex items-center justify-between gap-1 h-10 px-3 py-2">
+        <div class="flex items-center flex-grow min-w-0">
+          {' '}
+          <Button
+            icon="gala:menu-left"
+            title="Toggle Left Panel"
+            variant="secondary"
+            onClick={() => showLeftSidebar.set(!$showLeftSidebar())}
+            class="flex-shrink-0 mr-2"
+          />
+          <FileTabs />
+        </div>
+
+        <div class="flex items-center gap-2 flex-shrink-0 ml-auto">
+          {' '}
+          <EditorTopRightHeader
+            unsaved={$unsaved}
+            toggleTerminal={toggleTerminal}
+            onSave={handleSave}
+            activeTerminal={$activeTerminal}
+          />
+          <Button
+            icon="gala:menu-right"
+            title="Toggle Right Panel"
+            variant="secondary"
+            onClick={() => showRightSidebar.set(!$showRightSidebar())}
+            class="flex-shrink-0"
+          />
+        </div>
       </div>
-
-      <CodeMirrorEditor onSave={handleSave} />
-
-      {/* Conditionally render TerminalShellAi */}
-      <Show when={activeTerminal() === 'ai'}>
+      <Show when={$filePath()} fallback={<EditorInitialView />}>
+        <CodeMirrorEditor onSave={handleSave} />
+      </Show>
+      <Show when={$activeTerminal() === 'ai'}>
         <TerminalShellAi onClose={handleCloseTerminal} />
       </Show>
-
-      {/* Conditionally render TerminalShell (local) */}
-      <Show when={activeTerminal() === 'local'}>
-        <TerminalShell onClose={handleCloseTerminal} />
+      <Show when={$activeTerminal() === 'local'}>
+        <DeveloperConsole onClose={handleCloseTerminal} />
       </Show>
     </>
   );

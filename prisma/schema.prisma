@@ -233,10 +233,23 @@ model Submission {
 model Log {
   id        String   @id @default(uuid())
   data      Json
-  type      String
+  level     String   @default("INFO")
+  tags      String[] @default([])
   createdAt DateTime @default(now())
+  @@index([createdAt])
 }
-
+model Logs {
+  id        String   @id @default(uuid())
+  type      String
+  level     String   @default("INFO") 
+  data      Json
+  tags      String[] @default([])
+  createdAt DateTime @default(now())
+  
+  @@index([type])
+  @@index([level])
+  @@index([createdAt])
+}
 enum Role {
   ADMIN
   USER

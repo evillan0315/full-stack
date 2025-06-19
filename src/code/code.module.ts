@@ -6,6 +6,6 @@ import { StripperService } from './stripper/stripper.service';
 
 @Module({
   providers: [CodeService, StripperService],
-  controllers: [CodeController, StripperController]
+  controllers: [CodeController, StripperController],
 })
 export class CodeModule {}

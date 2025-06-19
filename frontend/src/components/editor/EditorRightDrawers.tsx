@@ -38,13 +38,13 @@ export default function EditorRightDrawers(props: Props) {
       >
         <ChatGenerateCode {...sharedDrawerProps} />
       </RightDrawer>
-      
+
       <RightDrawer
         isOpen={props.markdownDrawerOpen()}
         onClose={() => props.setMarkdownDrawerOpen(false)}
         title="View Markdown"
       >
-        <MarkdownViewer content={editorContent.get()}/>
+        <MarkdownViewer content={editorContent.get()} />
       </RightDrawer>
     </>
   );

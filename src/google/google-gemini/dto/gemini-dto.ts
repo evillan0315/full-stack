@@ -19,7 +19,8 @@ export class GenerateTextDto {
  */
 export class GenerateImageBase64Dto {
   @ApiProperty({
-    description: 'The prompt text to send to the Gemini model, accompanying the image.',
+    description:
+      'The prompt text to send to the Gemini model, accompanying the image.',
     example: 'Describe this image.',
   })
   @IsString()
@@ -27,8 +28,9 @@ export class GenerateImageBase64Dto {
   prompt: string;
 
   @ApiProperty({
-    description: 'Base64 encoded image data (e.g., "data:image/jpeg;base64,...").',
-    example: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD/2wBDAAY...'
+    description:
+      'Base64 encoded image data (e.g., "data:image/jpeg;base64,...").',
+    example: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD/2wBDAAY...',
   })
   @IsString()
   @IsNotEmpty()
@@ -36,7 +38,7 @@ export class GenerateImageBase64Dto {
 
   @ApiProperty({
     description: 'MIME type of the image (e.g., "image/jpeg", "image/png").',
-    example: 'image/jpeg'
+    example: 'image/jpeg',
   })
   @IsString()
   @IsNotEmpty()
@@ -49,7 +51,8 @@ export class GenerateImageBase64Dto {
  */
 export class GenerateFileDto {
   @ApiProperty({
-    description: 'The prompt text to send to the Gemini model, accompanying the file.',
+    description:
+      'The prompt text to send to the Gemini model, accompanying the file.',
     example: 'Analyze this SQL schema and provide insights.',
   })
   @IsString()
@@ -61,4 +64,3 @@ export class GenerateFileDto {
   // We'll use @ApiProperty() and @ApiConsumes() on the controller method
   // to document the file upload.
 }
-

@@ -2,8 +2,11 @@ import { createSignal, onMount, onCleanup } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useEditorFile } from '../../../hooks/useEditorFile';
-import { editorOriginalContent, editorFilePath, editorContent, editorUnsaved } from '../../../stores/editorContent';
+import { editorOriginalContent, editorFilePath, editorContent, editorUnsaved , editorCurrentDirectory} from '../../../stores/editorContent';
+import FileManagerHeader from '../../../components/file/FileManagerHeader';
+import CollapsiblePanel from '../panels/CollapsiblePanel';
 import FileManager from '../../../components/file/FileManager';
+import { useStore } from '@nanostores/solid';
 
 export default function EditorLeftSidebar() {
   const defaultWidth = 240;
@@ -12,10 +15,10 @@ export default function EditorLeftSidebar() {
   const [width, setWidth] = createSignal(defaultWidth);
   const [isResizing, setIsResizing] = createSignal(false);
   const [isCollapsed, setIsCollapsed] = createSignal(false);
-
+  
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
+  const $editorCurrentDirectory = useStore(editorCurrentDirectory);
   const editorFileHook = useEditorFile(
     (loadedContent) => {
       editorContent.set(loadedContent);
@@ -61,14 +64,25 @@ export default function EditorLeftSidebar() {
   onCleanup(() => {
     document.removeEventListener('editor-load-file', handleEditorLoadFile);
   });
-
+  console.log(editorFileHook.currentDirectory(), 'editorFileHook.currentDirectory()');
   return (
-    <div
-      id="leftSidebar"
-      class="flex flex-col border-r transition-all duration-200"
-      //style={{ width: `${width()}px` }}
-    >
-      <FileManager onFileSelect={(path) => loadFile(path)} />
-    </div>
+    <>
+      <div class="h-full flex flex-col">
+        <CollapsiblePanel
+          header={
+<FileManagerHeader
+              currentDirectory={$editorCurrentDirectory}
+              // Removed navigateUp prop - it's handled internally by FileManagerHeader now
+              fetchDirectory={editorFileHook.fetchDirectory}
+              handleFileAction={editorFileHook.handleFileAction}
+              createFolder={editorFileHook.createFolder}
+              createFile={editorFileHook.createFile}
+            />
+          }
+        >
+          <FileManager onFileSelect={loadFile} />
+        </CollapsiblePanel>
+      </div>
+    </>
   );
 }

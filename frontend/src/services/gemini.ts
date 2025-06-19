@@ -1,25 +1,79 @@
-// src/services/gemini.js
-// This file defines the API calls specifically for the Google Gemini service.
-import api from '../services/api';
-const NESTJS_GEMINI_API_URL = `/gemini/file/generate-text`; // Adjust if your Gemini controller path is different
+import api from './api';
+import { useEditorFile } from '../hooks/useEditorFile';
 
-/**
- * Sends a text prompt to the NestJS backend's Gemini service and
- * receives a text response.
- * @param {string} prompt The text prompt to send to Gemini.
- * @returns {Promise<string>} A promise that resolves to the generated text response.
- */
-export async function generateGeminiText(prompt) {
-    try {
-        const response = await api.post(NESTJS_GEMINI_API_URL,{ prompt: prompt });
-        if (!response.data) {
-	    throw new Error('Failed to Generate content');
-	  }
-        return response.data;
-    } catch (error) {
-        console.error('Error calling Gemini API:', error);
-        // Re-throw the error so the calling component can handle it
-        throw error;
+const { createFile } = useEditorFile();
+export async function generateGeminiText(prompt, systemInstruction, conversationId) {
+
+  try {
+    const payload = { prompt };
+    if (systemInstruction !== undefined) {
+      payload.systemInstruction = systemInstruction;
     }
+    if (conversationId !== undefined) {
+      payload.conversationId = conversationId;
+    }
+
+    const response = await api.post('/gemini/file/generate-text', payload);
+    if (!response.data) {
+      throw new Error('Failed to Generate content');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error calling Gemini API:', error);
+    throw error;
+  }
 }
 
+export async function generateGeminiFile(prompt, fileData, systemInstruction, conversationId) {
+  try {
+    const formData = new FormData();
+    formData.append('prompt', prompt);
+    console.log(prompt, 'prompt');
+
+    const byteCharacters = atob(fileData.data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: fileData.type });
+
+    formData.append('file', blob, fileData.name);
+
+    if (systemInstruction !== undefined) {
+      formData.append('systemInstruction', systemInstruction);
+    }
+    if (conversationId !== undefined) {
+      formData.append('conversationId', conversationId);
+    }
+
+    const response = await api.post('/gemini/file/generate-file', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    if (!response.data) {
+      throw new Error('Failed to Generate content');
+    }
+    const createResponse = await createFile('./docs/gemini/', fileData.name, response.data);
+    
+    
+    return createResponse.data;
+  } catch (error) {
+    console.error('Error calling Gemini File API:', error);
+    throw error;
+  }
+}
+
+export async function convertMarkdowToHtml(markdown) {
+  try {
+    const response = await api.post('/utils/to-html', { markdown: markdown });
+    if (!response.data) {
+      throw new Error('Failed to Generate content');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error calling Utils API:', error);
+    throw error;
+  }
+}

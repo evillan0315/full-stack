@@ -21,19 +21,29 @@ export class ModuleControlService implements OnModuleInit {
   // This is a good place to load initial data that depends on injected services like ConfigService.
   onModuleInit() {
     this.logger.log('ModuleControlService initializing modules from config...');
-    const featureModules = this.configService.get<ConfigurableModule[]>('featureModules');
+    const featureModules =
+      this.configService.get<ConfigurableModule[]>('featureModules');
 
     if (featureModules && Array.isArray(featureModules)) {
-      featureModules.forEach(moduleConfig => {
-        if (typeof moduleConfig.name === 'string' && typeof moduleConfig.enabled === 'boolean') {
+      featureModules.forEach((moduleConfig) => {
+        if (
+          typeof moduleConfig.name === 'string' &&
+          typeof moduleConfig.enabled === 'boolean'
+        ) {
           this.registerModule(moduleConfig.name, moduleConfig.enabled);
         } else {
-          this.logger.warn(`Invalid module configuration found: ${JSON.stringify(moduleConfig)}`);
+          this.logger.warn(
+            `Invalid module configuration found: ${JSON.stringify(moduleConfig)}`,
+          );
         }
       });
-      this.logger.log(`Successfully registered ${featureModules.length} modules from configuration.`);
+      this.logger.log(
+        `Successfully registered ${featureModules.length} modules from configuration.`,
+      );
     } else {
-      this.logger.warn('No "featureModules" array found in configuration or it is invalid. No modules registered from config.');
+      this.logger.warn(
+        'No "featureModules" array found in configuration or it is invalid. No modules registered from config.',
+      );
     }
   }
 
@@ -48,7 +58,9 @@ export class ModuleControlService implements OnModuleInit {
       return;
     }
     this.modules.set(name, { name, enabled: initialStatus });
-    this.logger.log(`Module '${name}' registered with initial status: ${initialStatus ? 'enabled' : 'disabled'}.`);
+    this.logger.log(
+      `Module '${name}' registered with initial status: ${initialStatus ? 'enabled' : 'disabled'}.`,
+    );
   }
 
   /**
@@ -92,7 +104,9 @@ export class ModuleControlService implements OnModuleInit {
     const module = this.modules.get(name);
     if (module) {
       module.enabled = !module.enabled;
-      this.logger.log(`Module '${name}' toggled to: ${module.enabled ? 'enabled' : 'disabled'}.`);
+      this.logger.log(
+        `Module '${name}' toggled to: ${module.enabled ? 'enabled' : 'disabled'}.`,
+      );
       return module.enabled;
     }
     this.logger.warn(`Module '${name}' not found for toggling.`);
@@ -107,7 +121,9 @@ export class ModuleControlService implements OnModuleInit {
   isModuleEnabled(name: string): boolean {
     const module = this.modules.get(name);
     const status = module ? module.enabled : false;
-    this.logger.debug(`Checking status for '${name}': ${status ? 'enabled' : 'disabled'}.`);
+    this.logger.debug(
+      `Checking status for '${name}': ${status ? 'enabled' : 'disabled'}.`,
+    );
     return status;
   }
 
@@ -119,4 +135,3 @@ export class ModuleControlService implements OnModuleInit {
     return Array.from(this.modules.values());
   }
 }
-

@@ -10,7 +10,7 @@ export function createModalService() {
   const [type, setType] = createSignal<ModalType>('confirm');
   const [message, setMessage] = createSignal('');
   const [inputValue, setInputValue] = createSignal('');
-  
+
   // More precise type for resolver
   let resolveFn: ((value: any) => void) | null = null;
 
@@ -107,4 +107,3 @@ export function createModalService() {
 
   return { Modal, confirm, prompt, alert };
 }
-

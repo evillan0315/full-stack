@@ -8,7 +8,7 @@ import AvatarMenu from '../ui/AvatarMenu';
 import { ThemeToggle } from '../ThemeToggle';
 export default function Header() {
   return (
-    <header class="flex items-center h-10 px-2 justify-between shadow-lg border-b">
+    <header class="flex items-center h-12 px-2 justify-between shadow-lg border-b py-1">
       <div class="flex items-center justify-center ">
         <div class="flex-1 align-center">
           <Logo name={company.name} />

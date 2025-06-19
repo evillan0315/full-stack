@@ -7,10 +7,12 @@ import { UtilsModule } from '../utils/utils.module';
 import { ConfigModule } from '@nestjs/config';
 import { FileValidationService } from '../common/services/file-validation.service';
 import { ModuleControlModule } from '../module-control/module-control.module';
+import { FileSearchService } from './file-search/file-search.service';
+import { FileSearchController } from './file-search/file-search.controller';
 
 @Module({
   imports: [PrismaModule, UtilsModule, ConfigModule, ModuleControlModule],
-  controllers: [FileController],
+  controllers: [FileController, FileSearchController],
   providers: [
     FileService,
     FileLanguageService,
@@ -19,6 +21,7 @@ import { ModuleControlModule } from '../module-control/module-control.module';
       provide: 'EXCLUDED_FOLDERS',
       useValue: ['node_modules'],
     },
+    FileSearchService,
   ],
 })
 export class FileModule {}

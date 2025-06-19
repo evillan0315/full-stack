@@ -63,7 +63,6 @@ export function useDrawer() {
 
     topicOptions,
     languageOptions,
-    outputFormats
+    outputFormats,
   };
 }
-

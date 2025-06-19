@@ -17,7 +17,7 @@ import { DatabaseModule } from './database/database.module';
 import { TerminalModule } from './terminal/terminal.module';
 import { FolderModule } from './folder/folder.module';
 import { GoogleModule } from './google/google.module';
-import { GoogleOAuthService } from './google/google-oauth/google-oauth.service';
+//import { GoogleOAuthService } from './google/google-oauth/google-oauth.service';
 import { SchemaModule } from './schema/schema.module';
 import { LogModule } from './log/log.module';
 import { AudioModule } from './audio/audio.module';
@@ -28,10 +28,8 @@ import { TranspilerModule } from './transpiler/transpiler.module';
 import { CodeModule } from './code/code.module';
 import { FeatureModule } from './feature/feature.module';
 import { ModuleControlModule } from './module-control/module-control.module';
-
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import fileConfig from './config/file.config';
-
-
 
 /**
  * The root module of the NestJS application.
@@ -40,8 +38,6 @@ import fileConfig from './config/file.config';
  * It also configures global settings like static file serving and configuration loading.
  */
 @Module({
-
- 
   imports: [
     ConfigModule.forRoot({
       envFilePath: ['.env'],
@@ -49,16 +45,20 @@ import fileConfig from './config/file.config';
       // __dirname is the directory of the current file (src/app.module.ts)
       // path.resolve moves up one directory (to project root) then into 'config'
       load: [
-        fileConfig, 
-        () => require(path.resolve(process.cwd(), 'src/config/feature-modules.json'))
+        fileConfig,
+        () =>
+          require(
+            path.resolve(process.cwd(), 'src/config/feature-modules.json'),
+          ),
         // Dynamically load feature-modules.json
         // Use path.join for cross-platform compatibility
-       ],
+      ],
       isGlobal: true, // Makes ConfigService available globally
       // If you also use .env files, you can add them:
       // envFilePath: ['.env'],
     }),
-    ModuleControlModule, 
+    EventEmitterModule.forRoot(),
+    ModuleControlModule,
     /**
      * Authentication module for handling user authentication and authorization.
      */
@@ -130,7 +130,6 @@ import fileConfig from './config/file.config';
      * `isGlobal: true` makes this module available throughout the application without needing to import it in other modules.
      * `load: [fileConfig]` loads the file configuration from './config/file.config'.
      */
-    
 
     /**
      * Module for serving static files (e.g., images, CSS, JavaScript).
@@ -163,6 +162,6 @@ import fileConfig from './config/file.config';
   /**
    * Providers defined in this module. Providers offer services or functionality that can be injected into controllers and other providers.
    */
-  providers: [AppService, GoogleOAuthService],
+  providers: [AppService],
 })
 export class AppModule {}

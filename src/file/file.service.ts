@@ -33,7 +33,8 @@ import { Request, Response } from 'express';
 import { UtilsService } from '../utils/utils.service';
 
 @Injectable()
-export class FileService implements OnModuleInit { // Implement OnModuleInit
+export class FileService implements OnModuleInit {
+  // Implement OnModuleInit
   private readonly logger = new Logger(FileService.name);
   private readonly maxFileSize: number;
   private readonly allowedMimeTypes: string[];
@@ -61,13 +62,17 @@ export class FileService implements OnModuleInit { // Implement OnModuleInit
   onModuleInit() {
     // Optionally, you could log a warning or take action if FileModule is disabled on startup
     if (!this.moduleControlService.isModuleEnabled('FileModule')) {
-      this.logger.warn('FileModule is currently disabled via ModuleControlService. File operations will be restricted.');
+      this.logger.warn(
+        'FileModule is currently disabled via ModuleControlService. File operations will be restricted.',
+      );
     }
   }
 
   private ensureFileModuleEnabled(): void {
     if (!this.moduleControlService.isModuleEnabled('FileModule')) {
-      throw new ForbiddenException('File module is currently disabled. Cannot perform file operations.');
+      throw new ForbiddenException(
+        'File module is currently disabled. Cannot perform file operations.',
+      );
     }
   }
 
@@ -393,14 +398,8 @@ export class FileService implements OnModuleInit { // Implement OnModuleInit
   ): Promise<ReadFileResponseDto[]> {
     this.ensureFileModuleEnabled(); // Check if file module is enabled
 
-    return files.map(
-      (file) =>
-        this.readFile(
-          file.buffer,
-          file.filename,
-          generateBlobUrl,
-          file.filePath,
-        ),
+    return files.map((file) =>
+      this.readFile(file.buffer, file.filename, generateBlobUrl, file.filePath),
     );
   }
 
@@ -565,4 +564,3 @@ export class FileService implements OnModuleInit { // Implement OnModuleInit
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 }
-

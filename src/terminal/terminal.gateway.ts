@@ -22,6 +22,7 @@ import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../auth/enums/user-role.enum';
+import { LogService } from '../log/log.service';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @WebSocketGateway({
@@ -35,12 +36,21 @@ export class TerminalGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
   private readonly logger = new Logger(TerminalGateway.name);
+
   @WebSocketServer()
   server: Server;
+
   private systemIntervalMap = new Map<string, NodeJS.Timeout>();
   private cwdMap = new Map<string, string>();
   private sshClientMap = new Map<string, SSHClient>();
   private sshStreamMap = new Map<string, any>();
+
+  constructor(
+    private readonly authService: AuthService,
+    private readonly terminalService: TerminalService,
+    private readonly logService: LogService, // Inject LogService
+  ) {}
+
   private disposeSsh(clientId: string) {
     const sshClient = this.sshClientMap.get(clientId);
     if (sshClient) {
@@ -49,10 +59,6 @@ export class TerminalGateway
     }
     this.sshStreamMap.delete(clientId);
   }
-  constructor(
-    private readonly authService: AuthService,
-    private readonly terminalService: TerminalService,
-  ) {}
 
   async handleConnection(client: Socket) {
     const token = client.handshake.auth?.token?.replace('Bearer ', '').trim();
@@ -66,7 +72,11 @@ export class TerminalGateway
     const clientId = client.id;
     this.cwdMap.set(clientId, process.cwd());
 
-    const info = {
+    // Log WebSocket connect
+    await this.logService.websocket('connect', clientId);
+
+    client.emit('outputPath', process.cwd());
+    client.emit('outputInfo', {
       platform: os.platform(),
       type: os.type(),
       release: os.release(),
@@ -74,56 +84,29 @@ export class TerminalGateway
       uptime: os.uptime(),
       hostname: os.hostname(),
       cwd: process.cwd(),
-      homedir: os.homedir(),
-    };
+    });
 
-    const convertUptimeToTime = (seconds: number) => {
-      const days = Math.floor(seconds / (24 * 3600));
-      const hours = Math.floor((seconds % (24 * 3600)) / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = Math.floor(seconds % 60);
-      let str = '';
-      if (days) str += `${days}d `;
-      if (hours) str += `${hours}h `;
-      if (minutes) str += `${minutes}m `;
-      if (secs) str += `${secs}s`;
-      return str;
-    };
-
-    const sendSystemInfo = () => {
-      exec('uptime', (_, stdout) => {
-        const systemLoad =
-          stdout.split('load average: ')[1]?.split(',')[0] || 'n/a';
-        exec('free -h', (_, memOut) => {
-          const memory = memOut.split('\n')[1].split(/\s+/);
-          const swap = memOut.split('\n')[2].split(/\s+/);
-          const uptimeString = convertUptimeToTime(info.uptime);
-
-          const message = `
-Project Name: Smart Terminal AI
-
-Smart Terminal AI is an intelligent, web-based terminal interface powered by NestJS and SolidJS, integrated with AI models like Amazon Q, ChatGPT, and Gemini.
-
-* Docs:  https://github.com/evillan0315/bash-ai/docs
-* Repo:  https://github.com/evillan0315/bash-ai
-
-System info as of ${new Date().toUTCString()}:
-
-System load: ${systemLoad}		Uptime: ${uptimeString}
-Memory: ${memory[2]} / ${memory[1]}	Hostname: ${info.hostname}
-Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
-`;
-          client.emit('outputMessage', message);
-        });
-      });
-    };
-
-    //sendSystemInfo();
-    //const interval = setInterval(sendSystemInfo, 5000);
-    //this.systemIntervalMap.set(clientId, interval);
-    client.emit('outputPath', info.cwd);
-    client.emit('outputInfo', info);
     client.on('disconnect', () => this.handleDisconnect(client));
+  }
+
+  handleDisconnect(client: Socket) {
+    const clientId = client.id;
+
+    this.terminalService.dispose(clientId);
+    this.cwdMap.delete(clientId);
+
+    const interval = this.systemIntervalMap.get(clientId);
+    if (interval) {
+      clearInterval(interval);
+      this.systemIntervalMap.delete(clientId);
+    }
+
+    this.disposeSsh(clientId);
+
+    this.logger.log(`Client disconnected: ${clientId}`);
+
+    // Log WebSocket disconnect
+    this.logService.websocket('disconnect', clientId);
   }
 
   @SubscribeMessage('exec')
@@ -133,14 +116,15 @@ Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
   ) {
     const clientId = client.id;
 
+    // Log WebSocket command execution
+    this.logService.websocket('exec', clientId);
+
     if (this.sshStreamMap.has(clientId)) {
-      // SSH mode
       const stream = this.sshStreamMap.get(clientId);
       stream.write(`${command}\n`);
       return;
     }
 
-    // Local shell fallback
     let cwd = this.cwdMap.get(clientId) || process.cwd();
 
     const trimmed = command.trim();
@@ -179,6 +163,7 @@ Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
     client.emit('prompt', { cwd, command });
     this.terminalService.runCommand(clientId, command, cwd, client);
   }
+
   @SubscribeMessage('ssh-connect')
   async handleSshConnect(
     @MessageBody()
@@ -207,6 +192,8 @@ Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
         this.logger.log(`SSH connected for client ${clientId}`);
         client.emit('output', `Connected to ${payload.host}\n`);
 
+        this.logService.websocket('ssh-connect', clientId);
+
         sshClient.shell((err, stream) => {
           if (err) {
             client.emit('error', `Shell error: ${err.message}`);
@@ -222,6 +209,7 @@ Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
             .on('close', () => {
               client.emit('output', 'SSH session closed\n');
               this.disposeSsh(clientId);
+              this.logService.websocket('ssh-disconnect', clientId);
             });
         });
       })
@@ -232,12 +220,15 @@ Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
 
     this.sshClientMap.set(clientId, sshClient);
   }
+
   @SubscribeMessage('input')
   handleInput(
     @MessageBody() data: { input: string },
     @ConnectedSocket() client: Socket,
   ) {
     const clientId = client.id;
+
+    this.logService.websocket('input', clientId);
 
     if (this.sshStreamMap.has(clientId)) {
       const stream = this.sshStreamMap.get(clientId);
@@ -254,26 +245,12 @@ Swap: ${swap[2]} / ${swap[1]}		Home: ${info.homedir}
     @ConnectedSocket() client: Socket,
   ) {
     this.terminalService.resize(client.id, data.cols, data.rows);
+    this.logService.websocket('resize', client.id);
   }
 
   @SubscribeMessage('close')
   handleSessionClose(@ConnectedSocket() client: Socket) {
     this.terminalService.dispose(client.id);
-  }
-
-  handleDisconnect(client: Socket) {
-    const clientId = client.id;
-
-    this.terminalService.dispose(clientId);
-    this.cwdMap.delete(clientId);
-
-    const interval = this.systemIntervalMap.get(clientId);
-    if (interval) {
-      clearInterval(interval);
-      this.systemIntervalMap.delete(clientId);
-    }
-
-    this.disposeSsh(clientId);
-    this.logger.log(`Client disconnected: ${clientId}`);
+    this.logService.websocket('close', client.id);
   }
 }

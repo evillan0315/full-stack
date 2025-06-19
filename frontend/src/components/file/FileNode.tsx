@@ -3,8 +3,6 @@ import { createMemo, Show, For, onMount } from 'solid-js';
 import { Icon } from '@iconify-icon/solid';
 import api from '../../services/api';
 import type { FileItem } from '../../types/types';
-import Tooltip from '../../components/ui/Tooltip';
-
 import { useStore } from '@nanostores/solid';
 import { editorFilePath, editorOpenTabs, editorUnsaved } from '../../stores/editorContent';
 
@@ -57,12 +55,9 @@ const FileNode = (props: FileNodeProps) => {
     children: props.file.children || ([] as FileItem[]),
   });
 
-  const currentIcon = createMemo(() => getFileIcon(props.file.name, props.file.isDirectory, state.open));
-  const $openTabs = useStore(editorOpenTabs);
-  const $filePath = useStore(editorFilePath);
-  const $unsaved = useStore(editorUnsaved);
-
-  const hasChildren = createMemo(() => state.children.length > 0);
+  const currentIcon = createMemo(() =>
+    getFileIcon(props.file.name, props.file.isDirectory, state.open),
+  );
 
   const toggle = async () => {
     if (!props.file.isDirectory) return;
@@ -83,17 +78,16 @@ const FileNode = (props: FileNodeProps) => {
       }
     }
   };
-  const handleClick = () => {
-    if (props.file.isDirectory) {
-      toggle();
-    } else {
-      const path = props.file.path;
 
-      editorFilePath.set(path);
-
-      // Directly trigger load
-      document.dispatchEvent(new CustomEvent('editor-load-file', { detail: { path } }));
+  const handleFileClick = () => {
+    if (!props.file.isDirectory) {
+      editorFilePath.set(props.file.path);
+      document.dispatchEvent(new CustomEvent('editor-load-file', { detail: { path: props.file.path } }));
     }
+  };
+
+  const handleFolderDoubleClick = () => {
+    props.onSelect(props.file.path, true);
   };
 
   const handleRename = async () => {
@@ -134,29 +128,31 @@ const FileNode = (props: FileNodeProps) => {
   return (
     <div class="relative">
       <div
-        class="cursor-pointer hover:bg-gray-700/10 px-1 rounded flex items-center gap-x-2"
-        onClick={handleClick}
+        class="cursor-pointer hover:bg-gray-700/10 px-1 rounded flex items-center justify-between gap-1"
         onContextMenu={(e) => props.onContextMenu(e, props.file)}
         onDblClick={() => {
-          if (!props.file.isDirectory && !state.editing) {
+          if (props.file.isDirectory) {
+            handleFolderDoubleClick();
+          } else if (!state.editing) {
             setState('editing', true);
           }
         }}
+        onClick={handleFileClick}
       >
-        <Icon width="20" height="20" icon={currentIcon()} />
+        
+       <div class="flex items-center justify-start gap-3">
+        <Icon width="1.2em" height="1.2em" icon={currentIcon()} />
 
         <Show
           when={state.editing}
           fallback={
-            <>
-              <div title={props.file.path} class="truncate max-w-[150px] block">
-                {props.file.name}
-              </div>
-            </>
+            <div title={props.file.path} class="truncate max-w-[150px] block">
+              {props.file.name}
+            </div>
           }
         >
           <input
-            class="rounded px-1 text-sm flex-grow"
+            class="rounded px-1 text-sm flex-1"
             value={state.newName}
             autofocus
             onInput={(e) => setState('newName', e.currentTarget.value)}
@@ -165,11 +161,11 @@ const FileNode = (props: FileNodeProps) => {
             onClick={(e) => e.stopPropagation()}
           />
         </Show>
-
+        </div>
         {props.file.isDirectory && (
           <Icon
             icon={state.open ? 'mdi:chevron-down' : 'mdi:chevron-right'}
-            class="w-4 h-4 text-gray-500 ml-auto cursor-pointer"
+            class="w-4 h-4 text-gray-500 cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               toggle();
@@ -200,3 +196,4 @@ const FileNode = (props: FileNodeProps) => {
 };
 
 export default FileNode;
+

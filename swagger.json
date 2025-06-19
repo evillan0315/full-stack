@@ -1002,6 +1002,126 @@
         ]
       }
     },
+    "/api/file/search": {
+      "get": {
+        "description": "Streams matching file paths as they are found using Server-Sent Events (SSE).",
+        "operationId": "FileSearchController_streamFiles",
+        "parameters": [
+          {
+            "name": "rootDir",
+            "required": true,
+            "in": "query",
+            "description": "Root directory to start the search from",
+            "schema": {
+              "example": "/home/eddie/projects/app/src",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileName",
+            "required": true,
+            "in": "query",
+            "description": "Name of the file to search for",
+            "schema": {
+              "example": "index.ts",
+              "type": "string"
+            }
+          },
+          {
+            "name": "extension",
+            "required": false,
+            "in": "query",
+            "description": "File extension filter (e.g., .ts)",
+            "schema": {
+              "example": ".ts",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (for pagination)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of results per page (for pagination)",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Streaming of matching file paths has started."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Recursively search for files by name and stream results (SSE)",
+        "tags": [
+          "File & Folder"
+        ]
+      }
+    },
+    "/api/utils/get-directory": {
+      "get": {
+        "description": "Returns the directory part of the provided file path.",
+        "operationId": "UtilsController_getDirectory",
+        "parameters": [
+          {
+            "name": "filePath",
+            "required": true,
+            "in": "query",
+            "description": "Absolute or relative file path to extract the directory from",
+            "schema": {
+              "example": "/home/eddie/projects/app/src/index.ts",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Directory extracted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": "/home/eddie/projects/app/src"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: filePath is missing or invalid."
+          }
+        },
+        "summary": "Get directory from file path",
+        "tags": [
+          "Utilities"
+        ]
+      }
+    },
     "/api/utils/parse-env-map": {
       "get": {
         "description": "Parses a semicolon-delimited key=value string into an object.",
@@ -2103,102 +2223,6 @@
         ]
       }
     },
-    "/json-dto/endpoints": {
-      "get": {
-        "operationId": "JsonDtoController_getEndpoints",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "List of endpoints with their details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/JsonDtoEndpointDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List all JSON DTO endpoints with responses",
-        "tags": [
-          "Json DTO Inspector"
-        ]
-      }
-    },
-    "/json-dto/list": {
-      "get": {
-        "operationId": "JsonDtoController_listDtos",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "List of DTO names",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List all available DTOs",
-        "tags": [
-          "Json DTO Inspector"
-        ]
-      }
-    },
-    "/json-dto/schema": {
-      "get": {
-        "operationId": "JsonDtoController_getSchema",
-        "parameters": [
-          {
-            "name": "dto",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "JSON schema of the selected DTO",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JsonDtoSchemaResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get JSON schema of a selected DTO",
-        "tags": [
-          "Json DTO Inspector"
-        ]
-      }
-    },
     "/api/database/tables": {
       "get": {
         "operationId": "DatabaseController_getTables",
@@ -2629,6 +2653,194 @@
         "summary": "Execute a terminal command locally",
         "tags": [
           "Terminal"
+        ]
+      }
+    },
+    "/api/log": {
+      "post": {
+        "operationId": "LogController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLogDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Log successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "abc123",
+                    "type": "SYSTEM",
+                    "level": "INFO",
+                    "tags": [
+                      "system"
+                    ],
+                    "data": {
+                      "message": "System initialized"
+                    },
+                    "createdAt": "2025-06-19T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "403": {
+            "description": "Log module is disabled"
+          }
+        },
+        "summary": "Create a new log",
+        "tags": [
+          "Log"
+        ]
+      },
+      "get": {
+        "operationId": "LogController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of logs retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateLogDto"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Log module is disabled"
+          }
+        },
+        "summary": "Retrieve all logs",
+        "tags": [
+          "Log"
+        ]
+      }
+    },
+    "/api/log/{id}": {
+      "get": {
+        "operationId": "LogController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Log found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateLogDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Log module is disabled"
+          },
+          "404": {
+            "description": "Log not found."
+          }
+        },
+        "summary": "Find log by ID",
+        "tags": [
+          "Log"
+        ]
+      },
+      "patch": {
+        "operationId": "LogController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLogDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Log updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateLogDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid update data"
+          },
+          "403": {
+            "description": "Log module is disabled"
+          },
+          "404": {
+            "description": "Log not found."
+          }
+        },
+        "summary": "Update log by ID",
+        "tags": [
+          "Log"
+        ]
+      },
+      "delete": {
+        "operationId": "LogController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Log deleted successfully."
+          },
+          "403": {
+            "description": "Log module is disabled"
+          },
+          "404": {
+            "description": "Log not found."
+          }
+        },
+        "summary": "Delete log by ID",
+        "tags": [
+          "Log"
         ]
       }
     },
@@ -3240,10 +3452,24 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Generate text from a simple text prompt.",
         "tags": [
           "Gemini AI"
@@ -3275,10 +3501,24 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Generate text from a prompt with an embedded Base64 image.",
         "tags": [
           "Gemini AI"
@@ -3291,7 +3531,7 @@
         "parameters": [],
         "requestBody": {
           "required": true,
-          "description": "Prompt text and the file to be analyzed.",
+          "description": "Prompt text and the file to be analyzed, with optional system instruction and conversation ID.",
           "content": {
             "multipart/form-data": {
               "schema": {
@@ -3301,6 +3541,17 @@
                     "type": "string",
                     "description": "The text prompt for Gemini.",
                     "example": "Analyze this SQL schema and suggest improvements."
+                  },
+                  "systemInstruction": {
+                    "type": "string",
+                    "description": "Optional system instruction for the model.",
+                    "example": "Act as a code reviewer."
+                  },
+                  "conversationId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "Optional ID of an ongoing conversation.",
+                    "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
                   },
                   "file": {
                     "type": "string",
@@ -3327,10 +3578,24 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - insufficient role"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Generate text from a prompt with an uploaded file (e.g., .sql, .txt).",
         "tags": [
           "Gemini AI"
@@ -3623,241 +3888,6 @@
         "summary": "Delete Schema by ID",
         "tags": [
           "Schema"
-        ]
-      }
-    },
-    "/api/log": {
-      "post": {
-        "operationId": "LogController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateLogDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successfully created.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateLogDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation failed."
-          },
-          "401": {
-            "description": "Unauthorized."
-          },
-          "403": {
-            "description": "Forbidden."
-          }
-        },
-        "summary": "Create a new Log",
-        "tags": [
-          "Log"
-        ]
-      },
-      "get": {
-        "operationId": "LogController_findAll",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "List of Log records.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CreateLogDto"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized."
-          },
-          "403": {
-            "description": "Forbidden."
-          }
-        },
-        "summary": "Retrieve all Log records",
-        "tags": [
-          "Log"
-        ]
-      }
-    },
-    "/api/log/paginated": {
-      "get": {
-        "operationId": "LogController_findAllPaginated",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": 1,
-              "example": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "pageSize",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": 10,
-              "example": 10,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Paginated results",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginationLogResultDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Paginated Log records",
-        "tags": [
-          "Log"
-        ]
-      }
-    },
-    "/api/log/{id}": {
-      "get": {
-        "operationId": "LogController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Record found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateLogDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized."
-          },
-          "403": {
-            "description": "Forbidden."
-          },
-          "404": {
-            "description": "Record not found."
-          }
-        },
-        "summary": "Find Log by ID",
-        "tags": [
-          "Log"
-        ]
-      },
-      "patch": {
-        "operationId": "LogController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateLogDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successfully updated.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpdateLogDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid data."
-          },
-          "401": {
-            "description": "Unauthorized."
-          },
-          "403": {
-            "description": "Forbidden."
-          },
-          "404": {
-            "description": "Record not found."
-          }
-        },
-        "summary": "Update Log by ID",
-        "tags": [
-          "Log"
-        ]
-      },
-      "delete": {
-        "operationId": "LogController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully deleted."
-          },
-          "401": {
-            "description": "Unauthorized."
-          },
-          "403": {
-            "description": "Forbidden."
-          },
-          "404": {
-            "description": "Record not found."
-          }
-        },
-        "summary": "Delete Log by ID",
-        "tags": [
-          "Log"
         ]
       }
     },
@@ -5702,6 +5732,42 @@
           "isDirectory"
         ]
       },
+      "FileSearchDto": {
+        "type": "object",
+        "properties": {
+          "rootDir": {
+            "type": "string",
+            "description": "Root directory to start the search from",
+            "example": "/home/eddie/projects/app/src"
+          },
+          "fileName": {
+            "type": "string",
+            "description": "Name of the file to search for",
+            "example": "index.ts"
+          },
+          "extension": {
+            "type": "string",
+            "description": "File extension filter (e.g., .ts)",
+            "example": ".ts"
+          },
+          "page": {
+            "type": "number",
+            "description": "Page number (for pagination)",
+            "example": 1,
+            "default": 1
+          },
+          "limit": {
+            "type": "number",
+            "description": "Number of results per page (for pagination)",
+            "example": 10,
+            "default": 10
+          }
+        },
+        "required": [
+          "rootDir",
+          "fileName"
+        ]
+      },
       "FormatCodeDto": {
         "type": "object",
         "properties": {
@@ -5839,130 +5905,6 @@
         },
         "required": [
           "json"
-        ]
-      },
-      "JsonDtoService": {
-        "type": "object",
-        "properties": {}
-      },
-      "JsonDtoExplorerService": {
-        "type": "object",
-        "properties": {}
-      },
-      "JsonDtoSchemaResponseDto": {
-        "type": "object",
-        "properties": {
-          "schema": {
-            "type": "object",
-            "description": "Generated JSON schema of the specified DTO",
-            "additionalProperties": {
-              "type": "object"
-            }
-          }
-        },
-        "required": [
-          "schema"
-        ]
-      },
-      "JsonDtoEndpointQueryParamDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Name of the query parameter",
-            "example": "dto"
-          },
-          "required": {
-            "type": "boolean",
-            "description": "Whether this query parameter is required",
-            "example": false
-          },
-          "description": {
-            "type": "string",
-            "description": "Description of the query parameter",
-            "example": "Type of DTO to fetch the schema for"
-          }
-        },
-        "required": [
-          "name",
-          "required",
-          "description"
-        ]
-      },
-      "JsonDtoEndpointResponseDto": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "number",
-            "description": "HTTP status code",
-            "example": 200
-          },
-          "description": {
-            "type": "string",
-            "description": "Description of the response",
-            "example": "Successful response with DTO schema"
-          },
-          "schema": {
-            "type": "object",
-            "description": "Schema or type of the response payload",
-            "additionalProperties": true,
-            "example": {
-              "schema": {
-                "property1": {
-                  "type": "string"
-                },
-                "property2": {
-                  "type": "number"
-                }
-              }
-            }
-          }
-        },
-        "required": [
-          "status",
-          "description",
-          "schema"
-        ]
-      },
-      "JsonDtoEndpointDto": {
-        "type": "object",
-        "properties": {
-          "method": {
-            "type": "string",
-            "description": "HTTP method for the endpoint",
-            "example": "GET"
-          },
-          "path": {
-            "type": "string",
-            "description": "Full URL path of the endpoint",
-            "example": "/json-dto/custom"
-          },
-          "queryParams": {
-            "description": "List of query parameters accepted by the endpoint",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/JsonDtoEndpointQueryParamDto"
-            }
-          },
-          "description": {
-            "type": "string",
-            "description": "Short description of the endpoint",
-            "example": "Returns the JSON schema for a selected DTO"
-          },
-          "responses": {
-            "description": "List of possible responses for the endpoint",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/JsonDtoEndpointResponseDto"
-            }
-          }
-        },
-        "required": [
-          "method",
-          "path",
-          "queryParams",
-          "description",
-          "responses"
         ]
       },
       "ColumnDto": {
@@ -6119,6 +6061,60 @@
           "command",
           "cwd"
         ]
+      },
+      "CreateLogDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of log entry"
+          },
+          "level": {
+            "type": "string",
+            "description": "Log level (e.g., INFO, ERROR, DEBUG)"
+          },
+          "tags": {
+            "description": "Tags associated with the log",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "data": {
+            "type": "object",
+            "description": "Structured log data"
+          }
+        },
+        "required": [
+          "type",
+          "level",
+          "tags",
+          "data"
+        ]
+      },
+      "UpdateLogDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of log entry"
+          },
+          "level": {
+            "type": "string",
+            "description": "Log level (e.g., INFO, ERROR, DEBUG)"
+          },
+          "tags": {
+            "description": "Tags associated with the log",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "data": {
+            "type": "object",
+            "description": "Structured log data"
+          }
+        }
       },
       "CreateFolderDto": {
         "type": "object",
@@ -6465,6 +6461,16 @@
             "type": "string",
             "description": "The prompt text to send to the Gemini model.",
             "example": "Write a short story about a brave knight."
+          },
+          "systemInstruction": {
+            "type": "string",
+            "description": "Optional system instruction to guide the model's behavior (e.g., persona or style). If provided for a new conversation, it will be used for subsequent requests in that conversation.",
+            "example": "Act as a seasoned cybersecurity expert and explain common phishing techniques."
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "Optional ID of an ongoing conversation. If provided, the system instruction from the first request in this conversation will be used.",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
           }
         },
         "required": [
@@ -6476,18 +6482,28 @@
         "properties": {
           "prompt": {
             "type": "string",
-            "description": "The prompt text to send to the Gemini model, accompanying the image.",
+            "description": "The prompt text to accompany the image.",
             "example": "Describe this image."
           },
           "base64Image": {
             "type": "string",
-            "description": "Base64 encoded image data (e.g., \"data:image/jpeg;base64,...\").",
-            "example": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD/2wBDAAY..."
+            "description": "The Base64 encoded image data (without \"data:image/jpeg;base64,\" prefix).",
+            "example": "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
           },
           "mimeType": {
             "type": "string",
-            "description": "MIME type of the image (e.g., \"image/jpeg\", \"image/png\").",
+            "description": "The MIME type of the image (e.g., \"image/jpeg\", \"image/png\").",
             "example": "image/jpeg"
+          },
+          "systemInstruction": {
+            "type": "string",
+            "description": "Optional system instruction to guide the model's behavior (e.g., persona or style). If provided for a new conversation, it will be used for subsequent requests in that conversation.",
+            "example": "Analyze this image from a botanical perspective."
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "Optional ID of an ongoing conversation. If provided, the system instruction from the first request in this conversation will be used.",
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
           }
         },
         "required": [
@@ -6553,66 +6569,6 @@
           "schema": {
             "type": "object",
             "description": "schema field"
-          }
-        }
-      },
-      "CreateLogDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "object",
-            "description": "data field"
-          },
-          "type": {
-            "type": "string",
-            "description": "type field"
-          }
-        },
-        "required": [
-          "data",
-          "type"
-        ]
-      },
-      "PaginationLogResultDto": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CreateLogDto"
-            }
-          },
-          "total": {
-            "type": "number"
-          },
-          "page": {
-            "type": "number"
-          },
-          "pageSize": {
-            "type": "number"
-          },
-          "totalPages": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "items",
-          "total",
-          "page",
-          "pageSize",
-          "totalPages"
-        ]
-      },
-      "UpdateLogDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "object",
-            "description": "data field"
-          },
-          "type": {
-            "type": "string",
-            "description": "type field"
           }
         }
       },

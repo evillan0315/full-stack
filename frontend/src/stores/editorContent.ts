@@ -1,14 +1,32 @@
 import { atom, computed } from 'nanostores';
 
+function persistentAtom<T>(key: string, initialValue: T) {
+  const storedValue = localStorage.getItem(key);
+  const initial = storedValue ? JSON.parse(storedValue) : initialValue;
+  const store = atom<T>(initial);
+
+  if (typeof window !== 'undefined') {
+    store.listen((value) => {
+      localStorage.setItem(key, JSON.stringify(value));
+    });
+  }
+
+  return store;
+}
+
 export const editorContent = atom<string>('');
 export const editorFilePath = atom<string>('');
+
+export const editorCurrentDirectory = persistentAtom<string>('editorCurrentDirectory', '/');
+export const editorFilesDirectories = atom<string[]>([]);
+export const editorOpenedDirectories = atom<string[]>([]);
 export const editorLanguage = atom<string>('');
 export const editorOriginalContent = atom<string>('');
 export const editorHistory = atom<string[]>([]);
 export const editorFuture = atom<string[]>([]);
 export const editorNewPath = atom<string>('');
-export const editorOpenTabs = atom<string[]>([]);
-export const editorUnsaved = atom<Record<string, boolean>>({});
+export const editorOpenTabs = persistentAtom<string[]>('editorOpenTabs', []);
+export const editorUnsaved = persistentAtom<Record<string, boolean>>('editorUnsaved', {});
 
 export const isDirty = computed(
   [editorFilePath, editorContent, editorOriginalContent],

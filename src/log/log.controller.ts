@@ -2,43 +2,27 @@ import {
   Controller,
   Get,
   Post,
-  Res,
-  Req,
-  Body,
-  Param,
   Patch,
   Delete,
-  UseGuards,
-  HttpStatus,
+  Body,
+  Param,
   Query,
-  UseInterceptors,
-  UploadedFile,
-  BadRequestException,
-  InternalServerErrorException,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
-  ApiBearerAuth,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiNotFoundResponse,
   ApiBadRequestResponse,
+  ApiNotFoundResponse,
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
   ApiQuery,
-  ApiResponse,
-  ApiConsumes,
   ApiBody,
 } from '@nestjs/swagger';
-import axios from 'axios';
-
 import { LogService } from './log.service';
-import {
-  CreateLogDto,
-  PaginationLogResultDto,
-  PaginationLogQueryDto,
-} from './dto/create-log.dto';
+import { CreateLogDto } from './dto/create-log.dto';
 import { UpdateLogDto } from './dto/update-log.dto';
 
 @ApiTags('Log')
@@ -46,93 +30,76 @@ import { UpdateLogDto } from './dto/update-log.dto';
 export class LogController {
   constructor(private readonly logService: LogService) {}
 
-  // ───────────────────────────────────────────────────────────
-  // CREATE
-  // ───────────────────────────────────────────────────────────
-
   @Post()
-  @ApiOperation({ summary: 'Create a new Log' })
+  @ApiOperation({ summary: 'Create a new log' })
   @ApiCreatedResponse({
-    description: 'Successfully created.',
-    type: CreateLogDto,
+    description: 'Log successfully created.',
+    schema: {
+      example: {
+        id: 'abc123',
+        type: 'SYSTEM',
+        level: 'INFO',
+        tags: ['system'],
+        data: { message: 'System initialized' },
+        createdAt: '2025-06-19T12:00:00.000Z',
+      },
+    },
   })
-  @ApiBadRequestResponse({ description: 'Validation failed.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
+  @ApiBadRequestResponse({ description: 'Invalid input data' })
+  @ApiForbiddenResponse({ description: 'Log module is disabled' })
+  @ApiBody({ type: CreateLogDto })
   create(@Body() dto: CreateLogDto) {
     return this.logService.create(dto);
   }
 
-  // ───────────────────────────────────────────────────────────
-  // FIND ALL
-  // ───────────────────────────────────────────────────────────
-
   @Get()
-  @ApiOperation({ summary: 'Retrieve all Log records' })
-  @ApiOkResponse({ description: 'List of Log records.', type: [CreateLogDto] })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
+  @ApiOperation({ summary: 'Retrieve all logs' })
+  @ApiOkResponse({
+    description: 'List of logs retrieved successfully.',
+    schema: {
+      type: 'array',
+      items: { $ref: '#/components/schemas/CreateLogDto' },
+    },
+  })
+  @ApiForbiddenResponse({ description: 'Log module is disabled' })
   findAll() {
     return this.logService.findAll();
   }
 
-  // ───────────────────────────────────────────────────────────
-  // PAGINATED
-  // ───────────────────────────────────────────────────────────
-
-  @Get('paginated')
-  @ApiOperation({ summary: 'Paginated Log records' })
-  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
-  @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Paginated results',
-    type: PaginationLogResultDto,
-  })
-  findAllPaginated(@Query() query: PaginationLogQueryDto) {
-    const { page, pageSize } = query;
-    return this.logService.findAllPaginated(undefined, page, pageSize);
-  }
-
-  // ───────────────────────────────────────────────────────────
-  // FIND ONE
-  // ───────────────────────────────────────────────────────────
-
   @Get(':id')
-  @ApiOperation({ summary: 'Find Log by ID' })
-  @ApiOkResponse({ description: 'Record found.', type: CreateLogDto })
-  @ApiNotFoundResponse({ description: 'Record not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
+  @ApiOperation({ summary: 'Find log by ID' })
+  @ApiOkResponse({
+    description: 'Log found.',
+    schema: {
+      $ref: '#/components/schemas/CreateLogDto',
+    },
+  })
+  @ApiNotFoundResponse({ description: 'Log not found.' })
+  @ApiForbiddenResponse({ description: 'Log module is disabled' })
   findOne(@Param('id') id: string) {
     return this.logService.findOne(id);
   }
 
-  // ───────────────────────────────────────────────────────────
-  // UPDATE
-  // ───────────────────────────────────────────────────────────
-
   @Patch(':id')
-  @ApiOperation({ summary: 'Update Log by ID' })
-  @ApiOkResponse({ description: 'Successfully updated.', type: UpdateLogDto })
-  @ApiBadRequestResponse({ description: 'Invalid data.' })
-  @ApiNotFoundResponse({ description: 'Record not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
+  @ApiOperation({ summary: 'Update log by ID' })
+  @ApiOkResponse({
+    description: 'Log updated successfully.',
+    schema: {
+      $ref: '#/components/schemas/CreateLogDto',
+    },
+  })
+  @ApiBadRequestResponse({ description: 'Invalid update data' })
+  @ApiNotFoundResponse({ description: 'Log not found.' })
+  @ApiForbiddenResponse({ description: 'Log module is disabled' })
   update(@Param('id') id: string, @Body() dto: UpdateLogDto) {
     return this.logService.update(id, dto);
   }
 
-  // ───────────────────────────────────────────────────────────
-  // DELETE
-  // ───────────────────────────────────────────────────────────
-
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete Log by ID' })
-  @ApiOkResponse({ description: 'Successfully deleted.' })
-  @ApiNotFoundResponse({ description: 'Record not found.' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  @ApiForbiddenResponse({ description: 'Forbidden.' })
+  @ApiOperation({ summary: 'Delete log by ID' })
+  @ApiOkResponse({ description: 'Log deleted successfully.' })
+  @ApiNotFoundResponse({ description: 'Log not found.' })
+  @ApiForbiddenResponse({ description: 'Log module is disabled' })
   remove(@Param('id') id: string) {
     return this.logService.remove(id);
   }

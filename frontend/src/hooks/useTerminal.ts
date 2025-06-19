@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { io, Socket } from 'socket.io-client';
-import { generateGeminiText } from '../services/gemini'; 
+import { generateGeminiText } from '../services/gemini';
 
 const TERMINAL_OPTIONS = {
   cursorBlink: true,
@@ -12,8 +12,8 @@ const TERMINAL_OPTIONS = {
   theme: {
     background: '#1a202c', // Dark background for the terminal
     foreground: '#a0aec0', // Light gray text
-    cursor: '#9ae6b4',     // Green cursor
-    selection: '#4a5568',  // Darker gray selection
+    cursor: '#9ae6b4', // Green cursor
+    selection: '#4a5568', // Darker gray selection
     black: '#000000',
     red: '#e53e3e',
     green: '#48bb78',
@@ -29,7 +29,7 @@ const TERMINAL_OPTIONS = {
     brightBlue: '#63b3ed',
     brightMagenta: '#b794f4',
     brightCyan: '#4fd1c5',
-    brightWhite: '#edf2f7'
+    brightWhite: '#edf2f7',
   },
 };
 interface UseTerminalOptions {
@@ -42,13 +42,12 @@ export function useTerminal(options: UseTerminalOptions) {
   const [term, setTerm] = createSignal<Terminal>();
   const [socket, setSocket] = createSignal<Socket>();
   const fitAddon = new FitAddon();
-  
-  
+
   let buffer = '';
   let commandHistory: string[] = [];
   let historyIndex = -1;
   const promptStr = options.prompt ?? '$';
-  
+
   const printPrompt = () => {
     term()?.write(`\x1b[1;32m${promptStr}\x1b[0m `);
   };
@@ -115,7 +114,7 @@ export function useTerminal(options: UseTerminalOptions) {
       convertEol: true,
       fontFamily: 'monospace',
       fontSize: options.fontSize ?? 10,
-      theme: { background: '#000' }
+      theme: { background: '#000' },
     });
     t.loadAddon(fitAddon);
     t.open(container);
@@ -126,23 +125,26 @@ export function useTerminal(options: UseTerminalOptions) {
 
     const token = localStorage.getItem('token');
     const s = io(`${import.meta.env.BASE_URL_API}/terminal`, {
-      auth: { token: `Bearer ${token}` }
+      auth: { token: `Bearer ${token}` },
     });
 
     s.on('connect', () => console.log('[✔] Terminal connected'));
-    s.on('output', msg => { t.writeln(msg); printPrompt(); });
-    s.on('outputInfo', msg => t.writeln(`[cwd] ${msg.cwd}`));
-    s.on('error', err => t.writeln(`\x1b[1;31mError:\x1b[0m ${err}`));
+    s.on('output', (msg) => {
+      t.writeln(msg);
+      printPrompt();
+    });
+    s.on('outputInfo', (msg) => t.writeln(`[cwd] ${msg.cwd}`));
+    s.on('error', (err) => t.writeln(`\x1b[1;31mError:\x1b[0m ${err}`));
 
     setSocket(s);
 
-    container.addEventListener('paste', e => {
+    container.addEventListener('paste', (e) => {
       e.preventDefault();
       const text = e.clipboardData?.getData('text');
       if (text) t.write(text);
     });
 
-    container.addEventListener('copy', e => {
+    container.addEventListener('copy', (e) => {
       const selection = t.getSelection();
       if (selection) {
         e.preventDefault();
@@ -170,7 +172,6 @@ export function useTerminal(options: UseTerminalOptions) {
     dispose,
     terminalOpen,
     setTerminalOpen,
-    toggleTerminal
+    toggleTerminal,
   };
 }
-

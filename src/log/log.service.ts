@@ -1,101 +1,158 @@
 import {
   Injectable,
-  Logger, // Import Logger
-  ForbiddenException, // Import ForbiddenException
-  OnModuleInit, // Import OnModuleInit lifecycle hook
+  Logger,
+  ForbiddenException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ModuleControlService } from '../module-control/module-control.service'; // Import ModuleControlService
-
+import { ModuleControlService } from '../module-control/module-control.service';
 import { CreateLogDto } from './dto/create-log.dto';
 import { UpdateLogDto } from './dto/update-log.dto';
-import { Prisma } from '@prisma/client';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
-export class LogService implements OnModuleInit { // Implement OnModuleInit
-  private readonly logger = new Logger(LogService.name); // Initialize logger
+export class LogService implements OnModuleInit {
+  private readonly logger = new Logger(LogService.name);
 
   constructor(
     private prisma: PrismaService,
-    private readonly moduleControlService: ModuleControlService, // Inject ModuleControlService
+    private readonly moduleControlService: ModuleControlService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  // Lifecycle hook called once the host module has been initialized.
-  // This is a good place to log the initial status of the module.
   onModuleInit() {
+    this.logger.log(`LogModule initialization completed.`);
     if (!this.moduleControlService.isModuleEnabled('LogModule')) {
-      this.logger.warn('LogModule is currently disabled via ModuleControlService. Log operations will be restricted.');
+      this.logger.warn(
+        'LogModule is disabled at startup. Logging will be inactive.',
+      );
     }
   }
 
-  /**
-   * Helper method to check if the LogModule is enabled.
-   * Throws a ForbiddenException if it's disabled.
-   */
   private ensureLogModuleEnabled(): void {
     if (!this.moduleControlService.isModuleEnabled('LogModule')) {
-      throw new ForbiddenException('Log module is currently disabled. Cannot perform log operations.');
+      throw new ForbiddenException('Log module is disabled');
     }
+  }
+
+  systemLog(message: string) {
+    this.logger.log(message, 'System');
+    return this.createAndStream({
+      type: 'SYSTEM',
+      level: 'INFO',
+      data: { message, context: 'System' },
+      tags: ['system'],
+    });
+  }
+
+  logSystemError(message: string, stack?: string, context?: string) {
+    this.logger.error(message, stack, context);
+    return this.createAndStream({
+      type: 'ERROR',
+      level: 'ERROR',
+      data: { message, stack, context },
+      tags: ['error', 'system'],
+    });
+  }
+
+  async websocket(event: string, clientId: string) {
+    this.logger.debug(`WebSocket ${event} ${clientId}`, 'WebSocket');
+    return this.createAndStream({
+      type: 'WEBSOCKET',
+      level: 'INFO',
+      data: { event, clientId },
+      tags: ['websocket'],
+    });
+  }
+
+  async auth(action: string, userId: string, ip?: string) {
+    this.logger.log(`Auth ${action} for ${userId}`, 'Auth');
+    return this.createAndStream({
+      type: 'AUTH',
+      level: 'INFO',
+      data: { action, userId, ip },
+      tags: ['auth'],
+    });
+  }
+
+  logHttpRequest(
+    method: string,
+    url: string,
+    statusCode: number,
+    duration: number,
+    userId: string,
+  ) {
+    const msg = `${method} ${url} ${statusCode} - ${duration}ms`;
+    this.logger.log(msg, 'HTTP');
+    return this.createAndStream({
+      type: 'HTTP',
+      level: 'INFO',
+      data: { method, url, statusCode, duration, userId },
+      tags: ['http'],
+    });
+  }
+
+  async createAndStream(data: CreateLogDto) {
+    this.ensureLogModuleEnabled();
+
+    const tags =
+      data.tags && data.tags.length > 0 ? data.tags : [data.type.toLowerCase()];
+
+    const log = await this.prisma.logs.create({
+      data: {
+        ...data,
+        tags,
+      },
+    });
+
+    this.eventEmitter.emit('log.created', log);
+    return log;
   }
 
   create(data: CreateLogDto) {
-    this.ensureLogModuleEnabled(); // Check if LogModule is enabled
-    const createData: any = { ...data };
-    return this.prisma.log.create({ data: createData });
-  }
+    this.ensureLogModuleEnabled();
 
-  async findAllPaginated(
-    where: Prisma.LogWhereInput = {},
-    page = 1,
-    pageSize = 10,
-    select?: Prisma.LogSelect,
-  ) {
-    this.ensureLogModuleEnabled(); // Check if LogModule is enabled
+    const tags =
+      data.tags && data.tags.length > 0 ? data.tags : [data.type.toLowerCase()];
 
-    const skip = (page - 1) * pageSize;
-    const take = Number(pageSize);
-
-    const [items, total] = await this.prisma.$transaction([
-      this.prisma.log.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take,
-        ...(select ? { select } : {}),
-      }),
-      this.prisma.log.count({ where }),
-    ]);
-
-    return {
-      items,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
-    };
+    return this.prisma.logs.create({
+      data: {
+        ...data,
+        tags,
+      },
+    });
   }
 
   findAll() {
-    this.ensureLogModuleEnabled(); // Check if LogModule is enabled
-    return this.prisma.log.findMany();
+    this.ensureLogModuleEnabled();
+    return this.prisma.logs.findMany();
   }
 
   findOne(id: string) {
-    this.ensureLogModuleEnabled(); // Check if LogModule is enabled
-    return this.prisma.log.findUnique({ where: { id } });
+    this.ensureLogModuleEnabled();
+    return this.prisma.logs.findUnique({
+      where: { id },
+    });
   }
 
   update(id: string, data: UpdateLogDto) {
-    this.ensureLogModuleEnabled(); // Check if LogModule is enabled
-    return this.prisma.log.update({
+    this.ensureLogModuleEnabled();
+
+    const tags = data.tags && data.tags.length > 0 ? data.tags : undefined;
+
+    return this.prisma.logs.update({
       where: { id },
-      data,
+      data: {
+        ...data,
+        ...(tags && { tags }),
+      },
     });
   }
 
   remove(id: string) {
-    this.ensureLogModuleEnabled(); // Check if LogModule is enabled
-    return this.prisma.log.delete({ where: { id } });
+    this.ensureLogModuleEnabled();
+    return this.prisma.logs.delete({
+      where: { id },
+    });
   }
 }
-

@@ -5,8 +5,9 @@ import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
 import { TerminalService } from './terminal.service';
 import { ModuleControlModule } from '../module-control/module-control.module';
+import { LogModule } from '../log/log.module';
 @Module({
-  imports: [UserModule, AuthModule, ModuleControlModule],
+  imports: [UserModule, AuthModule, ModuleControlModule, LogModule],
   providers: [TerminalGateway, TerminalService],
   controllers: [TerminalController],
 })

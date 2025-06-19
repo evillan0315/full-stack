@@ -32,8 +32,6 @@ export class SchemaService {
   async create(data: CreateSchemaDto) {
     const createData: any = { ...data };
 
-    console.log(createData, 'createData');
-    console.log(this.userId, 'this.userId');
     const hasCreatedById = data.hasOwnProperty('createdById');
     if (this.userId) {
       createData.createdBy = {

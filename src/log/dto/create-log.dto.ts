@@ -14,29 +14,22 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
 export class CreateLogDto {
-  @ApiProperty({ description: 'data field' })
-  @IsObject()
-  data: any;
-  @ApiProperty({ description: 'type field' })
+  @ApiProperty({ description: 'Type of log entry' })
   @IsString()
   type: string;
-}
 
-export class PaginationLogResultDto {
-  @ApiProperty({ type: [CreateLogDto] })
-  items: CreateLogDto[];
+  @ApiProperty({ description: 'Log level (e.g., INFO, ERROR, DEBUG)' })
+  @IsString()
+  level: string;
 
-  @ApiProperty()
-  total: number;
+  @ApiProperty({ description: 'Tags associated with the log', type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  tags: string[];
 
-  @ApiProperty()
-  page: number;
-
-  @ApiProperty()
-  pageSize: number;
-
-  @ApiProperty()
-  totalPages: number;
+  @ApiProperty({ description: 'Structured log data' })
+  @IsObject()
+  data: any;
 }
 
 export class PaginationLogQueryDto {

@@ -13,7 +13,7 @@ import {
   editorFuture,
 } from '../../stores/editorContent';
 import { theme } from '../../stores/theme';
-import { useEditorKeybindings } from '../../hooks/useEditorKeybindings'; 
+import { useEditorKeybindings } from '../../hooks/useEditorKeybindings';
 interface CodeMirrorEditorProps {
   onChange?: (content: string) => void;
   onSave?: () => void;

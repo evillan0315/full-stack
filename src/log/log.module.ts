@@ -1,13 +1,24 @@
-import { Module } from '@nestjs/common';
-import { LogService } from './log.service';
-import { LogController } from './log.controller';
-import { ModuleControlModule } from '../module-control/module-control.module';
 
+import { Module } from '@nestjs/common';
+import { LogInterceptor } from './log.interceptor';
+import { LogController } from './log.controller';
+import { LogService } from './log.service';
+import { ModuleControlModule } from '../module-control/module-control.module';
 import { PrismaModule } from '../prisma/prisma.module';
+import { LogGateway } from './log.gateway';
+
 
 @Module({
-  imports: [PrismaModule, ModuleControlModule],
+  imports: [PrismaModule, ModuleControlModule], 
   controllers: [LogController],
-  providers: [LogService],
+  providers: [
+    LogService,
+    LogGateway,
+    {
+      provide: 'APP_INTERCEPTOR',
+      useClass: LogInterceptor,
+    },
+  ],
+  exports: [LogService, LogGateway],
 })
 export class LogModule {}

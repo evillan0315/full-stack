@@ -1,4 +1,3 @@
-
 // src/components/Chat/Chat.tsx
 
 import { createSignal, For, onMount, createEffect } from 'solid-js';
@@ -86,9 +85,7 @@ const Chat = () => {
       <div class="flex-grow overflow-y-auto p-4" id="chat-container">
         <For each={messages()}>
           {(message) => (
-            <div
-              class={`mb-2 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
+            <div class={`mb-2 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div
                 class={`rounded-lg py-2 px-3 max-w-2/3 break-words ${
                   message.sender === 'user'
@@ -234,5 +231,3 @@ Make sure tailwindcss is install and setup with the correct configuration to use
 
 Remember to replace the simulation bot response logic with the actual logic you want.
 */
-
-

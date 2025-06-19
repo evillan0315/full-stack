@@ -1,25 +1,25 @@
-import { createMemo, onMount, onCleanup, For, Show, createSignal } from 'solid-js';
-import { Icon } from '@iconify-icon/solid';
+import {
+  createMemo,
+  onMount,
+  onCleanup,
+  For,
+  Show,
+  createSignal,
+  createEffect,
+} from 'solid-js';
 import * as path from 'path-browserify';
 import FileNode from '../../components/file/FileNode';
 import Loading from '../../components/Loading';
-
+import { Icon } from '@iconify-icon/solid';
 import { useEditorFile } from '../../hooks/useEditorFile';
-import type { FileItem } from '../../types/types';
-import { Button } from '../../components/ui/Button';
 import { confirm, prompt, alert } from '../../services/modalService';
-
-type ContextMenuState = {
-  x: number;
-  y: number;
-  file: FileItem | null;
-  visible: boolean;
-};
-
-interface FileManagerProps {
-  onFileSelect?: (path: string) => void;
-  refreshList?: (refreshFn: (directory?: string) => Promise<void>) => void;
-}
+import ContextMenu, { type ContextMenuItem } from '../ui/ContextMenu';
+import { useStore } from '@nanostores/solid';
+import {
+  editorCurrentDirectory,
+  editorFilesDirectories,
+} from '../../stores/editorContent';
+import type { FileItem } from '../../types/types';
 
 function buildTree(files: FileItem[] = []): FileItem[] {
   const map = new Map<string, FileItem & { children: FileItem[] }>();
@@ -35,7 +35,7 @@ function buildTree(files: FileItem[] = []): FileItem[] {
       if (parent) {
         parent.children.push(file);
       } else {
-        console.warn(`Orphaned file/folder: ${file.path}. Parent '${parentPath}' not found.`);
+        console.warn(`Orphaned file/folder: ${file.path}`);
         tree.push(file);
       }
     }
@@ -53,15 +53,35 @@ function buildTree(files: FileItem[] = []): FileItem[] {
   return tree;
 }
 
-export default function FileManager(props: FileManagerProps) {
-  const { directoryFiles, currentDirectory, fetchDirectory, fetchFile, loading } = useEditorFile();
+function formatDate(dateStr: string | undefined): string {
+  if (!dateStr) return '-';
+  return new Intl.DateTimeFormat('en-GB', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(new Date(dateStr));
+}
 
-  const fileTree = createMemo(() => buildTree(directoryFiles()));
+export default function FileManager(props: { onFileSelect?: (path: string) => void; refreshList?: (refreshFn: (dir?: string) => Promise<void>) => void; }) {
+  const {
+    currentDirectory,
+    fetchDirectory,
+    createFile,
+    createFolder,
+    deleteFileOrFolder,
+  } = useEditorFile();
+  const $editorCurrentDirectory = useStore(editorCurrentDirectory);
+  const $editorFilesDirectories = useStore(editorFilesDirectories);
+  const fileTree = createMemo(() => buildTree($editorFilesDirectories()));
 
-  const [contextMenu, setContextMenu] = createSignal<ContextMenuState>({
+  const [contextMenu, setContextMenu] = createSignal({
     x: 0,
     y: 0,
-    file: null,
+    file: null as FileItem | null,
     visible: false,
   });
 
@@ -69,7 +89,6 @@ export default function FileManager(props: FileManagerProps) {
     if (isDirectory) {
       fetchDirectory(filePath);
     } else {
-      fetchFile(filePath);
       props.onFileSelect?.(filePath);
     }
   };
@@ -79,58 +98,47 @@ export default function FileManager(props: FileManagerProps) {
     setContextMenu({ x: e.clientX, y: e.clientY, file, visible: true });
   };
 
-  const closeContextMenu = () => setContextMenu((c) => ({ ...c, visible: false }));
+  const closeContextMenu = () =>
+    setContextMenu((c) => ({ ...c, visible: false }));
 
   const handleClickOutside = (e: MouseEvent) => {
-    if (!document.getElementById('context-menu')?.contains(e.target as Node)) {
+    if (!(document.getElementById('context-menu')?.contains(e.target as Node))) {
       closeContextMenu();
     }
   };
 
-  const handleFileAction = async (action: 'open' | 'delete' | 'create', type?: 'file' | 'folder') => {
+  const handleFileAction = async (
+    action: 'open' | 'delete' | 'create',
+    type?: 'file' | 'folder'
+  ) => {
     const file = contextMenu().file;
-    if (!file) return;
+    if (!file) return closeContextMenu();
     closeContextMenu();
 
-    try {
-      if (action === 'open') {
-        handleFileNodeSelect(file.path, file.isDirectory);
-        return;
-      }
+    if (action === 'open') {
+      handleFileNodeSelect(file.path, file.isDirectory);
+      return;
+    }
 
-      if (action === 'create') {
-        const name = await prompt(`Enter name for new ${type}:`, '', 'info');
-        if (!name) {
-          await alert('Name cannot be empty.', 'warning');
-          return;
-        }
-        await api.post('/file/create', {
-          filePath: path.join(file.path, name),
-          isDirectory: type === 'folder',
-          content: type === 'file' ? '' : undefined,
-        });
-      }
+    if (action === 'create') {
+      const targetDir = file.isDirectory ? file.path : currentDirectory();
+      const name = await prompt(`Enter name for new ${type}:`, '', 'info');
+      if (!name) return alert('Name cannot be empty.', 'warning');
+      if (type === 'file') await createFile(targetDir, name);
+      if (type === 'folder') await createFolder(targetDir, name);
+    }
 
-      if (action === 'delete') {
-        const confirmed = await confirm(`Delete "${file.name}"? This action cannot be undone.`, 'warning');
-        if (!confirmed) return;
-        await api.post('/file/delete', { filePath: file.path });
-      }
-
-      await fetchDirectory(currentDirectory() || './');
-    } catch (err) {
-      console.error(`Error performing ${action}:`, err);
-      await alert(`Error: ${(err as any).response?.data?.message || (err as Error).message}`, 'error');
+    if (action === 'delete') {
+      const confirmed = await confirm(
+        `Delete "${file.name}"? This action cannot be undone.`,
+        'warning'
+      );
+      if (confirmed) await deleteFileOrFolder(file.path);
     }
   };
 
-  const navigateUp = () => {
-    const parent = path.dirname(currentDirectory() || '/');
-    if (parent !== currentDirectory()) fetchDirectory(parent);
-  };
-
   onMount(() => {
-    fetchDirectory('/');
+    fetchDirectory($editorCurrentDirectory());
     document.addEventListener('click', handleClickOutside);
     props.refreshList?.(fetchDirectory);
   });
@@ -140,62 +148,19 @@ export default function FileManager(props: FileManagerProps) {
   });
 
   return (
-    <div class="w-full h-full flex flex-col relative">
-      <div class="file-manager-header sticky top-0 z-10 flex items-center justify-between gap-2 h-8 px-3 py-0 border-b">
-        <div class="flex-inline">
-          <Button
-            icon="mdi:arrow-up-bold"
-            variant="secondary"
-            onClick={currentDirectory() !== './' ? navigateUp : undefined}
-            disabled={currentDirectory() === './'}
-            title="Go Up"
-          />
-
-          <span class="mx-2 text-sm font-medium">Path: {currentDirectory()}</span>
-        </div>
-        <div class="flex items-center justify-center gap-2">
-          <Button
-            icon="mdi:refresh"
-            variant="secondary"
-            size="sm"
-            onClick={() => fetchDirectory(currentDirectory() || './')}
-            title="Refresh"
-          />
-
-          <Button
-            icon="mdi:file-plus"
-            variant="secondary"
-            size="sm"
-            onClick={() => handleFileAction('create', 'file')}
-            title="New File"
-          />
-          <Button
-            icon="mdi:folder-plus"
-            variant="secondary"
-            size="sm"
-            onClick={() => handleFileAction('create', 'folder')}
-            title="New Folder"
-          />
-        </div>
-      </div>
-
-      <div class="flex flex-col flex-1 overflow-auto p-4">
+    <div class="flex flex-col h-full">
+      <div class="p-2 flex-grow overflow-auto">
         <Show
-          when={!loading()}
+          when={fileTree().length > 0}
           fallback={
-            <div class="h-full flex items-center justify-center relative">
-              <Loading />
-            </div>
+            <div class="text-center text-gray-500">No files or folders.</div>
           }
         >
-          <For
-            each={fileTree()}
-            fallback={<p class="text-center text-gray-500">No files or folders in this directory.</p>}
-          >
+          <For each={fileTree()}>
             {(file) => (
               <FileNode
                 file={file}
-                onSelect={(filePath) => handleFileNodeSelect(filePath, file.isDirectory)}
+                onSelect={handleFileNodeSelect}
                 onContextMenu={handleContextMenu}
                 onRefresh={() => fetchDirectory(currentDirectory() || './')}
               />
@@ -204,43 +169,55 @@ export default function FileManager(props: FileManagerProps) {
         </Show>
       </div>
 
-      <Show when={contextMenu().visible && contextMenu().file}>
-        <div
-          id="context-menu"
-          class="file-manager-context-menu fixed min-w-[160px] border shadow-md rounded z-50"
-          style={{ top: `${contextMenu().y}px`, left: `${contextMenu().x}px` }}
-        >
-          <div class="px-2 font-semibold truncate">{contextMenu().file!.name}</div>
-          <div class="flex items-center gap-2 px-2 text-sm">
-            <Icon icon={contextMenu().file!.isDirectory ? 'mdi:folder' : 'mdi:file'} width="1.4em" height="1.4em" />
-            {contextMenu().file!.isDirectory ? 'Folder' : 'File'}
-          </div>
-          <ul class="space-y-1 mt-2 border-t">
-            <li class="text-sm text-yellow-500 cursor-pointer p-2 rounded " onClick={() => handleFileAction('open')}>
-              Open
-            </li>
-            <Show when={contextMenu().file!.isDirectory}>
-              <>
-                <li
-                  class="text-sm text-green-600 cursor-pointer p-2 rounded "
-                  onClick={() => handleFileAction('create', 'file')}
-                >
-                  ➕ New File
-                </li>
-                <li
-                  class="text-sm text-green-600 cursor-pointer p-2 rounded "
-                  onClick={() => handleFileAction('create', 'folder')}
-                >
-                  📁 New Folder
-                </li>
-              </>
-            </Show>
-            <li class="text-sm text-red-500 cursor-pointer p-2 rounded " onClick={() => handleFileAction('delete')}>
-              ❌ Delete
-            </li>
-          </ul>
-        </div>
-      </Show>
+      <ContextMenu
+        {...contextMenu()}
+        title={contextMenu().file?.name}
+        subtitle={
+          contextMenu().file && (
+            <>
+              {contextMenu().file.isDirectory ? 'Folder' : 'File'}
+              {!contextMenu().file.isDirectory &&
+                ` (${(contextMenu().file.size / 1024).toFixed(2)} KB)`}
+              <br />
+              Created: {formatDate(contextMenu().file.createdAt)}<br />
+              Updated: {formatDate(contextMenu().file.updatedAt)}
+            </>
+          )
+        }
+        items={[
+          {
+            icon: Icon.bind(null, { icon: 'ion:open-outline' }),
+            label: 'Open',
+            action: () => handleFileAction('open'),
+          },
+          ...(contextMenu().file?.isDirectory
+            ? [
+                {
+                  icon: Icon.bind(null, {
+                    icon: 'qlementine-icons:add-file-16',
+                  }),
+                  label: 'New File',
+                  action: () => handleFileAction('create', 'file'),
+                },
+                {
+                  icon: Icon.bind(null, {
+                    icon: 'mdi:folder-add-outline',
+                  }),
+                  label: 'New Folder',
+                  action: () => handleFileAction('create', 'folder'),
+                },
+              ]
+            : []),
+          {
+            icon: Icon.bind(null, {
+              icon: 'streamline:file-delete-alternate',
+            }),
+            label: 'Delete',
+            action: () => handleFileAction('delete'),
+          },
+        ]}
+      />
     </div>
   );
 }
+

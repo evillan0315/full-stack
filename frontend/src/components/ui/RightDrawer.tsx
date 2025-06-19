@@ -77,7 +77,7 @@ export default function RightDrawer(props: RightDrawerProps): JSX.Element {
 
   return (
     <Show when={props.isOpen}>
-      <div class="fixed inset-0 z-40 flex justify-end">
+      <div class="fixed inset-0 z-40 flex justify-end bg-black">
         {/* Backdrop */}
         <div
           class="fixed inset-0 bg-black/70 transition-opacity duration-300"
@@ -90,7 +90,7 @@ export default function RightDrawer(props: RightDrawerProps): JSX.Element {
 
         {/* Drawer */}
         <div
-          class="relative z-50 w-full max-w-lg bg-gray-900 shadow-xl flex flex-col transform transition-transform duration-300"
+          class="relative z-200 w-full max-w-lg bg-black shadow-xl flex flex-col transform transition-transform duration-300"
           classList={{
             'translate-x-0': visible(), // Slide in to position
             'translate-x-full': !visible(), // Start/exit fully offscreen

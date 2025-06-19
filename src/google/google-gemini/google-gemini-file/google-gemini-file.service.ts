@@ -1,6 +1,16 @@
 // src/google/google-gemini/google-gemini-file/google-gemini-file.service.ts
-import { Injectable, Logger, InternalServerErrorException, Inject, Scope } from '@nestjs/common';
-import { GenerateTextDto, GenerateImageBase64Dto, GenerateFileDto } from './dto/';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+  Inject,
+  Scope,
+} from '@nestjs/common';
+import {
+  GenerateTextDto,
+  GenerateImageBase64Dto,
+  GenerateFileDto,
+} from './dto/';
 import { ModuleControlService } from '../../../module-control/module-control.service';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { RequestType, Prisma } from '@prisma/client'; // Import Prisma from @prisma/client
@@ -8,55 +18,72 @@ import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { CreateJwtUserDto } from '../../../auth/dto/auth.dto';
 import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating conversation IDs
-
+import { EventEmitter2 } from '@nestjs/event-emitter';
 @Injectable({ scope: Scope.REQUEST })
 export class GoogleGeminiFileService {
   private readonly logger = new Logger(GoogleGeminiFileService.name);
   private readonly GEMINI_API_KEY = `${process.env.GOOGLE_GEMINI_API_KEY}`;
   private readonly GOOGLE_GEMINI_MODEL = `${process.env.GOOGLE_GEMINI_MODEL}`;
-  private readonly GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models";
+  private readonly GEMINI_API_URL =
+    'https://generativelanguage.googleapis.com/v1beta/models';
 
   constructor(
     private readonly moduleControlService: ModuleControlService,
     private readonly prisma: PrismaService,
-    @Inject(REQUEST) private readonly request: Request & { user?: CreateJwtUserDto },
+    @Inject(REQUEST)
+    private readonly request: Request & { user?: CreateJwtUserDto },
+    private readonly eventEmitter: EventEmitter2, // <-- ✅ REQUIRED
   ) {
     if (!this.moduleControlService.isModuleEnabled('GoogleModule')) {
-      this.logger.warn('Gemini module is disabled according to ModuleControlService.');
+      this.logger.warn(
+        'Gemini module is disabled according to ModuleControlService.',
+      );
     }
   }
 
   private get userId(): string {
-    if (!this.request.user || !this.request.user.sub) {
-      throw new InternalServerErrorException('User ID not found in request context. Authentication might be missing or misconfigured.');
+    if (!this.request.user || !this.request.user.id) {
+      throw new InternalServerErrorException(
+        'User ID not found in request context. Authentication might be missing or misconfigured.',
+      );
     }
-    return this.request.user.sub;
+    console.log(this.request.user, 'user');
+    return this.request.user.id;
   }
 
   // Helper to get conversation's system instruction
-  private async getConversationSystemInstruction(conversationId: string): Promise<string | null> {
-    const firstRequestInConversation = await this.prisma.geminiRequest.findFirst({
-      where: {
-        conversationId: conversationId,
-      },
-      orderBy: {
-        createdAt: 'asc', // Get the very first request
-      },
-      select: {
-        systemInstruction: true,
-      },
-    });
+  private async getConversationSystemInstruction(
+    conversationId: string,
+  ): Promise<string | null> {
+    const firstRequestInConversation =
+      await this.prisma.geminiRequest.findFirst({
+        where: {
+          conversationId: conversationId,
+        },
+        orderBy: {
+          createdAt: 'asc', // Get the very first request
+        },
+        select: {
+          systemInstruction: true,
+        },
+      });
     return firstRequestInConversation?.systemInstruction || null;
   }
 
   private async callGeminiApi(modelName: string, payload: any): Promise<any> {
     if (!this.moduleControlService.isModuleEnabled('GoogleModule')) {
-      this.logger.warn('Gemini API calls are disabled by ModuleControlService. Aborting API call.');
-      throw new InternalServerErrorException('Gemini API functionality is currently disabled.');
+      this.logger.warn(
+        'Gemini API calls are disabled by ModuleControlService. Aborting API call.',
+      );
+      throw new InternalServerErrorException(
+        'Gemini API functionality is currently disabled.',
+      );
     }
 
     try {
-      this.logger.debug(`Calling Gemini API for model: ${modelName} with payload: ${JSON.stringify(payload)}`);
+      this.logger.debug(
+        `Calling Gemini API for model: ${modelName} with payload: ${JSON.stringify(payload)}`,
+      );
       const apiUrl = `${this.GEMINI_API_URL}/${this.GOOGLE_GEMINI_MODEL}:generateContent?key=${this.GEMINI_API_KEY}`;
 
       const response = await fetch(apiUrl, {
@@ -69,8 +96,12 @@ export class GoogleGeminiFileService {
 
       if (!response.ok) {
         const errorData = await response.json();
-        this.logger.error(`Gemini API error (${response.status}): ${JSON.stringify(errorData)}`);
-        throw new InternalServerErrorException(`Gemini API error: ${errorData.error?.message || 'Unknown error'}`);
+        this.logger.error(
+          `Gemini API error (${response.status}): ${JSON.stringify(errorData)}`,
+        );
+        throw new InternalServerErrorException(
+          `Gemini API error: ${errorData.error?.message || 'Unknown error'}`,
+        );
       }
 
       const result = await response.json();
@@ -85,14 +116,20 @@ export class GoogleGeminiFileService {
       ) {
         return result;
       } else {
-        this.logger.warn('Gemini API response structure unexpected or content missing.');
-        throw new InternalServerErrorException('No content found in Gemini API response.');
+        this.logger.warn(
+          'Gemini API response structure unexpected or content missing.',
+        );
+        throw new InternalServerErrorException(
+          'No content found in Gemini API response.',
+        );
       }
     } catch (error) {
       if (error instanceof InternalServerErrorException) {
         throw error;
       }
-      throw new InternalServerErrorException(`Failed to connect to Gemini API: ${error.message}`);
+      throw new InternalServerErrorException(
+        `Failed to connect to Gemini API: ${error.message}`,
+      );
     }
   }
 
@@ -105,7 +142,8 @@ export class GoogleGeminiFileService {
     let effectiveSystemInstruction = systemInstruction;
 
     if (effectiveConversationId) {
-      const storedSystemInstruction = await this.getConversationSystemInstruction(effectiveConversationId);
+      const storedSystemInstruction =
+        await this.getConversationSystemInstruction(effectiveConversationId);
       if (storedSystemInstruction) {
         effectiveSystemInstruction = storedSystemInstruction; // Use the stored one
       }
@@ -123,7 +161,7 @@ export class GoogleGeminiFileService {
 
     if (effectiveSystemInstruction) {
       payload.systemInstruction = {
-        parts: [{ text: effectiveSystemInstruction }]
+        parts: [{ text: effectiveSystemInstruction }],
       };
     }
 
@@ -153,20 +191,36 @@ export class GoogleGeminiFileService {
           responseText: generatedText,
           finishReason: geminiApiResult.candidates[0].finishReason || null,
           // Use Prisma.JsonNull for null values on JSON type fields
-          safetyRatings: geminiApiResult.candidates[0].safetyRatings ? JSON.stringify(geminiApiResult.candidates[0].safetyRatings) : Prisma.JsonNull,
+          safetyRatings: geminiApiResult.candidates[0].safetyRatings
+            ? JSON.stringify(geminiApiResult.candidates[0].safetyRatings)
+            : Prisma.JsonNull,
           tokenCount: geminiApiResult.usageMetadata?.totalTokenCount || null,
         },
       });
+      // Emit event for the gateway to broadcast
+      this.eventEmitter.emit('gemini.new_data', {
+        requestId: geminiRequest.id,
+        conversationId: geminiRequest.conversationId,
+        prompt: geminiRequest.prompt,
+        systemInstruction: geminiRequest.systemInstruction,
+        modelUsed: modelName,
+        responseText: generatedText,
+        createdAt: new Date(),
+      });
       return generatedText;
-
     } catch (error) {
-      this.logger.error(`Error generating text or saving response: ${error.message}`);
+      this.logger.error(
+        `Error generating text or saving response: ${error.message}`,
+      );
       throw error;
     }
   }
 
-  async generateTextWithBase64Image(generateImageBase64Dto: GenerateImageBase64Dto): Promise<string> {
-    const { prompt, base64Image, mimeType, systemInstruction, conversationId } = generateImageBase64Dto;
+  async generateTextWithBase64Image(
+    generateImageBase64Dto: GenerateImageBase64Dto,
+  ): Promise<string> {
+    const { prompt, base64Image, mimeType, systemInstruction, conversationId } =
+      generateImageBase64Dto;
     const modelName = this.GOOGLE_GEMINI_MODEL;
     const currentUserId = this.userId;
 
@@ -174,7 +228,8 @@ export class GoogleGeminiFileService {
     let effectiveSystemInstruction = systemInstruction;
 
     if (effectiveConversationId) {
-      const storedSystemInstruction = await this.getConversationSystemInstruction(effectiveConversationId);
+      const storedSystemInstruction =
+        await this.getConversationSystemInstruction(effectiveConversationId);
       if (storedSystemInstruction) {
         effectiveSystemInstruction = storedSystemInstruction;
       }
@@ -184,7 +239,13 @@ export class GoogleGeminiFileService {
 
     // Define payload with systemInstruction potentially present
     const payload: {
-      contents: { role: string; parts: ({ text: string; } | { inlineData: { mimeType: string; data: string; }; })[] }[];
+      contents: {
+        role: string;
+        parts: (
+          | { text: string }
+          | { inlineData: { mimeType: string; data: string } }
+        )[];
+      }[];
       systemInstruction?: { parts: { text: string }[] }; // Added optional property
     } = {
       contents: [
@@ -205,7 +266,7 @@ export class GoogleGeminiFileService {
 
     if (effectiveSystemInstruction) {
       payload.systemInstruction = {
-        parts: [{ text: effectiveSystemInstruction }]
+        parts: [{ text: effectiveSystemInstruction }],
       };
     }
 
@@ -236,19 +297,37 @@ export class GoogleGeminiFileService {
           requestId: geminiRequest.id,
           responseText: generatedText,
           finishReason: geminiApiResult.candidates[0].finishReason || null,
-          safetyRatings: geminiApiResult.candidates[0].safetyRatings ? JSON.stringify(geminiApiResult.candidates[0].safetyRatings) : Prisma.JsonNull,
+          safetyRatings: geminiApiResult.candidates[0].safetyRatings
+            ? JSON.stringify(geminiApiResult.candidates[0].safetyRatings)
+            : Prisma.JsonNull,
           tokenCount: geminiApiResult.usageMetadata?.totalTokenCount || null,
         },
       });
+      // Emit event for the gateway to broadcast
+      this.eventEmitter.emit('gemini.new_data', {
+        requestId: geminiRequest.id,
+        conversationId: geminiRequest.conversationId,
+        prompt: geminiRequest.prompt,
+        systemInstruction: geminiRequest.systemInstruction,
+        modelUsed: geminiRequest.modelUsed,
+        responseText: generatedText,
+        createdAt: new Date(),
+      });
       return generatedText;
-
     } catch (error) {
-      this.logger.error(`Error generating text with image or saving response: ${error.message}`);
+      this.logger.error(
+        `Error generating text with image or saving response: ${error.message}`,
+      );
       throw error;
     }
   }
 
-  async generateTextWithFile(prompt: string, file: Express.Multer.File, systemInstruction?: string, conversationId?: string): Promise<string> {
+  async generateTextWithFile(
+    prompt: string,
+    file: Express.Multer.File,
+    systemInstruction?: string,
+    conversationId?: string,
+  ): Promise<string> {
     if (!file) {
       throw new InternalServerErrorException('No file provided for analysis.');
     }
@@ -261,7 +340,8 @@ export class GoogleGeminiFileService {
     let effectiveSystemInstruction = systemInstruction;
 
     if (effectiveConversationId) {
-      const storedSystemInstruction = await this.getConversationSystemInstruction(effectiveConversationId);
+      const storedSystemInstruction =
+        await this.getConversationSystemInstruction(effectiveConversationId);
       if (storedSystemInstruction) {
         effectiveSystemInstruction = storedSystemInstruction;
       }
@@ -271,7 +351,13 @@ export class GoogleGeminiFileService {
 
     // Define payload with systemInstruction potentially present
     const payload: {
-      contents: { role: string; parts: ({ text: string; } | { inlineData: { mimeType: string; data: string; }; })[] }[];
+      contents: {
+        role: string;
+        parts: (
+          | { text: string }
+          | { inlineData: { mimeType: string; data: string } }
+        )[];
+      }[];
       systemInstruction?: { parts: { text: string }[] }; // Added optional property
     } = {
       contents: [
@@ -292,7 +378,7 @@ export class GoogleGeminiFileService {
 
     if (effectiveSystemInstruction) {
       payload.systemInstruction = {
-        parts: [{ text: effectiveSystemInstruction }]
+        parts: [{ text: effectiveSystemInstruction }],
       };
     }
 
@@ -323,14 +409,27 @@ export class GoogleGeminiFileService {
           requestId: geminiRequest.id,
           responseText: generatedText,
           finishReason: geminiApiResult.candidates[0].finishReason || null,
-          safetyRatings: geminiApiResult.candidates[0].safetyRatings ? JSON.stringify(geminiApiResult.candidates[0].safetyRatings) : Prisma.JsonNull,
+          safetyRatings: geminiApiResult.candidates[0].safetyRatings
+            ? JSON.stringify(geminiApiResult.candidates[0].safetyRatings)
+            : Prisma.JsonNull,
           tokenCount: geminiApiResult.usageMetadata?.totalTokenCount || null,
         },
       });
+      // Emit event for the gateway to broadcast
+      this.eventEmitter.emit('gemini.new_data', {
+        requestId: geminiRequest.id,
+        conversationId: geminiRequest.conversationId,
+        prompt: geminiRequest.prompt,
+        systemInstruction: geminiRequest.systemInstruction,
+        modelUsed: modelName,
+        responseText: generatedText,
+        createdAt: new Date(),
+      });
       return generatedText;
-
     } catch (error) {
-      this.logger.error(`Error generating text with file or saving response: ${error.message}`);
+      this.logger.error(
+        `Error generating text with file or saving response: ${error.message}`,
+      );
       throw error;
     }
   }

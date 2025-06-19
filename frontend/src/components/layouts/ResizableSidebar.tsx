@@ -1,5 +1,5 @@
 import { createSignal, onCleanup, onMount } from 'solid-js';
-import LeftSidebar from './LeftSidebar';
+import RightSidebar from './RightSidebar';
 
 export default function ResizableLeftSidebar() {
   const [width, setWidth] = createSignal(200);
