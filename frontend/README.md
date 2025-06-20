@@ -4,9 +4,6 @@ A developer-focused layout system interface, implemented using **TypeScript**, *
 
 ---
 
-Thank you, Eddie. Below is a **fixed and cleaned-up Table of Contents** where the links match the actual GitHub-compatible anchor format. You had some incorrect use of `##` inside the link labels and incorrect anchor syntax — I’ve corrected that.
-
----
 
 ## 📑 Table of Contents
 
@@ -408,9 +405,6 @@ The editor provides an advanced AI-powered terminal experience using **xterm.js*
 
 ---
 
-Here’s a **professional addition** you can include in your README **Features** section based on the `MiddleFooter` component:
-
----
 
 ### 🎥 Screen Capture & Recording Features
 
