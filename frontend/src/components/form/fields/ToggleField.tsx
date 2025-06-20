@@ -21,9 +21,7 @@ const ToggleField: Component<ToggleFieldProps> = (props) => (
           required={props.isRequired}
         />
         <div
-          class={`w-10 h-5 bg-gray-300 rounded-full shadow-inner transition ${
-            props.value ? 'bg-sky-600' : ''
-          }`}
+          class={`w-10 h-5 bg-gray-300 rounded-full shadow-inner transition ${props.value ? 'bg-sky-600' : ''}`}
         ></div>
         <div
           class={`dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition ${
@@ -35,11 +33,8 @@ const ToggleField: Component<ToggleFieldProps> = (props) => (
         {props.property.title} {props.isRequired && <span class="text-red-500">*</span>}
       </span>
     </label>
-    {props.property.description && (
-      <p class="mt-1 text-sm text-gray-500">{props.property.description}</p>
-    )}
+    {props.property.description && <p class="mt-1 text-sm text-gray-500">{props.property.description}</p>}
   </div>
 );
 
 export default ToggleField;
-

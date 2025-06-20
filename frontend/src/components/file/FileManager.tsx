@@ -1,12 +1,4 @@
-import {
-  createMemo,
-  onMount,
-  onCleanup,
-  For,
-  Show,
-  createSignal,
-  createEffect,
-} from 'solid-js';
+import { createMemo, onMount, onCleanup, For, Show, createSignal, createEffect } from 'solid-js';
 import * as path from 'path-browserify';
 import FileNode from '../../components/file/FileNode';
 import Loading from '../../components/Loading';
@@ -15,10 +7,7 @@ import { useEditorFile } from '../../hooks/useEditorFile';
 import { confirm, prompt, alert } from '../../services/modalService';
 import ContextMenu, { type ContextMenuItem } from '../ui/ContextMenu';
 import { useStore } from '@nanostores/solid';
-import {
-  editorCurrentDirectory,
-  editorFilesDirectories,
-} from '../../stores/editorContent';
+import { editorCurrentDirectory, editorFilesDirectories } from '../../stores/editorContent';
 import type { FileItem } from '../../types/types';
 
 function buildTree(files: FileItem[] = []): FileItem[] {
@@ -66,14 +55,11 @@ function formatDate(dateStr: string | undefined): string {
   }).format(new Date(dateStr));
 }
 
-export default function FileManager(props: { onFileSelect?: (path: string) => void; refreshList?: (refreshFn: (dir?: string) => Promise<void>) => void; }) {
-  const {
-    currentDirectory,
-    fetchDirectory,
-    createFile,
-    createFolder,
-    deleteFileOrFolder,
-  } = useEditorFile();
+export default function FileManager(props: {
+  onFileSelect?: (path: string) => void;
+  refreshList?: (refreshFn: (dir?: string) => Promise<void>) => void;
+}) {
+  const { currentDirectory, fetchDirectory, createFile, createFolder, deleteFileOrFolder } = useEditorFile();
   const $editorCurrentDirectory = useStore(editorCurrentDirectory);
   const $editorFilesDirectories = useStore(editorFilesDirectories);
   const fileTree = createMemo(() => buildTree($editorFilesDirectories()));
@@ -98,19 +84,15 @@ export default function FileManager(props: { onFileSelect?: (path: string) => vo
     setContextMenu({ x: e.clientX, y: e.clientY, file, visible: true });
   };
 
-  const closeContextMenu = () =>
-    setContextMenu((c) => ({ ...c, visible: false }));
+  const closeContextMenu = () => setContextMenu((c) => ({ ...c, visible: false }));
 
   const handleClickOutside = (e: MouseEvent) => {
-    if (!(document.getElementById('context-menu')?.contains(e.target as Node))) {
+    if (!document.getElementById('context-menu')?.contains(e.target as Node)) {
       closeContextMenu();
     }
   };
 
-  const handleFileAction = async (
-    action: 'open' | 'delete' | 'create',
-    type?: 'file' | 'folder'
-  ) => {
+  const handleFileAction = async (action: 'open' | 'delete' | 'create', type?: 'file' | 'folder') => {
     const file = contextMenu().file;
     if (!file) return closeContextMenu();
     closeContextMenu();
@@ -129,10 +111,7 @@ export default function FileManager(props: { onFileSelect?: (path: string) => vo
     }
 
     if (action === 'delete') {
-      const confirmed = await confirm(
-        `Delete "${file.name}"? This action cannot be undone.`,
-        'warning'
-      );
+      const confirmed = await confirm(`Delete "${file.name}"? This action cannot be undone.`, 'warning');
       if (confirmed) await deleteFileOrFolder(file.path);
     }
   };
@@ -150,12 +129,7 @@ export default function FileManager(props: { onFileSelect?: (path: string) => vo
   return (
     <div class="flex flex-col h-full">
       <div class="p-2 flex-grow overflow-auto">
-        <Show
-          when={fileTree().length > 0}
-          fallback={
-            <div class="text-center text-gray-500">No files or folders.</div>
-          }
-        >
+        <Show when={fileTree().length > 0} fallback={<div class="text-center text-gray-500">No files or folders.</div>}>
           <For each={fileTree()}>
             {(file) => (
               <FileNode
@@ -176,10 +150,10 @@ export default function FileManager(props: { onFileSelect?: (path: string) => vo
           contextMenu().file && (
             <>
               {contextMenu().file.isDirectory ? 'Folder' : 'File'}
-              {!contextMenu().file.isDirectory &&
-                ` (${(contextMenu().file.size / 1024).toFixed(2)} KB)`}
+              {!contextMenu().file.isDirectory && ` (${(contextMenu().file.size / 1024).toFixed(2)} KB)`}
               <br />
-              Created: {formatDate(contextMenu().file.createdAt)}<br />
+              Created: {formatDate(contextMenu().file.createdAt)}
+              <br />
               Updated: {formatDate(contextMenu().file.updatedAt)}
             </>
           )
@@ -220,4 +194,3 @@ export default function FileManager(props: { onFileSelect?: (path: string) => vo
     </div>
   );
 }
-

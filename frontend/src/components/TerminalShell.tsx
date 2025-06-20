@@ -60,26 +60,7 @@ export default function TerminalShell(props: TerminalShellProps) {
 
   return (
     <div class=" flex flex-col border-t transition-all duration-200">
-      <div class="terminal-wrapper flex items-center justify-between ">
-        {/**<div class="flex items-center justify-start gap-2">
-          <Button variant="secondary" icon="mdi:terminal" class="p-0 text-sky-600" onClick={closeTerminal} />
-          Terminal
-        </div>
-        <div class="flex items-center gap-0 text-xs">
-          <div class="flex items-center text-xs gap-2 hidden ">
-            <Button onClick={() => setHeight(100)} class="p-0 text-xs cursor-pointer">
-              S
-            </Button>
-            <Button onClick={() => setHeight(200)} class="p-0 text-xs cursor-pointer">
-              M
-            </Button>
-            <Button onClick={() => setHeight(300)} class="p-0 text-xs cursor-pointer">
-              L
-            </Button>
-          </div>
-          <Button variant="secondary" icon="mdi:close" class="p-0 text-red-600" onClick={closeTerminal} />
-        </div>**/}
-      </div>
+      <div class="terminal-wrapper flex items-center justify-between "></div>
       <div class="h-1 cursor-ns-resize bg-gray-700 hover:bg-sky-500" onMouseDown={startResizing} />
       <div
         ref={(el) => (terminalRef = el)}

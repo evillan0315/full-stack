@@ -123,16 +123,7 @@
     background-color: var(--color-hover);
   }
 
-  .markdown-wrapper pre {
-    background-color: var(--color-pre-bg);
-    border-color: var(--color-border);
-    @apply border;
-  }
-
-  .markdown-wrapper hr {
-    border-color: var(--color-border);
-    @apply mt-6 border;
-  }
+ 
 
   .terminal.xterm {
     @apply p-3;
@@ -212,7 +203,72 @@
   }
 
 }
+@layer components {
+  .markdown-wrapper {
+    @apply leading-relaxed tracking-normal;
+  }
 
+  .markdown-wrapper h1 {
+    @apply text-3xl font-bold mt-8 mb-4 border-b border-gray-300 dark:border-gray-700 pb-2;
+  }
+
+  .markdown-wrapper h2 {
+    @apply text-2xl font-semibold mt-6 mb-3 border-b border-gray-200 dark:border-gray-600 pb-1;
+  }
+
+  .markdown-wrapper h3 {
+    @apply text-xl font-medium mt-4 mb-2;
+  }
+
+  .markdown-wrapper p {
+    @apply mb-4;
+  }
+
+  .markdown-wrapper ul,
+  .markdown-wrapper ol {
+    @apply pl-6 mb-4 list-disc;
+  }
+
+  .markdown-wrapper ol {
+    @apply list-decimal;
+  }
+
+  .markdown-wrapper blockquote {
+    @apply border-l-4 pl-4 italic text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 py-2 rounded;
+  }
+
+  .markdown-wrapper a {
+    @apply text-sky-600 dark:text-sky-400 underline hover:text-sky-800 dark:hover:text-sky-300;
+  }
+
+  .markdown-wrapper code {
+    @apply bg-gray-100 dark:bg-gray-800 text-sm px-1 py-0.5 rounded;
+  }
+
+  .markdown-wrapper pre {
+    @apply rounded-lg overflow-x-auto shadow-sm;
+  }
+
+  .markdown-wrapper table {
+    @apply w-full table-auto border-collapse text-sm my-4;
+  }
+
+  .markdown-wrapper th {
+    @apply border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 font-semibold px-2 py-1;
+  }
+
+  .markdown-wrapper td {
+    @apply border border-gray-300 dark:border-gray-700 px-2 py-1;
+  }
+
+  .markdown-wrapper hr {
+    @apply my-6 border-gray-300 dark:border-gray-700;
+  }
+
+  .markdown-wrapper img {
+    @apply max-w-full rounded shadow;
+  }
+}
 @layer utilities {
   @keyframes shadowPulse {
     0% {

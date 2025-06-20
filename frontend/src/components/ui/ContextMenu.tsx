@@ -32,10 +32,7 @@ export default function ContextMenu(props: ContextMenuProps) {
         <ul class="py-1">
           <For each={props.items}>
             {(item) => (
-              <li
-                class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-500/30"
-                onClick={item.action}
-              >
+              <li class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-500/30" onClick={item.action}>
                 <span class="inline-block">
                   <item.icon width="1.2em" height="1.2em" />
                 </span>
@@ -48,4 +45,3 @@ export default function ContextMenu(props: ContextMenuProps) {
     </Show>
   );
 }
-

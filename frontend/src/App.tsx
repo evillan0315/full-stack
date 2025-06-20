@@ -87,13 +87,6 @@ export default function App() {
           <Route path="/login" component={Login} />
 
           {/**
-           * Defines the route for the package tool page.
-           * @path "/tools/package"
-           * @component {Package}
-           */}
-          <Route path="/logger" component={Logger} />
-
-          {/**
            * Defines the route for the dashboard page, protected by authentication.
            * @path "/dashboard"
            * @component {Dashboard}
@@ -119,59 +112,6 @@ export default function App() {
             component={() => (
               <ProtectedRoute>
                 <Editor />
-              </ProtectedRoute>
-            )}
-          />
-          <Route
-            path="/builder"
-            component={() => (
-              <ProtectedRoute>
-                <Builder />
-              </ProtectedRoute>
-            )}
-          />
-
-          {/**
-           * Defines the route for the text-to-speech (TTS) form page, protected by authentication.
-           * @path "/tts"
-           * @component {TTSForm}
-           * @protected
-           */}
-          <Route
-            path="/tts"
-            component={() => (
-              <ProtectedRoute>
-                <TTSForm />
-              </ProtectedRoute>
-            )}
-          />
-
-          {/**
-           * Defines the route for the generate page, protected by authentication.
-           * @path "/generate"
-           * @component {GeneratePage}
-           * @protected
-           */}
-          <Route
-            path="/generate"
-            component={() => (
-              <ProtectedRoute>
-                <GeneratePage />
-              </ProtectedRoute>
-            )}
-          />
-
-          {/**
-           * Defines the route for the downloader page, protected by authentication.
-           * @path "/downloader"
-           * @component {Downloader}
-           * @protected
-           */}
-          <Route
-            path="/downloader"
-            component={() => (
-              <ProtectedRoute>
-                <Downloader />
               </ProtectedRoute>
             )}
           />

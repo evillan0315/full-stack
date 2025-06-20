@@ -1,55 +1,135 @@
-import AudioDownloader from '../components/AudioDownloader';
+import { createSignal, createEffect, onMount } from 'solid-js';
 import { Icon } from '@iconify-icon/solid';
+import api from '../services/api';
 
-import { PageHeader } from '../components/ui/PageHeader';
+const MiniAudioPlayer = () => {
+  const [songs, setSongs] = createSignal([]);
+  const [currentSong, setCurrentSong] = createSignal('');
+  const [currentSongIndex, setCurrentSongIndex] = createSignal('');
 
-export default function Downloader() {
+  const [isPlaying, setIsPlaying] = createSignal(false);
+  const [audio, setAudio] = createSignal(new Audio());
+  const [showPlaylist, setShowPlaylist] = createSignal(false);
+
+  const playSong = () => {
+    const u = `${import.meta.env.BASE_URL_API}/api/media/audio/${currentSong()}`;
+    console.log(u);
+    const currentAudio = new Audio();
+
+    currentAudio.src = u;
+    currentAudio.play();
+  };
+  const fetchSongs = async () => {
+    try {
+      const res = await api.get('/file/list?directory=./downloads/audio');
+      console.log(res.data);
+      setSongs(res.data);
+    } catch (error) {
+      console.error('Error fetching songs:', error);
+    }
+  };
+  onMount(() => {
+    fetchSongs();
+  });
+
+  createEffect(() => {
+    /*if (songs().length > 0) {
+      const currentSong = songs();
+      audio().src = currentSong.url;
+
+
+      audio().addEventListener('ended', handleNextSong);
+      return () => {
+        audio().removeEventListener('ended', handleNextSong);
+      };
+    }*/
+  });
+
+  const togglePlay = () => {
+    if (songs().length === 0) return;
+
+    if (isPlaying()) {
+      audio().pause();
+    } else {
+      audio().play();
+    }
+    setIsPlaying(!isPlaying());
+  };
+
+  createEffect(() => {
+    isPlaying() ? audio().play() : audio().pause();
+  });
+
+  const handleNextSong = () => {
+    if (songs().length === 0) return;
+
+    //setCurrentSongIndex((prevIndex) => (prevIndex + 1) % songs().length);
+    setIsPlaying(true);
+  };
+
+  const handlePrevSong = () => {
+    if (songs().length === 0) return;
+
+    //setCurrentSongIndex((prevIndex) => (prevIndex - 1 + songs().length) % songs().length);
+    setIsPlaying(true);
+  };
+
+  const togglePlaylist = () => {
+    setShowPlaylist(!showPlaylist());
+  };
+
   return (
-    <div class="flex flex-col max-w-7xl mx-auto">
-      <div class="flex-1 scroll-smooth px-4 py-4 space-y-4 mt-2">
-        <PageHeader icon="mdi:multimedia">
-          <h1 class="leading-0 uppercase tracking-widest text-2xl">
-            <b>Download & Extract</b> Audio or Video
-          </h1>
-        </PageHeader>
-        <p>
-          This downloader lets you extract audio or download full video content from platforms like{' '}
-          <strong>YouTube</strong>, <strong>Bilibili</strong>, <strong>Vimeo</strong>, and many others. Powered by{' '}
-          <code>yt-dlp</code>, it supports a wide range of media sources and formats.
-        </p>
-        {/* Main Content */}
-        <div class="flex flex-col md:flex-row gap-6">
-          <div class="space-y-4 md:w-3/4 rounded-lg border p-6 bg-gray-800/10 border-gray-500/30">
-            <AudioDownloader />
-          </div>
-
-          {/* Sidebar Info */}
-          <div class="w-full md:w-1/4 space-y-4 p-4 border rounded-lg bg-gray-800/10 border-gray-500/30">
-            <h3 class="text-xl font-semibold">🎧 About This Tool</h3>
-
-            <h4 class="font-medium text-gray-800 mt-4">✨ Key Features</h4>
-            <ul class="list-disc pl-5 text-gray-700 space-y-1">
-              <li>Extract high-quality audio or download full video content</li>
-              <li>Supports YouTube, Bilibili, Vimeo, and many more providers</li>
-              <li>Real-time progress updates via WebSockets</li>
-              <li>Output in MP3, MP4, or other supported formats</li>
-              <li>Cancelable download operations</li>
-              <li>One-click access to completed files</li>
-            </ul>
-
-            <h4 class="font-medium text-gray-800 mt-4">🔒 Privacy & Storage</h4>
-            <p class="text-gray-600">
-              All downloads are handled server-side and stored temporarily. No login or personal data is required.
-            </p>
-
-            <h4 class="font-medium text-gray-800 mt-4">🧰 Technology Stack</h4>
-            <p class="text-gray-600">
-              Built with <strong>SolidJS</strong> and <strong>NestJS</strong>, powered by <code>yt-dlp</code>, and
-              enhanced with <strong>WebSockets</strong> for instant feedback and interactivity.
-            </p>
-          </div>
+    <div class="w-[200px] h-[100px] bg-gray-800 text-white flex flex-col rounded-md shadow-md overflow-hidden">
+      <div class="flex items-center justify-between p-2">
+        <div class="text-sm font-semibold truncate w-24"></div>
+        <div class="flex items-center space-x-2">
+          <button
+            onClick={handlePrevSong}
+            class="text-gray-400 hover:text-white focus:outline-none disabled:opacity-50"
+          >
+            <Icon icon="mdi:skip-previous" width="20" height="20" />
+          </button>
+          <button
+            onClick={togglePlay}
+            disabled={songs().length === 0}
+            class="text-gray-400 hover:text-white focus:outline-none disabled:opacity-50"
+          >
+            <Icon icon={isPlaying() ? 'mdi:pause' : 'mdi:play'} width="24" height="24" />
+          </button>
+          <button
+            onClick={handleNextSong}
+            disabled={songs().length === 0}
+            class="text-gray-400 hover:text-white focus:outline-none disabled:opacity-50"
+          >
+            <Icon icon="mdi:skip-next" width="20" height="20" />
+          </button>
+          <button onClick={togglePlaylist} class="text-gray-400 hover:text-white focus:outline-none">
+            <Icon icon="mdi:playlist-music" width="20" height="20" />
+          </button>
         </div>
       </div>
+
+      {showPlaylist() && (
+        <div class="overflow-y-auto h-20 bg-gray-700">
+          <ul>
+            {songs().map((song, index) => (
+              <li
+                key={index}
+                class={`px-2 py-1 text-sm hover:bg-gray-600 cursor-pointer ${song.path === setCurrentSong() ? 'bg-gray-600' : ''}`}
+                onClick={() => {
+                  setCurrentSong(song.name);
+                  playSong();
+                  setIsPlaying(true);
+                }}
+              >
+                {song.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default MiniAudioPlayer;

@@ -3,7 +3,6 @@ import { useEditorFile } from '../hooks/useEditorFile';
 
 const { createFile } = useEditorFile();
 export async function generateGeminiText(prompt, systemInstruction, conversationId) {
-
   try {
     const payload = { prompt };
     if (systemInstruction !== undefined) {
@@ -55,10 +54,10 @@ export async function generateGeminiFile(prompt, fileData, systemInstruction, co
     if (!response.data) {
       throw new Error('Failed to Generate content');
     }
-    const createResponse = await createFile('./docs/gemini/', fileData.name, response.data);
-    
-    
-    return createResponse.data;
+    const stripCode = response.data;
+    const createResponse = await createFile('./docs/gemini/', fileData.name, stripCode.content);
+
+    return createResponse.filePath;
   } catch (error) {
     console.error('Error calling Gemini File API:', error);
     throw error;

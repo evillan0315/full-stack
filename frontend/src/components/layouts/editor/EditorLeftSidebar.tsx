@@ -2,7 +2,13 @@ import { createSignal, onMount, onCleanup } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useEditorFile } from '../../../hooks/useEditorFile';
-import { editorOriginalContent, editorFilePath, editorContent, editorUnsaved , editorCurrentDirectory} from '../../../stores/editorContent';
+import {
+  editorOriginalContent,
+  editorFilePath,
+  editorContent,
+  editorUnsaved,
+  editorCurrentDirectory,
+} from '../../../stores/editorContent';
 import FileManagerHeader from '../../../components/file/FileManagerHeader';
 import CollapsiblePanel from '../panels/CollapsiblePanel';
 import FileManager from '../../../components/file/FileManager';
@@ -15,7 +21,7 @@ export default function EditorLeftSidebar() {
   const [width, setWidth] = createSignal(defaultWidth);
   const [isResizing, setIsResizing] = createSignal(false);
   const [isCollapsed, setIsCollapsed] = createSignal(false);
-  
+
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const $editorCurrentDirectory = useStore(editorCurrentDirectory);
@@ -70,7 +76,7 @@ export default function EditorLeftSidebar() {
       <div class="h-full flex flex-col">
         <CollapsiblePanel
           header={
-<FileManagerHeader
+            <FileManagerHeader
               currentDirectory={$editorCurrentDirectory}
               // Removed navigateUp prop - it's handled internally by FileManagerHeader now
               fetchDirectory={editorFileHook.fetchDirectory}

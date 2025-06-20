@@ -76,7 +76,7 @@ export function createModalService() {
 
   const Modal = (): JSX.Element => (
     <Show when={isOpen()}>
-      <div class={`${type()}-dialog-modal dialog-modal fixed inset-0 flex items-center justify-center z-50`}>
+      <div class={`${type()}-dialog-modal dialog-modal fixed inset-0 flex items-center justify-center z-100`}>
         <div class={`${type()}-dialog-modal-body dialog-modal-body rounded-lg shadow-lg p-6 max-w-sm w-full space-y-4`}>
           <p class="text-sm">{message()}</p>
 

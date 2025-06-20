@@ -23,11 +23,8 @@ const BooleanField: Component<BooleanFieldProps> = (props) => (
         {props.property.title} {props.isRequired && <span class="text-red-500">*</span>}
       </span>
     </label>
-    {props.property.description && (
-      <p class="mt-1 text-sm text-gray-500">{props.property.description}</p>
-    )}
+    {props.property.description && <p class="mt-1 text-sm text-gray-500">{props.property.description}</p>}
   </div>
 );
 
 export default BooleanField;
-

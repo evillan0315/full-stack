@@ -1,123 +1,207 @@
-import { createSignal, createEffect, For, Show } from 'solid-js';
-import { io } from 'socket.io-client';
+import { createSignal, createEffect, onMount, onCleanup, For, Show } from 'solid-js';
+import { io, Socket } from 'socket.io-client';
+
+const NAMESPACES = ['/files', '/gemini', '/terminal', '/logs', '/download', '/upload', '/transcode'] as const;
+type Namespace = (typeof NAMESPACES)[number];
+
+interface LogEntry {
+  type: string;
+  level: string;
+  data: unknown;
+  tags?: string[];
+  createdAt: string;
+}
+
+interface GeminiEntry {
+  modelUsed?: string;
+  prompt: string;
+  responseText: string;
+  createdAt: string;
+}
 
 export default function LoggerPanel() {
-  const [logs, setLogs] = createSignal<any[]>([]);
-  const [geminiData, setGeminiData] = createSignal<any[]>([]);
+  let panelRef!: HTMLDivElement;
+  const [activeNamespace, setActiveNamespace] = createSignal<Namespace>('/logs');
+  const [logs, setLogs] = createSignal<LogEntry[]>([]);
+  const [geminiData, setGeminiData] = createSignal<GeminiEntry[]>([]);
   const [filter, setFilter] = createSignal<string>('');
+  const [height, setHeight] = createSignal(300);
+  const [isResizing, setIsResizing] = createSignal(false);
 
   createEffect(() => {
     const token = localStorage.getItem('token');
-    const socket = io(`${import.meta.env.BASE_URL_API}/logs`, {
+    if (!token) return;
+
+    const socket: Socket = io(`${import.meta.env.BASE_URL_API}${activeNamespace()}`, {
       auth: { token: `Bearer ${token}` },
     });
-    const geminiSocket = io(`${import.meta.env.BASE_URL_API}/gemini`, {
-      auth: { token: `Bearer ${token}` },
-    });
 
-    socket.on('recentLogs', (initialLogs) => {
-      setLogs(initialLogs.reverse());
-    });
+    switch (activeNamespace()) {
+      case '/logs':
+        socket.on('recentLogs', (initialLogs: LogEntry[]) => {
+          setLogs(initialLogs.reverse());
+        });
+        socket.on('log', (log: LogEntry) => {
+          setLogs((prev) => [log, ...prev].slice(0, 100));
+        });
+        break;
 
-    socket.on('log', (log) => {
-      setLogs(prev => [log, ...prev].slice(0, 100));
-    });
+      case '/gemini':
+        socket.on('gemini', (data: GeminiEntry) => {
+          setGeminiData((prev) => [data, ...prev].slice(0, 100));
+        });
+        break;
 
-    geminiSocket.on('gemini', (data) => {
-      setGeminiData(prev => [data, ...prev].slice(0, 100));
-    });
+      default:
+        console.warn(`No handler defined for namespace: ${activeNamespace()}`);
+        break;
+    }
 
     return () => {
       socket.disconnect();
-      geminiSocket.disconnect();
     };
   });
 
+  const startResizing = () => {
+    setIsResizing(true);
+    document.body.style.cursor = 'ns-resize';
+  };
+
+  const stopResizing = () => {
+    if (isResizing()) {
+      setIsResizing(false);
+      document.body.style.cursor = '';
+    }
+  };
+
+  const onMouseMove = (e: MouseEvent) => {
+    if (isResizing()) {
+      const rect = panelRef.getBoundingClientRect();
+      const newHeight = Math.max(100, rect.bottom - e.clientY);
+      setHeight(newHeight);
+    }
+  };
+
+  onMount(() => {
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', stopResizing);
+
+    onCleanup(() => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', stopResizing);
+    });
+  });
+
   const filteredLogs = () =>
-    logs().filter((log) =>
-      !filter() ||
-      log.type?.toLowerCase().includes(filter().toLowerCase()) ||
-      log.level?.toLowerCase().includes(filter().toLowerCase()) ||
-      (log.tags || []).some((tag: string) =>
-        tag.toLowerCase().includes(filter().toLowerCase())
-      )
+    logs().filter(
+      (log) =>
+        !filter() ||
+        log.type.toLowerCase().includes(filter().toLowerCase()) ||
+        log.level.toLowerCase().includes(filter().toLowerCase()) ||
+        (log.tags || []).some((tag) => tag.toLowerCase().includes(filter().toLowerCase())),
     );
 
   const filteredGemini = () =>
-    geminiData().filter((entry) =>
-      !filter() ||
-      entry.prompt?.toLowerCase().includes(filter().toLowerCase()) ||
-      entry.responseText?.toLowerCase().includes(filter().toLowerCase())
+    geminiData().filter(
+      (entry) =>
+        !filter() ||
+        entry.prompt.toLowerCase().includes(filter().toLowerCase()) ||
+        entry.responseText.toLowerCase().includes(filter().toLowerCase()),
     );
 
   return (
-    <div class="p-2 max-h-96 overflow-y-auto bg-black text-white font-mono text-xs">
-      <input
-        class="mb-2 w-full p-1 bg-gray-900 border border-gray-700 rounded focus:outline-none focus:ring focus:ring-sky-500"
-        placeholder="Filter logs or Gemini events..."
-        value={filter()}
-        onInput={(e) => setFilter(e.currentTarget.value)}
-      />
+    <div
+      ref={(el) => (panelRef = el)}
+      class="relative flex flex-col border-t transition-all duration-200 bg-gray-900"
+      style={{ height: `${height()}px` }}
+    >
+      {/* Resizer handle */}
+      <div class="resizer h-1 cursor-ns-resize bg-gray-700 hover:bg-sky-500" onMouseDown={startResizing} />
+      {/* Sticky Tabs + Filter */}
+      <div class="sticky top-0 z-10 bg-gray-900 border-b border-gray-700 p-2">
+        <div class="flex items-center">
+          <div class="flex flex-wrap space-x-1">
+            <For each={NAMESPACES}>
+              {(ns) => (
+                <button
+                  class={`px-2 py-1 rounded-t ${
+                    activeNamespace() === ns ? 'bg-gray-700 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  }`}
+                  onClick={() => {
+                    setLogs([]);
+                    setGeminiData([]);
+                    setActiveNamespace(ns);
+                  }}
+                >
+                  {ns.replace('/', '') || 'root'}
+                </button>
+              )}
+            </For>
+          </div>
+          <div class="ml-auto">
+            <input
+              class="w-[200px] p-1 border rounded focus:outline-none focus:ring focus:ring-sky-500"
+              placeholder="Filter..."
+              value={filter()}
+              onInput={(e) => setFilter(e.currentTarget.value)}
+            />
+          </div>
+        </div>
+      </div>
 
-      <Show when={filteredLogs().length > 0}>
-        <div class="mb-2 font-bold text-sky-400">Logs</div>
-        <For each={filteredLogs()}>
-          {(log) => (
-            <div class="border-b border-gray-700 py-1">
-              <div class="flex justify-between">
-                <span class="font-bold text-sky-400">{log.type}</span>
-                <span class="text-gray-500">
-                  {new Date(log.createdAt).toLocaleTimeString()}
-                </span>
-              </div>
-              <div class="text-gray-300">
-                {log.level} -{' '}
-                <pre class="whitespace-pre-wrap break-all">
-                  {JSON.stringify(log.data, null, 2)}
-                </pre>
-              </div>
-              <div class="text-gray-500 text-xs">
-                Tags: {log.tags?.join(', ') || 'none'}
-              </div>
-            </div>
-          )}
-        </For>
-      </Show>
-
-      <Show when={filteredGemini().length > 0}>
-        <div class="mt-4 mb-2 font-bold text-purple-400">Gemini Events</div>
-        <For each={filteredGemini()}>
-          {(entry) => (
-            <div class="border-b border-gray-700 py-1">
-              <div class="flex justify-between">
-                <span class="text-purple-400">{entry.modelUsed || 'Gemini'}</span>
-                <span class="text-gray-500">
-                  {new Date(entry.createdAt).toLocaleTimeString()}
-                </span>
-              </div>
-              <div class="text-gray-300">
-                <div class="mb-1">
-                  <span class="text-gray-500">Prompt:</span>{' '}
-                  <pre class="whitespace-pre-wrap break-all">
-                    {entry.prompt}
-                  </pre>
+      {/* Content */}
+      <div class="overflow-y-auto p-2 flex-1">
+        <Show when={activeNamespace() === '/logs' && filteredLogs().length > 0}>
+          <div class="mb-2 font-bold text-sky-400">Logs</div>
+          <For each={filteredLogs()}>
+            {(log) => (
+              <div class="py-1">
+                <div class="flex justify-between">
+                  <span class="font-bold text-sky-400">{log.type}</span>
+                  <span class="text-gray-500">{new Date(log.createdAt).toLocaleTimeString()}</span>
                 </div>
-                <div>
-                  <span class="text-gray-500">Response:</span>{' '}
-                  <pre class="whitespace-pre-wrap break-all">
-                    {entry.responseText}
-                  </pre>
+                <div class="text-gray-300">
+                  {log.level} - <pre class="whitespace-pre-wrap break-all">{JSON.stringify(log.data, null, 2)}</pre>
+                </div>
+                <div class="text-gray-500 text-xs">Tags: {log.tags?.join(', ') || 'none'}</div>
+              </div>
+            )}
+          </For>
+        </Show>
+
+        <Show when={activeNamespace() === '/gemini' && filteredGemini().length > 0}>
+          <div class="mb-2 font-bold text-purple-400">Gemini Events</div>
+          <For each={filteredGemini()}>
+            {(entry) => (
+              <div class="border-b border-gray-700 py-1">
+                <div class="flex justify-between">
+                  <span class="text-purple-400">{entry.modelUsed || 'Gemini'}</span>
+                  <span class="text-gray-500">{new Date(entry.createdAt).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-gray-300">
+                  <div class="mb-1">
+                    <span class="text-gray-500">Prompt:</span>{' '}
+                    <pre class="whitespace-pre-wrap break-all">{entry.prompt}</pre>
+                  </div>
+                  <div>
+                    <span class="text-gray-500">Response:</span>{' '}
+                    <pre class="whitespace-pre-wrap break-all">{entry.responseText}</pre>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </For>
-      </Show>
+            )}
+          </For>
+        </Show>
 
-      <Show when={filteredLogs().length === 0 && filteredGemini().length === 0}>
-        <div class="text-center text-gray-600 mt-4">No logs or Gemini events to display</div>
-      </Show>
+        <Show
+          when={
+            (activeNamespace() === '/logs' && filteredLogs().length === 0) ||
+            (activeNamespace() === '/gemini' && filteredGemini().length === 0)
+          }
+        >
+          <div class="text-center mt-4">No data to display</div>
+        </Show>
+      </div>
     </div>
   );
 }
-

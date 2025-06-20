@@ -3,7 +3,7 @@ import { useNavigate } from '@solidjs/router';
 import { Icon } from '@iconify-icon/solid';
 import { useStore } from '@nanostores/solid';
 import { useAuth } from '../contexts/AuthContext';
-
+import AudioPlayerToggle from '../components/media/AudioPlayerToggle';
 import EditorLayout from '../components/layouts/editor/EditorLayout';
 import {
   editorOriginalContent,
@@ -13,7 +13,6 @@ import {
   editorUnsaved,
 } from '../stores/editorContent';
 import { showToast } from '../stores/toast';
-
 
 import { useEditorFile } from '../hooks/useEditorFile';
 import EditorContainer from '../components/editor/EditorContainer';
@@ -25,6 +24,8 @@ export default function Editor() {
   return (
     <>
       <EditorLayout leftSidebar={true} rightSidebar={false} content={<EditorContainer />} />
+
+      <AudioPlayerToggle />
     </>
   );
 }

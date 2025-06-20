@@ -8,7 +8,6 @@ import { useStore } from '@nanostores/solid'; // You'll need this import if this
  * @returns Promise that resolves to true if it's okay to proceed (discard changes), false otherwise.
  */
 export async function confirmDiscardIfUnsaved(path: string): Promise<boolean> {
-  
   if (!path) return true;
 
   const unsavedMap = editorUnsaved.get();
@@ -31,13 +30,13 @@ export async function closeAllTabsWithConfirmation(): Promise<boolean> {
   const openTabs = editorOpenTabs.get();
   const unsavedMap = editorUnsaved.get();
 
-  const unsavedPaths = openTabs.filter(tabPath => unsavedMap[tabPath]);
+  const unsavedPaths = openTabs.filter((tabPath) => unsavedMap[tabPath]);
 
   if (unsavedPaths.length > 0) {
     const plural = unsavedPaths.length > 1 ? 'tabs' : 'tab';
     const confirmed = await confirm(
       'Discard All Changes?',
-      `You have unsaved changes in ${unsavedPaths.length} ${plural}. Are you sure you want to close all tabs and discard them?`
+      `You have unsaved changes in ${unsavedPaths.length} ${plural}. Are you sure you want to close all tabs and discard them?`,
     );
 
     if (!confirmed) {

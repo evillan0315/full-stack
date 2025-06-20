@@ -55,9 +55,7 @@ const FileNode = (props: FileNodeProps) => {
     children: props.file.children || ([] as FileItem[]),
   });
 
-  const currentIcon = createMemo(() =>
-    getFileIcon(props.file.name, props.file.isDirectory, state.open),
-  );
+  const currentIcon = createMemo(() => getFileIcon(props.file.name, props.file.isDirectory, state.open));
 
   const toggle = async () => {
     if (!props.file.isDirectory) return;
@@ -139,28 +137,27 @@ const FileNode = (props: FileNodeProps) => {
         }}
         onClick={handleFileClick}
       >
-        
-       <div class="flex items-center justify-start gap-3">
-        <Icon width="1.2em" height="1.2em" icon={currentIcon()} />
+        <div class="flex items-center justify-start gap-3">
+          <Icon width="1.2em" height="1.2em" icon={currentIcon()} />
 
-        <Show
-          when={state.editing}
-          fallback={
-            <div title={props.file.path} class="truncate max-w-[150px] block">
-              {props.file.name}
-            </div>
-          }
-        >
-          <input
-            class="rounded px-1 text-sm flex-1"
-            value={state.newName}
-            autofocus
-            onInput={(e) => setState('newName', e.currentTarget.value)}
-            onBlur={handleRename}
-            onKeyDown={handleInputKeyDown}
-            onClick={(e) => e.stopPropagation()}
-          />
-        </Show>
+          <Show
+            when={state.editing}
+            fallback={
+              <div title={props.file.path} class="truncate max-w-[150px] block">
+                {props.file.name}
+              </div>
+            }
+          >
+            <input
+              class="rounded px-1 text-sm flex-1"
+              value={state.newName}
+              autofocus
+              onInput={(e) => setState('newName', e.currentTarget.value)}
+              onBlur={handleRename}
+              onKeyDown={handleInputKeyDown}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </Show>
         </div>
         {props.file.isDirectory && (
           <Icon
@@ -196,4 +193,3 @@ const FileNode = (props: FileNodeProps) => {
 };
 
 export default FileNode;
-

@@ -32,7 +32,6 @@ export default function EditorActionButtons(props: Props) {
     <div class="flex items-center justify-center gap-2">
       <Show when={$unsaved()[$filePath()]}>
         <Button icon="icon-park-outline:save-one" title="Save File" variant="secondary" onClick={saveFile} />
-        
       </Show>
       <Button icon="mdi:console" title="Terminal" variant="secondary" onClick={() => props.toggleTerminal('local')} />
       {/*editorLanguage.get() === 'markdown' && (

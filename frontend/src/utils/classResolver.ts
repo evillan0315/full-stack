@@ -63,4 +63,3 @@ export function resolveStateClasses(options: {
 
   return classes.join(' ');
 }
-

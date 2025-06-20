@@ -1,12 +1,25 @@
-import { type Component, createSignal, onMount, onCleanup, Show } from 'solid-js';
+import { type Component, Show } from 'solid-js';
 import Header from './Header';
 import { Footer } from './Footer';
 import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
 import CommandPalette from './CommandPalette';
-import { createConfirmModal } from '../ui/ConfirmModal';
-import ModalSettings from './modal//ModalSettings';
-import type { MenuItem } from './types';
+import ModalSettings from './ModalSettings';
+
+import { useStore } from '@nanostores/solid';
+import MiniAudioPlayer from '../media/MiniAudioPlayer';
+import MiniVideoPlayer from '../media/MiniVideoPlayer';
+
+import {
+  showSettingsStore,
+  settingsStore,
+  settingsTabStore,
+  closeSettings,
+  updateSetting,
+  saveSettingsToStorage,
+} from '../../stores/settings';
+
+import type { MenuItem } from './../types';
 
 interface LayoutProps {
   title: string;
@@ -33,13 +46,41 @@ export default function Layout({
   middleFooter = false,
   rightFooter = false,
 }: LayoutProps) {
+  // Subscribe to stores
+  const $showSettings = useStore(showSettingsStore);
+  const $settings = useStore(settingsStore);
+  const $settingsTab = useStore(settingsTabStore);
+
   return (
-    <div class="flex flex-col h-full w-full">
+    <div class="flex flex-col h-full w-full relative">
       <Show when={header}>{header}</Show>
+
       {content}
+
       <Footer left={leftFooter} middle={middleFooter} right={rightFooter} />
+
       <CommandPalette />
-      <ModalSettings />
+
+      <Show when={$settings().showMiniAudioPlayer}>
+        <MiniAudioPlayer />
+      </Show>
+
+      <Show when={$settings().showMiniVideoPlayer}>
+        <MiniVideoPlayer />
+      </Show>
+
+      <Show when={$showSettings()}>
+        <ModalSettings
+          settings={$settings()}
+          onChange={updateSetting}
+          onSave={() => {
+            saveSettingsToStorage();
+            closeSettings();
+          }}
+          onClose={closeSettings}
+          activeTab={$settingsTab()}
+        />
+      </Show>
     </div>
   );
 }

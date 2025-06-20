@@ -174,13 +174,12 @@ export function useEditorFile(onLoadContent?: (content: string) => void, onSave?
     const filePath = `${directory}/${fileName}`;
     setLoading(true);
     setLoadingMessage(`Creating file ${fileName}...`);
-    
+
     try {
       await api.post('/file/create', { filePath, isDirectory: false, content: content || '' });
       showToast(`File '${fileName}' created.`, 'success');
-    await fetchDirectory(directory);
-    await fetchFile(filePath);
-      
+      await fetchDirectory(directory);
+      await fetchFile(filePath);
     } catch (error) {
       const msg = (error as any).response?.data?.message || (error as Error).message;
       showToast(`Error creating file: ${msg}`, 'error');

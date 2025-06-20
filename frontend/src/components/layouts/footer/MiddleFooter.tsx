@@ -3,6 +3,7 @@ import { Icon } from '@iconify-icon/solid';
 
 import { Button } from '../../../components/ui/Button';
 import { showToast } from '../../../stores/toast';
+import { company } from '../../../data/app';
 import api from '../../../services/api';
 
 interface MiddleFooterProps {
@@ -16,14 +17,16 @@ export const MiddleFooter = (props: MiddleFooterProps): JSX.Element => {
   const handleScreenRecordToggle = async () => {
     try {
       if (!isRecording()) {
-        const response = await api.get(`/screen/record-start?filename=./downloads/recorded-screen-${Date.now()}.mp4`);
+        const response = await api.get(
+          `/api/screen/record-start?filename=./downloads/recorded-screen-${Date.now()}.mp4`,
+        );
         const path = response.data?.path;
         if (!path) throw new Error('Invalid start response');
         setRecordingPath(path);
         setIsRecording(true);
         showToast(`🟢 Recording started`, 'info');
       } else {
-        await api.get('/screen/record-stop');
+        await api.get('/api/screen/record-stop');
         setIsRecording(false);
         const file = recordingPath().split('/').pop() || '';
         const url = `${import.meta.env.BASE_URL_API}/api/media/${encodeURIComponent(file)}`;
@@ -41,7 +44,7 @@ export const MiddleFooter = (props: MiddleFooterProps): JSX.Element => {
 
   const handleScreenShot = async () => {
     try {
-      const response = await api.get('/screen/capture');
+      const response = await api.get('/api/screen/capture');
       const path = response.data?.path;
       if (!path) throw new Error('Invalid screenshot response');
       const url = `${import.meta.env.BASE_URL_API}/api/media/${encodeURIComponent(path.split('/').pop())}`;
@@ -60,16 +63,18 @@ export const MiddleFooter = (props: MiddleFooterProps): JSX.Element => {
   return (
     <Show when={props.show}>
       <div class="flex items-center justify-start gap-2">
-        <Button onClick={handleScreenShot} title="Take a screenshot of the current screen">
-          <Icon icon="mdi:monitor-screenshot" width="20" height="20" />
-        </Button>
-        <Button onClick={handleScreenRecordToggle} title="Record your screen in real time.">
-          <Icon
-            icon={isRecording() ? 'mdi:stop-circle' : 'mdi:record-rec'}
-            width="20"
-            height="20"
-            class={isRecording() ? 'text-red-500' : ''}
-          />{' '}
+        <Button
+          icon="mdi:monitor-screenshot"
+          class="btn-icon"
+          onClick={handleScreenShot}
+          title="Take a screenshot of the current screen"
+        />
+
+        <Button
+          icon={isRecording() ? 'mdi:stop-circle' : 'mdi:record-rec'}
+          onClick={handleScreenRecordToggle}
+          title="Record your screen in real time."
+        >
           {isRecording() ? 'Recording...' : 'Record Screen'}
         </Button>
       </div>

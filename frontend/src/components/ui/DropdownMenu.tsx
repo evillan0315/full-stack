@@ -2,11 +2,7 @@ import { type Component, type JSX, For, createSignal, Show, onCleanup, onMount }
 import { Icon } from '@iconify-icon/solid';
 import { Button } from './Button';
 import type { DropdownItem, DropdownHeader, DropdownDivider } from '../../types/dropdown';
-import {
-  resolveVariantClasses,
-  resolveSizeClasses,
-  resolveStateClasses
-} from '../../utils/classResolver';
+import { resolveVariantClasses, resolveSizeClasses, resolveStateClasses } from '../../utils/classResolver';
 
 type DropdownMenuItem = DropdownItem | DropdownHeader | DropdownDivider;
 
@@ -30,7 +26,7 @@ const DropdownMenu: Component<DropdownMenuProps> = (props) => {
   const [isOpen, setIsOpen] = createSignal(false);
   let containerRef: HTMLDivElement | undefined;
 
-  const toggleDropdown = () => setIsOpen(prev => !prev);
+  const toggleDropdown = () => setIsOpen((prev) => !prev);
 
   const handleClickOutside = (event: MouseEvent) => {
     if (containerRef && !containerRef.contains(event.target as Node)) {
@@ -48,11 +44,16 @@ const DropdownMenu: Component<DropdownMenuProps> = (props) => {
 
   const resolveTextSizeClass = (size?: string): string => {
     switch (size) {
-      case 'sm': return 'text-sm';
-      case 'md': return 'text-base';
-      case 'lg': return 'text-lg';
-      case 'xl': return 'text-xl';
-      default: return 'text-sm';
+      case 'sm':
+        return 'text-sm';
+      case 'md':
+        return 'text-base';
+      case 'lg':
+        return 'text-lg';
+      case 'xl':
+        return 'text-xl';
+      default:
+        return 'text-sm';
     }
   };
 
@@ -79,7 +80,7 @@ const DropdownMenu: Component<DropdownMenuProps> = (props) => {
         <div
           class={`dropdown-menu absolute z-150 border shadow-${props.size ? props.size : 'sm'} 
             ${props.rounded ? 'rounded' : ''}
-            ${props.size ? (`rounded-${props.size}`) : ''}
+            ${props.size ? `rounded-${props.size}` : ''}
             ${props.xPosition === 'left' ? 'left-0' : 'right-0'}
             ${props.yPosition === 'bottom' ? 'bottom-0' : 'top-full'}
             
@@ -103,7 +104,6 @@ const DropdownMenu: Component<DropdownMenuProps> = (props) => {
                         setIsOpen(false);
                       }}
                     >
-                    
                       <Icon icon={dropdownItem.icon} />
                       {dropdownItem.label}
                     </li>
@@ -132,4 +132,3 @@ const DropdownMenu: Component<DropdownMenuProps> = (props) => {
 };
 
 export default DropdownMenu;
-

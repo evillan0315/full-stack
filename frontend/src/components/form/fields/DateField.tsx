@@ -21,11 +21,8 @@ const DateField: Component<DateFieldProps> = (props) => (
       class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm sm:text-sm"
       required={props.isRequired}
     />
-    {props.property.description && (
-      <p class="mt-1 text-sm text-gray-500">{props.property.description}</p>
-    )}
+    {props.property.description && <p class="mt-1 text-sm text-gray-500">{props.property.description}</p>}
   </div>
 );
 
 export default DateField;
-

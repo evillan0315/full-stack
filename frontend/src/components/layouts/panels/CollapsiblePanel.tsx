@@ -13,7 +13,7 @@ export default function CollapsiblePanel(props: CollapsiblePanelProps) {
     <div class="collapsible-panel flex flex-col h-full">
       <div class="collapsible-panel-header flex items-center justify-between px-2 py-2 border-b cursor-pointer elect-none">
         <div class="font-semibold text-sm">{props.header}</div>
-        
+
         <span onClick={() => setIsOpen(!isOpen())}>
           <svg
             class={`mr-1 w-4 h-4 transform transition-transform ${isOpen() ? 'rotate-90' : ''}`}

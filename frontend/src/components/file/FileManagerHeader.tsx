@@ -1,13 +1,4 @@
-
-import {
-  type Component,
-  createSignal,
-  Show,
-  For,
-  onMount,
-  onCleanup,
-  createEffect,
-} from 'solid-js';
+import { type Component, createSignal, Show, For, onMount, onCleanup, createEffect } from 'solid-js';
 import { Button } from '../ui/Button';
 import { Icon } from '@iconify-icon/solid';
 import * as path from 'path-browserify';
@@ -39,7 +30,6 @@ const FileManagerHeader: Component<FileManagerHeaderProps> = (props) => {
         return updated.slice(0, 5);
       });
     }
-
 
     localStorage.setItem('recentDirectories', JSON.stringify(recentDirectories()));
   });
@@ -84,7 +74,6 @@ const FileManagerHeader: Component<FileManagerHeaderProps> = (props) => {
   };
 
   onMount(() => {
-
     const savedRecents = localStorage.getItem('recentDirectories');
     if (savedRecents) {
       setRecentDirectories(JSON.parse(savedRecents));
@@ -93,8 +82,6 @@ const FileManagerHeader: Component<FileManagerHeaderProps> = (props) => {
   });
 
   onCleanup(() => {
-
-
     document.removeEventListener('click', handleClickOutside);
   });
 
@@ -106,12 +93,12 @@ const FileManagerHeader: Component<FileManagerHeaderProps> = (props) => {
             icon="mdi:arrow-left"
             variant="secondary"
             onClick={() => {
-                  const parent = path.dirname(props.currentDirectory() || '/');
-                  if (parent !== props.currentDirectory()) {
-                    props.fetchDirectory(parent);
-                    setShowDropdown(false);
-                  }
-                }}
+              const parent = path.dirname(props.currentDirectory() || '/');
+              if (parent !== props.currentDirectory()) {
+                props.fetchDirectory(parent);
+                setShowDropdown(false);
+              }
+            }}
             title="Go up directory"
           />
           <Button
@@ -131,9 +118,7 @@ const FileManagerHeader: Component<FileManagerHeaderProps> = (props) => {
                 onClick={() => handleDirectorySelect(props.currentDirectory())}
               >
                 Current:{' '}
-                <span class="font-semibold truncate max-w-[150px] inline-block">
-                  {props.currentDirectory()}
-                </span>
+                <span class="font-semibold truncate max-w-[150px] inline-block">{props.currentDirectory()}</span>
               </div>
               <div class="border-t border-gray-800 my-1"></div>
 
@@ -169,11 +154,9 @@ const FileManagerHeader: Component<FileManagerHeaderProps> = (props) => {
               </div>
             </div>
           </Show>
-
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
           {' '}
-
           <Button
             icon="mdi:refresh"
             variant="secondary"
@@ -181,20 +164,8 @@ const FileManagerHeader: Component<FileManagerHeaderProps> = (props) => {
             onClick={() => props.fetchDirectory(props.currentDirectory() || '/')}
             title="Refresh Current Directory"
           />
-          <Button
-            icon="mdi:file-plus"
-            variant="secondary"
-            size="sm"
-            onClick={handleNewFile}
-            title="New File"
-          />
-          <Button
-            icon="mdi:folder-plus"
-            variant="secondary"
-            size="sm"
-            onClick={handleNewFolder}
-            title="New Folder"
-          />
+          <Button icon="mdi:file-plus" variant="secondary" size="sm" onClick={handleNewFile} title="New File" />
+          <Button icon="mdi:folder-plus" variant="secondary" size="sm" onClick={handleNewFolder} title="New Folder" />
         </div>
       </div>
     </>

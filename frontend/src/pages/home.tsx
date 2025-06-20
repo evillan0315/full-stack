@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import FeatureCard from '../components/FeatureCard';
 import Hero from '../components/Hero';
 import { theme } from '../stores/theme';
-import TypewriterCodeWrapper from '../components/CodeWriter';
+import Typewriter from '../components/Typewriter';
 import { getThemeExtension } from '../utils/editorTheme';
 const ttsFeatures = [
   {
@@ -372,8 +372,15 @@ export default function Home() {
             },
           ]}
         />
-
-        <TypewriterCodeWrapper codeWriter={codeWriter} />
+        <Typewriter
+          text={codeWriter}
+          typingSpeed={1}
+          deleteSpeed={0}
+          loop={true}
+          delayBeforeTyping={1000}
+          delayBeforeDeleting={500}
+          themeExtension={getThemeExtension(theme.get())}
+        />
 
         <section class="mt-16 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
           <For each={benefits}>

@@ -56,27 +56,35 @@ export default function EditorLayout({ content }: EditorLayoutProps) {
     <div class="flex flex-1 h-full overflow-hidden">
       {/* Left Sidebar */}
       <Show when={$showLeftSidebar()}>
-        <div style={{ width: `${leftWidth()}px` }} class="h-full overflow-auto flex-shrink-0"> {/* Added flex-shrink-0 */}
+        <div style={{ width: `${leftWidth()}px` }} class="h-full overflow-auto flex-shrink-0">
+          {' '}
+          {/* Added flex-shrink-0 */}
           <EditorLeftSidebar />
         </div>
       </Show>
       {/* Left Resizer */}
       <Show when={$showLeftSidebar()}>
-        <div class="w-1 cursor-col-resize resizer flex-shrink-0" onMouseDown={startResize('left')}></div> {/* Added flex-shrink-0 */}
+        <div class="w-1 cursor-col-resize resizer flex-shrink-0" onMouseDown={startResize('left')}></div>{' '}
+        {/* Added flex-shrink-0 */}
       </Show>
 
       {/* Main Content Area - This is the crucial change */}
-      <div class="flex flex-col flex-grow min-w-0"> {/* Added flex-grow and min-w-0 */}
+      <div class="flex flex-col flex-grow min-w-0">
+        {' '}
+        {/* Added flex-grow and min-w-0 */}
         {content}
       </div>
 
       {/* Right Resizer */}
       <Show when={$showRightSidebar()}>
-        <div class="w-1 cursor-col-resize resizer flex-shrink-0" onMouseDown={startResize('right')}></div> {/* Added flex-shrink-0 */}
+        <div class="w-1 cursor-col-resize resizer flex-shrink-0" onMouseDown={startResize('right')}></div>{' '}
+        {/* Added flex-shrink-0 */}
       </Show>
       {/* Right Sidebar */}
       <Show when={$showRightSidebar()}>
-        <div style={{ width: `${rightWidth()}px` }} class="h-full overflow-auto flex-shrink-0"> {/* Added flex-shrink-0 */}
+        <div style={{ width: `${rightWidth()}px` }} class="h-full overflow-auto flex-shrink-0">
+          {' '}
+          {/* Added flex-shrink-0 */}
           <EditorRightSidebar />
         </div>
       </Show>

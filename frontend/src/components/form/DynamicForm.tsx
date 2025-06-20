@@ -80,7 +80,7 @@ const DynamicForm: Component<DynamicFormProps> = (props) => {
     setFormData(
       produce((state) => {
         state[key] = value;
-      })
+      }),
     );
   };
 
@@ -168,15 +168,8 @@ const DynamicForm: Component<DynamicFormProps> = (props) => {
       {loading() && <div class="text-center">Loading...</div>}
       {error() && <div class="text-red-500">Error: {error()}</div>}
       {schema() && (
-        <form
-          onSubmit={handleSubmit}
-          class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-          <For
-            each={Object.entries(schema()!.properties).sort(
-              ([, a], [, b]) => (a.order ?? 0) - (b.order ?? 0)
-            )}
-          >
+        <form onSubmit={handleSubmit} class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+          <For each={Object.entries(schema()!.properties).sort(([, a], [, b]) => (a.order ?? 0) - (b.order ?? 0))}>
             {([key, property]) => {
               const colSpan = property.colSpan ?? 1;
               const colSpanClass = colSpan === 2 ? 'md:col-span-2' : 'md:col-span-1';
@@ -198,4 +191,3 @@ const DynamicForm: Component<DynamicFormProps> = (props) => {
 };
 
 export default DynamicForm;
-

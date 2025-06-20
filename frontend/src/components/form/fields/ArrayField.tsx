@@ -56,19 +56,12 @@ const ArrayField: Component<ArrayFieldProps> = (props) => {
           </div>
         )}
       </For>
-      <button
-        type="button"
-        class="mt-2 text-sm text-sky-600 hover:underline"
-        onClick={addItem}
-      >
+      <button type="button" class="mt-2 text-sm text-sky-600 hover:underline" onClick={addItem}>
         + Add Item
       </button>
-      {props.property.description && (
-        <p class="mt-1 text-sm text-gray-500">{props.property.description}</p>
-      )}
+      {props.property.description && <p class="mt-1 text-sm text-gray-500">{props.property.description}</p>}
     </div>
   );
 };
 
 export default ArrayField;
-
